@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\Item;
 use App\Models\Inventory;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -118,24 +119,15 @@ class InventoryController extends Controller
     public function storeSubcategory(Request $request, $categoryId)
     {
         $request->validate([
-            'name'        => 'required|string|max:100',
-            'description' => 'nullable|string',
-            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'name' => 'required|string|max:100',
         ]);
-
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('subcategories', 'public');
-        }
 
         Subcategory::create([
             'category_id' => $categoryId,
             'name'        => $request->name,
-            'description' => $request->description,
-            'image'       => $imagePath,
         ]);
 
-        return redirect()->route('admin.inventory.category', $categoryId)
+        return redirect()->route('admin.inventory.category.show', $categoryId)
             ->with('success', 'Subcategory created.');
     }
 
@@ -150,35 +142,24 @@ class InventoryController extends Controller
         $subcategory = Subcategory::findOrFail($id);
 
         $request->validate([
-            'name'        => 'required|string|max:100',
-            'description' => 'nullable|string',
-            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'name' => 'required|string|max:100',
         ]);
-
-        $imagePath = $subcategory->image;
-        if ($request->hasFile('image')) {
-            if ($imagePath) Storage::disk('public')->delete($imagePath);
-            $imagePath = $request->file('image')->store('subcategories', 'public');
-        }
 
         $subcategory->update([
-            'name'        => $request->name,
-            'description' => $request->description,
-            'image'       => $imagePath,
+            'name' => $request->name,
         ]);
 
-        return redirect()->route('admin.inventory.category', $subcategory->category_id)
+        return redirect()->route('admin.inventory.category.show', $subcategory->category_id)
             ->with('success', 'Subcategory updated.');
     }
 
     public function destroySubcategory($id)
     {
         $subcategory = Subcategory::findOrFail($id);
-        if ($subcategory->image) Storage::disk('public')->delete($subcategory->image);
-        $categoryId = $subcategory->category_id;
+                $categoryId = $subcategory->category_id;
         $subcategory->delete();
 
-        return redirect()->route('admin.inventory.category', $categoryId)
+        return redirect()->route('admin.inventory.category.show', $categoryId)
             ->with('success', 'Subcategory deleted.');
     }
 
@@ -221,6 +202,9 @@ class InventoryController extends Controller
             'quantity'        => $request->quantity,
             'expiration_date' => $request->expiration_date,
         ]);
+
+        // Trigger notification for inventory addition
+        NotificationService::inventoryAdded($item->id, auth()->id());
 
         return redirect()->route('admin.inventory.subcategory', $subcategoryId)
             ->with('success', 'Item added successfully.');

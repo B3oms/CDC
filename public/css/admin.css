@@ -74,8 +74,8 @@ nav a:hover {
 }
 
 nav a.active {
-    background: #f5c300;
-    color: #1a3d1f;
+    background: #fbbf24;
+    color: #065f46;
     font-weight: 700;
 }
 
@@ -476,8 +476,8 @@ nav a:hover {
 }
 
 nav a.active {
-    background: #f5c300;
-    color: #1a3d1f;
+    background: #fbbf24;
+    color: #065f46;
     font-weight: 700;
 }
 
@@ -586,8 +586,15 @@ nav a.active {
 /* Dashboard grid */
 .dash-grid {
     display: grid;
-    grid-template-columns: 220px 1fr;
-    gap: 1rem;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+    .dash-grid {
+        grid-template-columns: 350px 1fr;
+        gap: 2rem;
+    }
 }
 
 /* Chart cards */
@@ -1898,7 +1905,7 @@ margin-bottom: 1rem;
     
     .dash-grid {
         grid-template-columns: 1fr;
-        gap: 1rem;
+        gap: 1.5rem;
     }
     
     .notification-dropdown {

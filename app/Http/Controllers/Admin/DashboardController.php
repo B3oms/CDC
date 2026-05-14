@@ -11,6 +11,10 @@ use App\Models\Barangay;
 use App\Models\Municipality;
 use App\Models\Item;
 use App\Models\Inventory;
+use App\Models\Notification;
+use App\Services\NotificationService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -81,46 +85,39 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Yearly Distribution Reports
+        | Yearly Distribution Reports (Staff Structure)
         |--------------------------------------------------------------------------
         */
-        $yearlyData = ReliefEvent::selectRaw('
-                YEAR(date) as year,
-                COUNT(*) as total_distributions,
-                SUM(
-                    CASE
-                        WHEN status = "Done"
-                        THEN 1
-                        ELSE 0
-                    END
-                ) as completed_distributions
-            ')
-            ->whereYear('date', '>=', now()->year - 5)
-            ->groupByRaw('YEAR(date)')
-            ->orderBy('year', 'asc')
-            ->get();
+        $yearlyData = ReliefEvent::select(
+                DB::raw('YEAR(date) as year'),
+                DB::raw('MONTH(date) as month'),
+                DB::raw('COUNT(*) as total')
+            )
+            ->whereYear('date', '>=', now()->year - 2)
+            ->groupBy('year', 'month')
+            ->orderBy('year')->orderBy('month')
+            ->get()
+            ->groupBy('year');
 
         /*
         |--------------------------------------------------------------------------
-        | Monthly Distribution Statistics
+        | Monthly Distribution Statistics (Staff Structure)
         |--------------------------------------------------------------------------
         */
-        $monthlyData = ReliefEvent::selectRaw('
-                MONTHNAME(date) as month_name,
-                MONTH(date) as month,
-                COUNT(*) as total,
-                SUM(
-                    CASE
-                        WHEN status = "Done"
-                        THEN 1
-                        ELSE 0
-                    END
-                ) as completed
-            ')
+        $monthlyData = ReliefEvent::select(
+                DB::raw('MONTH(date) as month'),
+                DB::raw('COUNT(*) as total')
+            )
             ->whereYear('date', now()->year)
-            ->groupByRaw('MONTH(date), MONTHNAME(date)')
-            ->orderByRaw('MONTH(date) ASC')
+            ->groupBy('month')
+            ->orderBy('month')
             ->get();
+
+        // Prepare yearly trend data for charts
+        $yearlyTrendLabels = $yearlyData->keys()->toArray();
+        $yearlyTrendValues = $yearlyData->map(function($months) {
+            return $months->sum('total');
+        })->all();
 
         /*
         |--------------------------------------------------------------------------
@@ -232,6 +229,8 @@ class DashboardController extends Controller
 
             'yearlyData',
             'monthlyData',
+            'yearlyTrendLabels',
+            'yearlyTrendValues',
 
             'calamityTypes',
             'topBarangays',
@@ -242,5 +241,90 @@ class DashboardController extends Controller
 
             'activeCalamity'
         ));
+    }
+
+    // Fetch real-time dashboard statistics
+    public function getStats()
+    {
+        $stats = [
+            'barangayCount' => Barangay::count(),
+            'municipalityCount' => Municipality::count(),
+            'regionCount' => Municipality::distinct('province')->count('province'),
+            'totalDistributions' => ReliefEvent::count(),
+            'verifiedBeneficiaries' => Beneficiary::where('status', 'verified')->count(),
+            'totalInventoryItems' => Item::count(),
+            'lowStockItems' => Inventory::where('quantity', '<=', DB::raw('reorder_level'))->count(),
+            'expiringItems' => Item::where('expiration_date', '<=', now()->addDays(30))->count(),
+            'activeStaff' => User::whereHas('role', function($q) { $q->where('name', 'Staff'); })->count(),
+            'pendingLocations' => \App\Models\Municipality::pending()->count(),
+            'lastUpdated' => now()->format('M d, Y H:i:s')
+        ];
+
+        return response()->json($stats);
+        $user = auth()->user();
+        return view('admin.profile', compact('user'));
+    }
+
+    // Update user profile
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user();
+        
+        $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'contact_number' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
+            'birthdate' => 'nullable|date',
+            'position' => 'nullable|string|max:255',
+            'organization' => 'nullable|string|max:255',
+        ]);
+
+        $user->update([
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'email' => $request->email,
+            'contact_number' => $request->contact_number,
+            'address' => $request->address,
+            'birthdate' => $request->birthdate,
+            'position' => $request->position,
+            'organization' => $request->organization,
+        ]);
+
+        return redirect()->route('admin.profile');
+    }
+
+    // Update user password
+    public function updatePassword(Request $request)
+    {
+        $user = auth()->user();
+        
+        $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        // Verify current password
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Current password is incorrect']);
+        }
+
+        // Update password
+        $user->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+
+        return redirect()->route('admin.profile')
+            ->with('success', 'Password updated successfully!');
+    }
+
+    /**
+     * Display the user's profile
+     */
+    public function profile()
+    {
+        $user = auth()->user();
+        return view('admin.profile', compact('user'));
     }
 }

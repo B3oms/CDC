@@ -13,20 +13,24 @@ class IsStaff
             return redirect('/');
         }
 
-        $role = auth()->user()->role->name;
+        try {
+            $role = auth()->user()->role->name;
 
-        if ($role === 'Admin') {
-            return redirect()->route('admin.dashboard');
-        }
+            if ($role === 'Admin') {
+                return redirect()->route('admin.dashboard');
+            }
 
-        if ($role === 'Barangay Partner') {
-            return redirect()->route('barangay.dashboard');
-        }
+            if ($role === 'Barangay Partner') {
+                return redirect()->route('barangay.dashboard');
+            }
 
-        if ($role !== 'Staff') {
+            if ($role !== 'Staff') {
+                return redirect('/');
+            }
+
+            return $next($request);
+        } catch (\Exception $e) {
             return redirect('/');
         }
-
-        return $next($request);
     }
 }

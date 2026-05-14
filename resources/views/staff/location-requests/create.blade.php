@@ -74,6 +74,33 @@
                 </div>
             </div>
             
+            <div class="form-row" id="provinceRow" style="display: none;">
+                <div class="form-group">
+                    <label for="region">Region *</label>
+                    <select id="region" name="region">
+                        <option value="">Select Region</option>
+                        <option value="Region I" {{ old('region') == 'Region I' ? 'selected' : '' }}>Region I (Ilocos Region)</option>
+                        <option value="Region II" {{ old('region') == 'Region II' ? 'selected' : '' }}>Region II (Cagayan Valley)</option>
+                        <option value="Region III" {{ old('region') == 'Region III' ? 'selected' : '' }}>Region III (Central Luzon)</option>
+                        <option value="Region IV-A" {{ old('region') == 'Region IV-A' ? 'selected' : '' }}>Region IV-A (CALABARZON)</option>
+                        <option value="Region IV-B" {{ old('region') == 'Region IV-B' ? 'selected' : '' }}>Region IV-B (MIMAROPA)</option>
+                        <option value="Region V" {{ old('region') == 'Region V' ? 'selected' : '' }}>Region V (Bicol Region)</option>
+                        <option value="Region VI" {{ old('region') == 'Region VI' ? 'selected' : '' }}>Region VI (Western Visayas)</option>
+                        <option value="Region VII" {{ old('region') == 'Region VII' ? 'selected' : '' }}>Region VII (Central Visayas)</option>
+                        <option value="Region VIII" {{ old('region') == 'Region VIII' ? 'selected' : '' }}>Region VIII (Eastern Visayas)</option>
+                        <option value="Region IX" {{ old('region') == 'Region IX' ? 'selected' : '' }}>Region IX (Zamboanga Peninsula)</option>
+                        <option value="Region X" {{ old('region') == 'Region X' ? 'selected' : '' }}>Region X (Northern Mindanao)</option>
+                        <option value="Region XI" {{ old('region') == 'Region XI' ? 'selected' : '' }}>Region XI (Davao Region)</option>
+                        <option value="Region XII" {{ old('region') == 'Region XII' ? 'selected' : '' }}>Region XII (SOCCSKSARGEN)</option>
+                        <option value="Region XIII" {{ old('region') == 'Region XIII' ? 'selected' : '' }}>Region XIII (Caraga)</option>
+                        <option value="NCR" {{ old('region') == 'NCR' ? 'selected' : '' }}>NCR (National Capital Region)</option>
+                        <option value="CAR" {{ old('region') == 'CAR' ? 'selected' : '' }}>CAR (Cordillera Administrative Region)</option>
+                        <option value="BARMM" {{ old('region') == 'BARMM' ? 'selected' : '' }}>BARMM (Bangsamoro)</option>
+                    </select>
+                    <small class="form-help">Required only for municipality requests</small>
+                </div>
+            </div>
+            
             <div class="form-row" id="municipalityRow" style="display: none;">
                 <div class="form-group">
                     <label for="municipality_id">Parent Municipality *</label>
@@ -122,15 +149,33 @@
 function toggleMunicipalityField() {
     const type = document.getElementById('type').value;
     const municipalityRow = document.getElementById('municipalityRow');
+    const provinceRow = document.getElementById('provinceRow');
     const municipalitySelect = document.getElementById('municipality_id');
+    
+    console.log('Toggle function called. Type:', type);
     
     if (type === 'barangay') {
         municipalityRow.style.display = 'flex';
+        provinceRow.style.display = 'none';
         municipalitySelect.required = true;
-    } else {
+        document.getElementById('region').required = false;
+        document.getElementById('region').value = '';
+        console.log('Showing barangay field, hiding region field');
+    } else if (type === 'municipality') {
         municipalityRow.style.display = 'none';
+        provinceRow.style.display = 'flex';
         municipalitySelect.required = false;
         municipalitySelect.value = '';
+        document.getElementById('region').required = true;
+        console.log('Showing region field, hiding barangay field');
+    } else {
+        municipalityRow.style.display = 'none';
+        provinceRow.style.display = 'none';
+        municipalitySelect.required = false;
+        municipalitySelect.value = '';
+        document.getElementById('region').required = false;
+        document.getElementById('region').value = '';
+        console.log('Hiding both fields');
     }
 }
 

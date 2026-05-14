@@ -168,6 +168,7 @@ class LocationController extends Controller
 
         return view('staff.locations.index', compact(
             'municipalities',
+            'approvedBarangays',
             'pendingMuniRequests',   'pendingBgyRequests',
             'approvedMuniRequests',  'approvedBgyRequests',
             'rejectedMuniRequests',  'rejectedBgyRequests',
@@ -185,37 +186,37 @@ class LocationController extends Controller
     {
         $data = $request->validate([
             'name'     => 'required|string|max:100',
-            'province' => 'required|string|max:100',
+            'region'   => 'required|string|max:100',
         ]);
 
         // Check live duplicates
         $liveExists = DB::table('municipalities')
             ->whereRaw('LOWER(name) = ?', [strtolower($data['name'])])
-            ->where('province', $data['province'])
+            ->where('province', $data['region'])
             ->exists();
 
         if ($liveExists) {
             return back()
-                ->withErrors(['name' => "'{$data['name']}' already exists in {$data['province']}."])
+                ->withErrors(['name' => "'{$data['name']}' already exists in {$data['region']}."])
                 ->withInput();
         }
 
         // Check pending duplicate
         $pendingExists = DB::table('municipality_requests')
             ->whereRaw('LOWER(name) = ?', [strtolower($data['name'])])
-            ->where('province', $data['province'])
+            ->where('province', $data['region'])
             ->where('status', 'pending')
             ->exists();
 
         if ($pendingExists) {
             return back()
-                ->withErrors(['name' => 'A pending request for this municipality already exists.'])
+                ->withErrors(['name' => "'{$data['name']}' is already pending approval in {$data['region']}."])
                 ->withInput();
         }
 
         DB::table('municipality_requests')->insert([
             'name'         => $data['name'],
-            'province'     => $data['province'],
+            'province'     => $data['region'],
             'requested_by' => Auth::id(),
             'status'       => 'pending',
             'created_at'   => now(),
@@ -239,12 +240,12 @@ class LocationController extends Controller
 
         $data = $request->validate([
             'name'     => 'required|string|max:100',
-            'province' => 'required|string|max:100',
+            'region'   => 'required|string|max:100',
         ]);
 
         DB::table('municipalities')->where('id', $id)->update([
             'name'       => $data['name'],
-            'province'   => $data['province'],
+            'province'   => $data['region'],
             'updated_at' => now(),
         ]);
 

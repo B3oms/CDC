@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Staff;
 use App\Http\Controllers\Controller;
 use App\Models\Beneficiary;
 use App\Models\Barangay;
+use App\Models\Municipality;
 use App\Models\User;
 use App\Models\Role;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -14,8 +16,21 @@ class BeneficiaryController extends Controller
 {
     public function index(Request $request)
     {
+        $municipalities = Municipality::with('barangays')->get();
         $barangays = Barangay::all();
-        $query     = Beneficiary::with('barangay');
+        
+        // If municipality is selected, get only barangays from that municipality
+        if ($request->municipality_id) {
+            $barangays = Barangay::where('municipality_id', $request->municipality_id)->get();
+        }
+        
+        $query = Beneficiary::with('barangay');
+
+        if ($request->municipality_id) {
+            $query->whereHas('barangay', function($q) use ($request) {
+                $q->where('municipality_id', $request->municipality_id);
+            });
+        }
 
         if ($request->barangay_id) {
             $query->where('barangay_id', $request->barangay_id);
@@ -29,27 +44,24 @@ class BeneficiaryController extends Controller
 
         $beneficiaries = $query->latest()->paginate(20);
 
-        // Slot counts per barangay
-        $slotCounts = Beneficiary::where('is_verified', 1)
-            ->selectRaw('barangay_id, COUNT(*) as count')
-            ->groupBy('barangay_id')
-            ->pluck('count', 'barangay_id');
-
         return view('staff.beneficiaries.index', compact(
-            'beneficiaries', 'barangays', 'slotCounts'
+            'beneficiaries', 'municipalities', 'barangays'
         ));
     }
 
     public function create()
     {
+        $municipalities = Municipality::with('barangays')->get();
         $barangays = Barangay::all();
-        return view('staff.beneficiaries.create', compact('barangays'));
+        return view('staff.beneficiaries.create', compact('municipalities', 'barangays'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
+            'municipality_id'  => 'required|exists:municipalities,id',
             'barangay_id'     => 'required|exists:barangays,id',
+            'region'          => 'required|string',
             'first_name'      => 'required|string|max:100',
             'last_name'       => 'required|string|max:100',
             'gender'          => 'required|in:Male,Female,Other',
@@ -58,9 +70,9 @@ class BeneficiaryController extends Controller
             'address'         => 'nullable|string',
             'family_size'     => 'required|integer|min:1',
             'monthly_income'  => 'required|numeric|min:0',
-            'has_senior'      => 'nullable|boolean',
             'children_count'  => 'required|integer|min:0',
-            'interview_notes' => 'nullable|string',
+            'has_senior'      => 'required|boolean',
+            'interview_notes'  => 'nullable|string',
         ]);
 
         // Check 250 slot limit
@@ -113,6 +125,9 @@ class BeneficiaryController extends Controller
             $this->createBeneficiaryAccount($beneficiary);
         }
 
+        // Trigger notification for beneficiary addition
+        NotificationService::beneficiaryAdded($beneficiary->id, auth()->id());
+
         $message = $isVerified
             ? 'Beneficiary verified and added successfully.'
             : 'Beneficiary recorded but did not meet verification criteria.';
@@ -129,6 +144,32 @@ class BeneficiaryController extends Controller
         ])->findOrFail($id);
 
         return view('staff.beneficiaries.show', compact('beneficiary'));
+    }
+
+    public function pdf(Request $request)
+    {
+        $query = Beneficiary::with('barangay');
+
+        if ($request->municipality_id) {
+            $query->whereHas('barangay', function($q) use ($request) {
+                $q->where('municipality_id', $request->municipality_id);
+            });
+        }
+
+        if ($request->barangay_id) {
+            $query->where('barangay_id', $request->barangay_id);
+        }
+
+        if ($request->status === 'verified') {
+            $query->where('is_verified', 1);
+        } elseif ($request->status === 'pending') {
+            $query->where('is_verified', 0);
+        }
+
+        $beneficiaries = $query->latest()->get();
+
+        $pdf = \PDF::loadView('staff.beneficiaries.pdf', compact('beneficiaries'));
+        return $pdf->download('beneficiaries-list.pdf');
     }
 
     private function createBeneficiaryAccount(Beneficiary $beneficiary)

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Barangay;
 
 use App\Http\Controllers\Controller;
 use App\Models\RecommendedBeneficiary;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class RecommendationController extends Controller
@@ -25,7 +26,7 @@ class RecommendationController extends Controller
             'address'        => 'nullable|string',
         ]);
 
-        RecommendedBeneficiary::create([
+        $recommendation = RecommendedBeneficiary::create([
             'barangay_id'    => auth()->user()->barangay_id,
             'submitted_by'   => auth()->id(),
             'first_name'     => $request->first_name,
@@ -34,6 +35,9 @@ class RecommendationController extends Controller
             'address'        => $request->address,
             'status'         => 'Pending',
         ]);
+
+        // Trigger notification for barangay report submission
+        NotificationService::barangayReportSubmitted($recommendation->id, auth()->user()->barangay_id);
 
         return back()->with('success', 'Recommendation submitted successfully.');
     }

@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 @section('title', 'Relief Events Management')
-@section('breadcrumb', '<i class="fas fa-hand-holding-heart"></i> Relief Management / Events')
+@section('breadcrumb', 'Relief Events')
 
 @section('content')
 

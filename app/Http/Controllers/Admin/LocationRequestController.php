@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\LocationRequest;
 use App\Models\Municipality;
 use App\Models\Barangay;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -58,6 +59,9 @@ class LocationRequestController extends Controller
                 ]);
             }
 
+            // Trigger notification for approval
+            NotificationService::locationRequestApproved($locationRequest->id, Auth::id());
+
             DB::commit();
 
             return back()->with('success', 'Location request approved successfully.');
@@ -83,6 +87,9 @@ class LocationRequestController extends Controller
                 'approved_by' => Auth::id(),
                 'rejection_reason' => $request->input('rejection_reason'),
             ]);
+
+            // Trigger notification for rejection
+            NotificationService::locationRequestRejected($locationRequest->id, Auth::id(), $request->input('rejection_reason'));
 
             DB::commit();
 

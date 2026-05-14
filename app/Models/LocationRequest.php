@@ -13,6 +13,7 @@ class LocationRequest extends Model
     protected $fillable = [
         'requested_by',
         'type',
+        'region',
         'municipality_id',
         'name',
         'status',

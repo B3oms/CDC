@@ -1,5 +1,6 @@
 @extends('admin.layouts.app')
 @section('title', 'Beneficiaries')
+@section('breadcrumb', 'Beneficiaries')
 
 @section('content')
 <div class="dash-header">
@@ -18,6 +19,7 @@
 
         {{-- Municipality --}}
         <select name="municipality_id" id="municipality"
+            onchange="document.getElementById('filterForm').submit()"
             style="padding:6px 12px;border:1px solid #d3d1c7;border-radius:6px;">
             <option value="">Select Municipality</option>
             @foreach($municipalities as $m)
@@ -30,6 +32,7 @@
 
         {{-- Barangay --}}
         <select name="barangay_id" id="barangay"
+            onchange="document.getElementById('filterForm').submit()"
             style="padding:6px 12px;border:1px solid #d3d1c7;border-radius:6px;"
             {{ request('municipality_id') ? '' : 'disabled' }}>
             <option value="">Select Barangay</option>
@@ -127,17 +130,5 @@
     </div>
 </div>
 
-{{-- SCRIPT --}}
-<script>
-document.getElementById('municipality').addEventListener('change', function () {
-    const barangay = document.getElementById('barangay');
-
-    // reset barangay when municipality changes
-    barangay.value = '';
-
-    // submit form
-    this.form.submit();
-});
-</script>
 
 @endsection

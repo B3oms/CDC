@@ -8,6 +8,7 @@ use App\Models\Municipality;
 use App\Models\Barangay;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class LocationRequestController extends Controller
 {
@@ -32,17 +33,23 @@ class LocationRequestController extends Controller
 
     public function store(Request $request)
     {
+        Log::info('Location request submission data: ', $request->all());
+        
         $validated = $request->validate([
             'type' => 'required|in:municipality,barangay',
+            'region' => 'required_if:type,municipality|string|max:255',
             'municipality_id' => 'required_if:type,barangay|exists:municipalities,id',
             'name' => 'required|string|max:255',
             'remarks' => 'nullable|string|max:1000',
         ]);
 
+        Log::info('Validated data: ', $validated);
+
         try {
             LocationRequest::create([
                 'requested_by' => Auth::id(),
                 'type' => $validated['type'],
+                'region' => $validated['region'] ?? null,
                 'municipality_id' => $validated['municipality_id'] ?? null,
                 'name' => $validated['name'],
                 'remarks' => $validated['remarks'] ?? null,

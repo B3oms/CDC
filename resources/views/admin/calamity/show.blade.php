@@ -1,15 +1,14 @@
-@extends('admin.layouts.app')
+@extends('staff.layouts.app')
 @section('title', 'Calamity Portal')
 
 @section('content')
 <div class="dash-header">
     <div>
         <h1>{{ $calamity->name }}</h1>
-        <p class="sub">{{ $calamity->type }} · {{ $calamity->date_occurred }} · 
-            <span class="badge-intensity {{ strtolower($calamity->intensity) }}">{{ $calamity->intensity }}</span>
-        </p>
+        <p class="sub">{{ $calamity->type }} · {{ $calamity->date_occurred }}</p>
     </div>
     <div style="display:flex;gap:10px;align-items:center;">
+        <a href="{{ route('admin.calamity.index') }}" class="btn-back">← Back</a>
         @if($calamity->status === 'Open')
         <span class="status-open">● PORTAL OPEN</span>
         <form method="POST" action="{{ route('admin.calamity.close', $calamity->id) }}">

@@ -6,7 +6,7 @@
     <div>
         <div class="breadcrumb-nav">
             <a href="{{ route('admin.inventory.index') }}">Inventory</a> /
-            <a href="{{ route('admin.inventory.category', $subcategory->category_id) }}">{{ $subcategory->category->name }}</a> /
+            <a href="{{ route('admin.inventory.category.show', $subcategory->category_id) }}">{{ $subcategory->category->name }}</a> /
             <a href="{{ route('admin.inventory.subcategory', $subcategory->id) }}">{{ $subcategory->name }}</a> /
             <span>Add Item</span>
         </div>

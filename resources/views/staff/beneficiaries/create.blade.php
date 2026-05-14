@@ -62,11 +62,46 @@
                         placeholder="09XXXXXXXXX">
                 </div>
                 <div class="form-group">
+                    <label>Region</label>
+                    <select name="region" id="region" required onchange="updateMunicipalities()">
+                        <option value="">-- Select Region --</option>
+                        <option value="Region I" {{ old('region') == 'Region I' ? 'selected' : '' }}>Region I (Ilocos Region)</option>
+                        <option value="Region II" {{ old('region') == 'Region II' ? 'selected' : '' }}>Region II (Cagayan Valley)</option>
+                        <option value="Region III" {{ old('region') == 'Region III' ? 'selected' : '' }}>Region III (Central Luzon)</option>
+                        <option value="Region IV-A" {{ old('region') == 'Region IV-A' ? 'selected' : '' }}>Region IV-A (CALABARZON)</option>
+                        <option value="Region IV-B" {{ old('region') == 'Region IV-B' ? 'selected' : '' }}>Region IV-B (MIMAROPA)</option>
+                        <option value="Region V" {{ old('region') == 'Region V' ? 'selected' : '' }}>Region V (Bicol Region)</option>
+                        <option value="Region VI" {{ old('region') == 'Region VI' ? 'selected' : '' }}>Region VI (Western Visayas)</option>
+                        <option value="Region VII" {{ old('region') == 'Region VII' ? 'selected' : '' }}>Region VII (Central Visayas)</option>
+                        <option value="Region VIII" {{ old('region') == 'Region VIII' ? 'selected' : '' }}>Region VIII (Eastern Visayas)</option>
+                        <option value="Region IX" {{ old('region') == 'Region IX' ? 'selected' : '' }}>Region IX (Zamboanga Peninsula)</option>
+                        <option value="Region X" {{ old('region') == 'Region X' ? 'selected' : '' }}>Region X (Northern Mindanao)</option>
+                        <option value="Region XI" {{ old('region') == 'Region XI' ? 'selected' : '' }}>Region XI (Davao Region)</option>
+                        <option value="Region XII" {{ old('region') == 'Region XII' ? 'selected' : '' }}>Region XII (SOCCSKSARGEN)</option>
+                        <option value="Region XIII" {{ old('region') == 'Region XIII' ? 'selected' : '' }}>Region XIII (Caraga)</option>
+                        <option value="NCR" {{ old('region') == 'NCR' ? 'selected' : '' }}>NCR (National Capital Region)</option>
+                        <option value="CAR" {{ old('region') == 'CAR' ? 'selected' : '' }}>CAR (Cordillera Administrative Region)</option>
+                        <option value="BARMM" {{ old('region') == 'BARMM' ? 'selected' : '' }}>BARMM (Bangsamoro)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Municipality</label>
+                    <select name="municipality_id" id="municipality" required onchange="updateBarangays()" disabled>
+                        <option value="">-- Select Municipality --</option>
+                        @foreach($municipalities as $m)
+                        <option value="{{ $m->id }}" data-region="{{ $m->province }}"
+                            {{ old('municipality_id') == $m->id ? 'selected' : '' }}>
+                            {{ $m->name }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
                     <label>Barangay</label>
-                    <select name="barangay_id" required>
+                    <select name="barangay_id" id="barangay" required disabled>
                         <option value="">-- Select Barangay --</option>
                         @foreach($barangays as $b)
-                        <option value="{{ $b->id }}"
+                        <option value="{{ $b->id }}" data-municipality="{{ $b->municipality_id }}"
                             {{ old('barangay_id', $prefill->barangay_id ?? '') == $b->id ? 'selected' : '' }}>
                             {{ $b->name }}
                         </option>
@@ -198,5 +233,154 @@ function updateCriteria() {
     }
 }
 updateCriteria();
+
+// Municipality data for dynamic loading
+const municipalityData = @json($municipalities->load('barangays'));
+
+function updateMunicipalities() {
+    const regionSelect = document.getElementById('region');
+    const municipalitySelect = document.getElementById('municipality');
+    const barangaySelect = document.getElementById('barangay');
+    const selectedRegion = regionSelect.value;
+    
+    // Clear current selections
+    municipalitySelect.innerHTML = '<option value="">-- Select Municipality --</option>';
+    barangaySelect.innerHTML = '<option value="">-- Select Barangay --</option>';
+    
+    if (selectedRegion) {
+        // Filter municipalities by region (using province as region identifier)
+        const filteredMunicipalities = municipalityData.filter(m => {
+            // Map provinces to regions (you may need to adjust this mapping based on your data)
+            return getRegionFromProvince(m.province) === selectedRegion;
+        });
+        
+        filteredMunicipalities.forEach(municipality => {
+            const option = document.createElement('option');
+            option.value = municipality.id;
+            option.textContent = municipality.name;
+            option.setAttribute('data-region', selectedRegion);
+            municipalitySelect.appendChild(option);
+        });
+    }
+    
+    // Enable/disable selects based on selection
+    municipalitySelect.disabled = !selectedRegion;
+    barangaySelect.disabled = true;
+}
+
+function updateBarangays() {
+    const municipalitySelect = document.getElementById('municipality');
+    const barangaySelect = document.getElementById('barangay');
+    const selectedMunicipalityId = municipalitySelect.value;
+    
+    // Clear current barangay options
+    barangaySelect.innerHTML = '<option value="">-- Select Barangay --</option>';
+    
+    if (selectedMunicipalityId) {
+        const municipality = municipalityData.find(m => m.id == selectedMunicipalityId);
+        if (municipality && municipality.barangays) {
+            municipality.barangays.forEach(barangay => {
+                const option = document.createElement('option');
+                option.value = barangay.id;
+                option.textContent = barangay.name;
+                barangaySelect.appendChild(option);
+            });
+        }
+    }
+    
+    // Enable/disable barangay select based on municipality selection
+    barangaySelect.disabled = !selectedMunicipalityId;
+}
+
+function getRegionFromProvince(province) {
+    // Map provinces to regions (adjust based on your actual data)
+    const regionMapping = {
+        'Ilocos Norte': 'Region I',
+        'Ilocos Sur': 'Region I',
+        'La Union': 'Region I',
+        'Pangasinan': 'Region I',
+        'Batanes': 'Region II',
+        'Cagayan': 'Region II',
+        'Isabela': 'Region II',
+        'Nueva Vizcaya': 'Region II',
+        'Quirino': 'Region II',
+        'Aurora': 'Region III',
+        'Bataan': 'Region III',
+        'Bulacan': 'Region III',
+        'Nueva Ecija': 'Region III',
+        'Pampanga': 'Region III',
+        'Tarlac': 'Region III',
+        'Zambales': 'Region III',
+        'Batangas': 'Region IV-A',
+        'Cavite': 'Region IV-A',
+        'Laguna': 'Region IV-A',
+        'Quezon': 'Region IV-A',
+        'Rizal': 'Region IV-A',
+        'Marinduque': 'Region IV-B',
+        'Occidental Mindoro': 'Region IV-B',
+        'Oriental Mindoro': 'Region IV-B',
+        'Palawan': 'Region IV-B',
+        'Romblon': 'Region IV-B',
+        'Albay': 'Region V',
+        'Camarines Norte': 'Region V',
+        'Camarines Sur': 'Region V',
+        'Catanduanes': 'Region V',
+        'Masbate': 'Region V',
+        'Sorsogon': 'Region V',
+        'Aklan': 'Region VI',
+        'Antique': 'Region VI',
+        'Capiz': 'Region VI',
+        'Guimaras': 'Region VI',
+        'Iloilo': 'Region VI',
+        'Negros Occidental': 'Region VI',
+        'Bohol': 'Region VII',
+        'Cebu': 'Region VII',
+        'Negros Oriental': 'Region VII',
+        'Siquijor': 'Region VII',
+        'Biliran': 'Region VIII',
+        'Eastern Samar': 'Region VIII',
+        'Leyte': 'Region VIII',
+        'Northern Samar': 'Region VIII',
+        'Samar': 'Region VIII',
+        'Southern Leyte': 'Region VIII',
+        'Zamboanga del Norte': 'Region IX',
+        'Zamboanga del Sur': 'Region IX',
+        'Zamboanga Sibugay': 'Region IX',
+        'Bukidnon': 'Region X',
+        'Camiguin': 'Region X',
+        'Lanao del Norte': 'Region X',
+        'Misamis Occidental': 'Region X',
+        'Misamis Oriental': 'Region X',
+        'Davao de Oro': 'Region XI',
+        'Davao del Norte': 'Region XI',
+        'Davao del Sur': 'Region XI',
+        'Davao Occidental': 'Region XI',
+        'Davao Oriental': 'Region XI',
+        'Compostela Valley': 'Region XI',
+        'Cotabato': 'Region XII',
+        'Lanao del Sur': 'Region XII',
+        'Maguindanao': 'Region XII',
+        'Sarangani': 'Region XII',
+        'Sultan Kudarat': 'Region XII',
+        'Agusan del Norte': 'Region XIII',
+        'Agusan del Sur': 'Region XIII',
+        'Dinagat Islands': 'Region XIII',
+        'Surigao del Norte': 'Region XIII',
+        'Surigao del Sur': 'Region XIII',
+        'Abra': 'CAR',
+        'Apayao': 'CAR',
+        'Benguet': 'CAR',
+        'Ifugao': 'CAR',
+        'Kalinga': 'CAR',
+        'Mountain Province': 'CAR'
+    };
+    
+    return regionMapping[province] || '';
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateMunicipalities();
+});
 </script>
 @endpush

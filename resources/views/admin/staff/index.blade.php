@@ -1,5 +1,6 @@
 @extends('admin.layouts.app')
 @section('title', 'Staff')
+@section('breadcrumb', 'Staff')
 
 @section('content')
 <div class="dash-header">

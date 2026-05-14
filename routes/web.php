@@ -12,10 +12,13 @@ use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
 use App\Http\Controllers\Staff\BeneficiaryController as StaffBeneficiaryController;
 use App\Http\Controllers\Staff\RecommendedController as StaffRecommendedController;
 use App\Http\Controllers\Staff\LocationController;
+use App\Http\Controllers\Staff\InventoryController as StaffInventoryController;
 use App\Http\Controllers\Barangay\EvacuationController;
 use App\Http\Controllers\Barangay\RecommendationController;
 use App\Http\Controllers\Admin\LocationRequestController as AdminLocationRequestController;
+use App\Http\Controllers\Admin\LocationManagementController;
 use App\Http\Controllers\Admin\EventController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Staff\LocationRequestController as StaffLocationRequestController;
 
 // ──────────────────────────────────────────────────────────
@@ -40,21 +43,30 @@ Route::prefix('admin')->name('admin.')->middleware(['isAdmin'])->group(function 
     Route::post('location-requests/{id}/reject', [AdminLocationRequestController::class, 'reject'])->name('location-requests.reject');
     Route::delete('location-requests/{id}', [AdminLocationRequestController::class, 'destroy'])->name('location-requests.destroy');
 
-    // Dashboard
+    // Admin Dashboard
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('location-requests/{id}', [AdminLocationRequestController::class, 'show'])->name('location-requests.show');
-    Route::get('location-requests/{id}/edit', [AdminLocationRequestController::class, 'edit'])->name('location-requests.edit');
-    Route::put('location-requests/{id}', [AdminLocationRequestController::class, 'update'])->name('location-requests.update');
-    Route::post('location-requests/{id}/approve', [AdminLocationRequestController::class, 'approve'])->name('location-requests.approve');
-    Route::post('location-requests/{id}/reject', [AdminLocationRequestController::class, 'reject'])->name('location-requests.reject');
-    Route::delete('location-requests/{id}', [AdminLocationRequestController::class, 'destroy'])->name('location-requests.destroy');
+    Route::get('dashboard/stats', [DashboardController::class, 'getStats'])->name('dashboard.stats');
+    Route::get('dashboard/notifications', [DashboardController::class, 'getNotifications'])->name('dashboard.notifications');
+    Route::post('dashboard/notifications/{notificationId}/read', [DashboardController::class, 'markNotificationRead'])->name('dashboard.notifications.read');
+    Route::post('dashboard/notifications/read-all', [DashboardController::class, 'markAllNotificationsRead'])->name('dashboard.notifications.readAll');
+    
+    // Profile
+    Route::get('profile', [DashboardController::class, 'profile'])->name('profile');
+    Route::put('profile', [DashboardController::class, 'updateProfile'])->name('profile.update');
+    Route::put('password', [DashboardController::class, 'updatePassword'])->name('password.update');
 
     
     // Location Management
-    Route::get('locations', [\App\Http\Controllers\Admin\LocationController::class, 'index'])->name('locations.index');
-    Route::post('locations/{id}/approve', [\App\Http\Controllers\Admin\LocationController::class, 'approve'])->name('locations.approve');
-    Route::post('locations/{id}/reject', [\App\Http\Controllers\Admin\LocationController::class, 'reject'])->name('locations.reject');
-    Route::delete('locations/{id}', [\App\Http\Controllers\Admin\LocationController::class, 'destroy'])->name('locations.destroy');
+    Route::get('locations', [LocationManagementController::class, 'index'])->name('locations.index');
+    Route::get('locations/create', [LocationManagementController::class, 'create'])->name('locations.create');
+    Route::post('locations', [LocationManagementController::class, 'store'])->name('locations.store');
+    Route::get('locations/{id}', [LocationManagementController::class, 'show'])->name('locations.show');
+    Route::get('locations/{id}/edit', [LocationManagementController::class, 'edit'])->name('locations.edit');
+    Route::put('locations/{id}', [LocationManagementController::class, 'update'])->name('locations.update');
+    Route::post('locations/{id}/approve', [LocationManagementController::class, 'approve'])->name('locations.approve');
+    Route::post('locations/{id}/reject', [LocationManagementController::class, 'reject'])->name('locations.reject');
+    Route::post('locations/{id}/restore', [LocationManagementController::class, 'restore'])->name('locations.restore');
+    Route::delete('locations/{id}', [LocationManagementController::class, 'destroy'])->name('locations.destroy');
 
     // Events Management
     Route::get('events', [EventController::class, 'index'])->name('events.index');
@@ -88,8 +100,10 @@ Route::middleware(['isAdminOrStaff'])->group(function () {
 
     
     // Calamity
+    Route::get('admin/calamity',            [CalamityController::class, 'index'])->name('admin.calamity.index');
     Route::get('admin/calamity/create',      [CalamityController::class, 'create'])->name('admin.calamity.create');
     Route::post('admin/calamity',            [CalamityController::class, 'store'])->name('admin.calamity.store');
+    Route::get('admin/calamity/{id}',        [CalamityController::class, 'show'])->name('admin.calamity.show');
     
     Route::post('admin/calamity/{id}/close', [CalamityController::class, 'close'])->name('admin.calamity.close');
     Route::get('admin/calamity/{id}/report', [CalamityController::class, 'report'])->name('admin.calamity.report');
@@ -121,6 +135,16 @@ Route::middleware(['isAdminOrStaff'])->group(function () {
     Route::get('admin/relief/{id}',          [ReliefMonitorController::class, 'show'])->name('admin.relief.show');
     Route::post('admin/relief/{id}/done',    [ReliefMonitorController::class, 'markDone'])->name('admin.relief.done');
     Route::post('admin/relief/{id}/ongoing', [ReliefMonitorController::class, 'markOngoing'])->name('admin.relief.ongoing');
+    Route::post('admin/relief/{id}/status',  [ReliefMonitorController::class, 'updateStatus'])->name('admin.relief.status');
+    Route::delete('admin/relief/{id}',       [ReliefMonitorController::class, 'destroy'])->name('admin.relief.destroy');
+    Route::get('admin/relief/stats',         [ReliefMonitorController::class, 'getStats'])->name('admin.relief.stats');
+    Route::get('admin/relief/report/pdf',   [ReliefMonitorController::class, 'downloadReport'])->name('admin.relief.report.pdf');
+    Route::get('admin/relief/{id}/pdf',     [ReliefMonitorController::class, 'downloadEventReport'])->name('admin.relief.event.pdf');
+
+    // Notifications
+    Route::get('admin/notifications', [NotificationController::class, 'index'])->name('admin.notifications.index');
+    Route::post('admin/notifications/{notificationId}/read', [NotificationController::class, 'markAsRead'])->name('admin.notifications.read');
+    Route::post('admin/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('admin.notifications.readAll');
 });
 
 // ──────────────────────────────────────────────────────────
@@ -130,12 +154,16 @@ Route::prefix('staff')->name('staff.')->middleware(['isStaff'])->group(function 
 
     // Dashboard
     Route::get('dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
+    Route::get('dashboard/notifications', [StaffDashboardController::class, 'getNotifications'])->name('dashboard.notifications');
+    Route::post('dashboard/notifications/{notificationId}/read', [StaffDashboardController::class, 'markNotificationRead'])->name('dashboard.notifications.read');
+    Route::post('dashboard/notifications/read-all', [StaffDashboardController::class, 'markAllNotificationsRead'])->name('dashboard.notifications.readAll');
 
     // Beneficiaries
     Route::get('beneficiaries',           [StaffBeneficiaryController::class, 'index'])->name('beneficiaries.index');
     Route::get('beneficiaries/create',    [StaffBeneficiaryController::class, 'create'])->name('beneficiaries.create');
     Route::post('beneficiaries',          [StaffBeneficiaryController::class, 'store'])->name('beneficiaries.store');
     Route::get('beneficiaries/{id}',      [StaffBeneficiaryController::class, 'show'])->name('beneficiaries.show');
+    Route::get('beneficiaries/pdf',       [StaffBeneficiaryController::class, 'pdf'])->name('beneficiaries.pdf');
 
     Route::get('locations', [\App\Http\Controllers\Staff\LocationController::class, 'index'])->name('staff.locations.index');
     Route::get('locations/create', [\App\Http\Controllers\Staff\LocationController::class, 'create'])->name('staff.locations.create');
@@ -160,6 +188,48 @@ Route::prefix('staff')->name('staff.')->middleware(['isStaff'])->group(function 
     Route::get('recommended',              [StaffRecommendedController::class, 'index'])->name('recommended.index');
     Route::get('recommended/{id}/convert', [StaffRecommendedController::class, 'convert'])->name('recommended.convert');
     Route::post('recommended/{id}/reject', [StaffRecommendedController::class, 'reject'])->name('recommended.reject');
+
+    // Relief Monitor (Staff View)
+    Route::get('relief',                   [\App\Http\Controllers\Staff\ReliefController::class, 'index'])->name('relief.index');
+    Route::get('relief/create',            [\App\Http\Controllers\Staff\ReliefController::class, 'create'])->name('relief.create');
+    Route::post('relief',                  [\App\Http\Controllers\Staff\ReliefController::class, 'store'])->name('relief.store');
+    Route::get('relief/{id}',              [\App\Http\Controllers\Staff\ReliefController::class, 'show'])->name('relief.show');
+    Route::post('relief/{id}/status',    [\App\Http\Controllers\Staff\ReliefController::class, 'updateStatus'])->name('relief.updateStatus');
+    Route::get('relief/stats',             [\App\Http\Controllers\Staff\ReliefController::class, 'stats'])->name('relief.stats');
+    Route::delete('relief/{id}',           [\App\Http\Controllers\Staff\ReliefController::class, 'destroy'])->name('relief.destroy');
+    
+    // Inventory (Staff View)
+    Route::get('inventory',               [\App\Http\Controllers\Staff\InventoryController::class, 'index'])->name('inventory.index');
+    
+    // Category CRUD - Specific routes first
+    Route::get('inventory/category/create', [\App\Http\Controllers\Staff\InventoryController::class, 'createCategory'])->name('inventory.category.create');
+    Route::post('inventory/category', [\App\Http\Controllers\Staff\InventoryController::class, 'storeCategory'])->name('inventory.category.store');
+    Route::get('inventory/category/{id}/edit', [\App\Http\Controllers\Staff\InventoryController::class, 'editCategory'])->name('inventory.category.edit');
+    Route::put('inventory/category/{id}', [\App\Http\Controllers\Staff\InventoryController::class, 'updateCategory'])->name('inventory.category.update');
+    Route::delete('inventory/category/{id}', [\App\Http\Controllers\Staff\InventoryController::class, 'destroyCategory'])->name('inventory.category.destroy');
+    
+    // Category show route - parameterized routes last
+    Route::get('inventory/category/{id}', [\App\Http\Controllers\Staff\InventoryController::class, 'showCategory'])->name('inventory.category.show');
+    Route::get('inventory/subcategory/{id}', [\App\Http\Controllers\Staff\InventoryController::class, 'showSubcategory'])->name('inventory.subcategory.show');
+
+    // Profile
+    Route::get('profile', [\App\Http\Controllers\Staff\ProfileController::class, 'show'])->name('profile.show');
+    Route::put('profile', [\App\Http\Controllers\Staff\ProfileController::class, 'update'])->name('profile.update');
+    Route::put('password', [\App\Http\Controllers\Staff\ProfileController::class, 'updatePassword'])->name('password.update');
+    
+    // Subcategory CRUD
+    Route::get('inventory/subcategory/create/{categoryId}', [\App\Http\Controllers\Staff\InventoryController::class, 'createSubcategory'])->name('inventory.subcategory.create');
+    Route::post('inventory/subcategory/{categoryId}', [\App\Http\Controllers\Staff\InventoryController::class, 'storeSubcategory'])->name('inventory.subcategory.store');
+    Route::get('inventory/subcategory/{id}/edit', [\App\Http\Controllers\Staff\InventoryController::class, 'editSubcategory'])->name('inventory.subcategory.edit');
+    Route::put('inventory/subcategory/{id}', [\App\Http\Controllers\Staff\InventoryController::class, 'updateSubcategory'])->name('inventory.subcategory.update');
+    Route::delete('inventory/subcategory/{id}', [\App\Http\Controllers\Staff\InventoryController::class, 'destroySubcategory'])->name('inventory.subcategory.destroy');
+    
+    // Item CRUD
+    Route::get('inventory/item/create/{subcategoryId}', [\App\Http\Controllers\Staff\InventoryController::class, 'createItem'])->name('inventory.item.create');
+    Route::post('inventory/item/{subcategoryId}', [\App\Http\Controllers\Staff\InventoryController::class, 'storeItem'])->name('inventory.item.store');
+    Route::get('inventory/item/{id}/edit', [\App\Http\Controllers\Staff\InventoryController::class, 'editItem'])->name('inventory.item.edit');
+    Route::put('inventory/item/{id}', [\App\Http\Controllers\Staff\InventoryController::class, 'updateItem'])->name('inventory.item.update');
+    Route::delete('inventory/item/{id}', [\App\Http\Controllers\Staff\InventoryController::class, 'destroyItem'])->name('inventory.item.destroy');
 
     // ── Location Management ────────────────────────────────
     // Municipalities

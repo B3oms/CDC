@@ -56,6 +56,11 @@ class Calamity extends Model
         return $this->hasMany(EvacuationReport::class);
     }
 
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Computed Attribute

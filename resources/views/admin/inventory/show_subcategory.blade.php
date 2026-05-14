@@ -6,13 +6,13 @@
     <div>
         <div class="breadcrumb-nav">
             <a href="{{ route('admin.inventory.index') }}">Inventory</a> /
-            <a href="{{ route('admin.inventory.category', $subcategory->category_id) }}">{{ $subcategory->category->name }}</a> /
+            <a href="{{ route('admin.inventory.category.show', $subcategory->category_id) }}">{{ $subcategory->category->name }}</a> /
             <span>{{ $subcategory->name }}</span>
         </div>
         <h1>{{ $subcategory->name }}</h1>
     </div>
     <div style="display:flex;gap:10px;">
-        <a href="{{ route('admin.inventory.category', $subcategory->category_id) }}" class="btn-back">← Back</a>
+        <a href="{{ route('admin.inventory.category.show', $subcategory->category_id) }}" class="btn-back">← Back</a>
         <a href="{{ route('admin.inventory.item.create', $subcategory->id) }}" class="btn-primary">+ Add Item</a>
     </div>
 </div>

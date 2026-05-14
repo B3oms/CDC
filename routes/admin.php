@@ -6,9 +6,14 @@ use Illuminate\Support\Facades\Route;
 // Location Management Routes
 Route::get('/locations', [LocationManagementController::class, 'index'])->name('admin.locations.index');
 Route::get('/locations/data', [LocationManagementController::class, 'getRequestsData'])->name('admin.locations.data');
-Route::post('/locations/approve-municipality/{id}', [LocationManagementController::class, 'approve'])->name('admin.locations.approve.municipality');
-Route::post('/locations/approve-barangay/{id}', [LocationManagementController::class, 'approve'])->name('admin.locations.approve.barangay');
-Route::post('/locations/reject-municipality/{id}', [LocationManagementController::class, 'reject'])->name('admin.locations.reject.municipality');
-Route::post('/locations/reject-barangay/{id}', [LocationManagementController::class, 'reject'])->name('admin.locations.reject.barangay');
-Route::get('/locations/municipality/{id}', [LocationManagementController::class, 'viewDetails'])->name('admin.locations.municipality.show');
-Route::get('/locations/barangay/{id}', [LocationManagementController::class, 'viewDetails'])->name('admin.locations.barangay.show');
+Route::get('/locations/create', [LocationManagementController::class, 'create'])->name('admin.locations.create');
+Route::post('/locations', [LocationManagementController::class, 'store'])->name('admin.locations.store');
+Route::get('/locations/{id}', [LocationManagementController::class, 'show'])->name('admin.locations.show');
+Route::get('/locations/{id}/edit', [LocationManagementController::class, 'edit'])->name('admin.locations.edit');
+Route::put('/locations/{id}', [LocationManagementController::class, 'update'])->name('admin.locations.update');
+Route::delete('/locations/{id}', [LocationManagementController::class, 'destroy'])->name('admin.locations.destroy');
+
+// Approval/Rejection Routes
+Route::post('/locations/{id}/approve', [LocationManagementController::class, 'approve'])->name('admin.locations.approve');
+Route::post('/locations/{id}/reject', [LocationManagementController::class, 'reject'])->name('admin.locations.reject');
+Route::post('/locations/{id}/restore', [LocationManagementController::class, 'restore'])->name('admin.locations.restore');

@@ -11,48 +11,57 @@
     <div class="alert-success">{{ session('success') }}</div>
 @endif
 
-{{-- Slot Summary --}}
-<div class="slots-grid">
-    @foreach(\App\Models\Barangay::all() as $brgy)
-    <div class="slot-card">
-        <div class="slot-name">{{ $brgy->name }}</div>
-        <div class="slot-bar-wrap">
-            @php $used = $slotCounts[$brgy->id] ?? 0; $pct = min(100, ($used/250)*100); @endphp
-            <div class="slot-bar">
-                <div class="slot-fill {{ $pct >= 100 ? 'full' : ($pct >= 80 ? 'warning' : '') }}"
-                    style="width:{{ $pct }}%"></div>
-            </div>
-        </div>
-        <div class="slot-count {{ $used >= 250 ? 'text-danger' : '' }}">
-            {{ $used }}/250
-        </div>
-    </div>
-    @endforeach
-</div>
-
-{{-- Filters --}}
+{{-- FILTERS --}}
 <div class="filter-row">
     <form method="GET" action="{{ route('staff.beneficiaries.index') }}"
-        style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-        <select name="barangay_id" onchange="this.form.submit()"
-            style="padding:6px 12px;border:1px solid #d3d1c7;border-radius:6px;font-size:13px;">
-            <option value="">All Barangays</option>
-            @foreach($barangays as $b)
-            <option value="{{ $b->id }}" {{ request('barangay_id') == $b->id ? 'selected' : '' }}>
-                {{ $b->name }}
-            </option>
+        id="filterForm"
+        style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+
+        {{-- Municipality --}}
+        <select name="municipality_id" id="municipality"
+            style="padding:6px 12px;border:1px solid #d3d1c7;border-radius:6px;">
+            <option value="">Select Municipality</option>
+            @foreach($municipalities as $m)
+                <option value="{{ $m->id }}"
+                    {{ request('municipality_id') == $m->id ? 'selected' : '' }}>
+                    {{ $m->name }}
+                </option>
             @endforeach
         </select>
-        <select name="status" onchange="this.form.submit()"
-            style="padding:6px 12px;border:1px solid #d3d1c7;border-radius:6px;font-size:13px;">
+
+        {{-- Barangay --}}
+        <select name="barangay_id" id="barangay"
+            style="padding:6px 12px;border:1px solid #d3d1c7;border-radius:6px;"
+            {{ request('municipality_id') ? '' : 'disabled' }}>
+            <option value="">Select Barangay</option>
+            @foreach($barangays as $b)
+                <option value="{{ $b->id }}"
+                    {{ request('barangay_id') == $b->id ? 'selected' : '' }}>
+                    {{ $b->name }}
+                </option>
+            @endforeach
+        </select>
+
+        {{-- Status --}}
+        <select name="status"
+            onchange="document.getElementById('filterForm').submit()"
+            style="padding:6px 12px;border:1px solid #d3d1c7;border-radius:6px;">
             <option value="">All Status</option>
             <option value="verified" {{ request('status') == 'verified' ? 'selected' : '' }}>Verified</option>
-            <option value="pending"  {{ request('status') == 'pending'  ? 'selected' : '' }}>Pending</option>
+            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
         </select>
+
+        {{-- Download PDF --}}
+        <a href="{{ route('staff.beneficiaries.pdf', request()->query()) }}"
+            class="btn-sm-secondary"
+            style="text-decoration:none;">
+            Download PDF
+        </a>
+
     </form>
 </div>
 
-{{-- Table --}}
+{{-- TABLE --}}
 <div class="section-card" style="margin-top:1rem;">
     <table class="dist-table">
         <thead>
@@ -76,16 +85,19 @@
                 <td>{{ $b->barangay->name ?? 'N/A' }}</td>
                 <td>{{ $b->family_size }}</td>
                 <td>₱{{ number_format($b->monthly_income, 0) }}</td>
+
                 <td>
                     <span style="font-weight:700;color:{{ $b->criteria_met >= 2 ? '#3b6d11' : '#a32d2d' }}">
                         {{ $b->criteria_met }}/4
                     </span>
                 </td>
+
                 <td>
                     <span class="badge-intensity {{ strtolower($b->vulnerability_level) }}">
                         {{ $b->vulnerability_level }}
                     </span>
                 </td>
+
                 <td>
                     @if($b->is_verified)
                         <span class="relief-status-badge ongoing">Verified</span>
@@ -93,9 +105,12 @@
                         <span class="relief-status-badge upcoming">Pending</span>
                     @endif
                 </td>
+
                 <td>
                     <a href="{{ route('staff.beneficiaries.show', $b->id) }}"
-                        class="btn-sm-secondary">View</a>
+                        class="btn-sm-secondary">
+                        View
+                    </a>
                 </td>
             </tr>
             @empty
@@ -107,8 +122,23 @@
             @endforelse
         </tbody>
     </table>
+
     <div style="margin-top:1rem;">
         {{ $beneficiaries->withQueryString()->links() }}
     </div>
 </div>
+
+{{-- SCRIPT --}}
+<script>
+document.getElementById('municipality').addEventListener('change', function () {
+    const barangay = document.getElementById('barangay');
+
+    // reset barangay when municipality changes
+    barangay.value = '';
+
+    // submit form
+    this.form.submit();
+});
+</script>
+
 @endsection
