@@ -10,16 +10,79 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
+.user-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.65rem;
+    padding: 1.25rem 0.75rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
 .user-info {
     text-decoration: none;
     color: inherit;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
     cursor: pointer;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    text-align: center;
+    width: 100%;
+}
+
+.user-name,
+.user-role {
+    width: 100%;
+    text-align: center;
+}
+
+.user-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    font-weight: 700;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #fff;
+}
+
+.user-role {
+    color: #9fe1cb;
+    text-transform: uppercase;
 }
 
 .user-info:hover {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 8px;
+}
+
+.logout-form {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.logout-btn {
+    width: 100%;
+    max-width: 175px;
+    text-align: center;
 }
 </style>
 @stack('styles')
@@ -164,6 +227,10 @@
 @stack('scripts')
 
 <script>
+const staffNotificationReadBaseUrl = "{{ url('staff/dashboard/notifications') }}";
+const staffNotificationReadAllUrl = "{{ url('staff/dashboard/notifications/read-all') }}";
+const staffCsrfToken = "{{ csrf_token() }}";
+
 // Toggle Sidebar
 function toggleSidebar() {
     document.querySelector('.sidebar').classList.toggle('collapsed');
@@ -215,7 +282,12 @@ function toggleQuickActions() {
 function loadNotifications() {
     const notificationList = document.getElementById('notificationList');
     
-    fetch('{{ route("staff.dashboard.notifications") }}')
+    fetch('{{ route("staff.dashboard.notifications") }}', {
+        headers: {
+            'Accept': 'application/json'
+        },
+        credentials: 'same-origin'
+    })
         .then(response => response.json())
         .then(data => {
             updateNotificationBadge(data.unread_count);
@@ -226,7 +298,7 @@ function loadNotifications() {
             notificationList.innerHTML = `
                 <div class="notification-empty">
                     <i class="fas fa-exclamation-triangle" style="color: #ef4444; font-size: 2rem; margin-bottom: 0.5rem;"></i>
-                    <p style="color: #ef4444; margin: 0;">Error loading notifications</p>
+                    <p style="color: #888780; margin: 0;">No notification</p>
                 </div>
             `;
         });
@@ -240,7 +312,7 @@ function displayNotifications(notifications) {
         notificationList.innerHTML = `
             <div class="notification-empty">
                 <i class="fas fa-bell-slash" style="color: #888780; font-size: 2rem; margin-bottom: 0.5rem;"></i>
-                <p style="color: #888780; margin: 0;">No notifications</p>
+                <p style="color: #888780; margin: 0;">No notification</p>
             </div>
         `;
         return;
@@ -275,11 +347,12 @@ function updateNotificationBadge(count) {
 
 // Mark notification as read
 function markNotificationRead(notificationId) {
-    fetch(`{{ route('staff.dashboard.notifications.read', ':notificationId') }}`.replace(':notificationId', notificationId), {
+    const readUrl = staffNotificationReadBaseUrl + '/' + notificationId + '/read';
+    fetch(readUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            'X-CSRF-TOKEN': staffCsrfToken
         }
     })
     .then(response => response.json())
@@ -305,11 +378,11 @@ function markNotificationRead(notificationId) {
 
 // Mark all notifications as read
 function markAllNotificationsRead() {
-    fetch('{{ route("staff.dashboard.notifications.readAll") }}', {
+    fetch(staffNotificationReadAllUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            'X-CSRF-TOKEN': staffCsrfToken
         }
     })
     .then(response => response.json())

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\LocationRequest;
 use App\Models\Municipality;
 use App\Models\Barangay;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -46,7 +47,7 @@ class LocationRequestController extends Controller
         Log::info('Validated data: ', $validated);
 
         try {
-            LocationRequest::create([
+            $locationRequest = LocationRequest::create([
                 'requested_by' => Auth::id(),
                 'type' => $validated['type'],
                 'region' => $validated['region'] ?? null,
@@ -55,6 +56,8 @@ class LocationRequestController extends Controller
                 'remarks' => $validated['remarks'] ?? null,
                 'status' => 'pending',
             ]);
+
+            NotificationService::locationRequestSubmitted($locationRequest->id);
 
             return redirect()
                 ->route('staff.locations.index')
@@ -102,6 +105,8 @@ class LocationRequestController extends Controller
                 'name' => $validated['name'],
                 'remarks' => $validated['remarks'] ?? null,
             ]);
+
+            NotificationService::locationRequestUpdated($locationRequest->id, Auth::id());
 
             return redirect()
                 ->route('staff.locations.index')

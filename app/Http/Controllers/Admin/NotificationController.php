@@ -23,11 +23,12 @@ class NotificationController extends Controller
                 return [
                     'id' => $notification->id,
                     'title' => $notification->title,
-                    'message' => $notification->message,
+                    'text' => $notification->message,
                     'type' => $notification->type,
                     'icon' => $notification->icon,
                     'color' => $notification->color,
                     'read' => $notification->read,
+                    'unread' => !$notification->read,
                     'created_at' => $notification->created_at->diffForHumans(),
                     'related_type' => $notification->related_type,
                     'related_id' => $notification->related_id,

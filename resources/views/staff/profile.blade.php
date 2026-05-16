@@ -1,4 +1,10 @@
-@extends('staff.layouts.app')
+@extends((auth()->user()->role->name ?? null) === 'Barangay Partner' ? 'admin.layouts.app' : 'staff.layouts.app')
+
+@php
+    $dashboardRoute = (auth()->user()->role->name ?? null) === 'Barangay Partner' ? route('barangay.dashboard') : route('staff.dashboard');
+    $profileUpdateRoute = (auth()->user()->role->name ?? null) === 'Barangay Partner' ? route('barangay.profile.update') : route('staff.profile.update');
+    $passwordUpdateRoute = (auth()->user()->role->name ?? null) === 'Barangay Partner' ? route('barangay.password.update') : route('staff.password.update');
+@endphp
 
 @section('breadcrumb', 'Profile')
 
@@ -109,7 +115,7 @@
 
             {{-- Actions --}}
             <div class="profile-actions">
-                <a href="{{ route('staff.dashboard') }}" class="btn btn-ghost">
+                <a href="{{ $dashboardRoute }}" class="btn btn-ghost">
                     <i class="fas fa-arrow-left"></i> Dashboard
                 </a>
                 <button type="button" onclick="showEditMode()" class="btn btn-primary">
@@ -129,7 +135,7 @@
 
         {{-- Edit Mode --}}
         <div id="editMode" style="display: none;">
-            <form method="POST" action="{{ route('staff.profile.update') }}">
+            <form method="POST" action="{{ $profileUpdateRoute }}">
                 @csrf
                 @method('PUT')
 
@@ -217,7 +223,7 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <form method="POST" action="{{ route('staff.password.update') }}">
+        <form method="POST" action="{{ $passwordUpdateRoute }}">
             @csrf
             @method('PUT')
             <div class="modal-body">

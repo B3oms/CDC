@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('notifications', function (Blueprint $table) {
+        if (!Schema::hasTable('notifications')) {
+            Schema::create('notifications', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('type'); // portal_open, barangay_report, inventory_addition, beneficiary_addition, event_creation, location_request_approved, location_request_rejected
@@ -24,7 +25,8 @@ return new class extends Migration
             
             $table->index(['user_id', 'read']);
             $table->index(['type', 'created_at']);
-        });
+            });
+        }
     }
 
     /**

@@ -27,7 +27,7 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ route('admin.inventory.item.update', $item->id) }}"
+    <form method="POST" action="{{ route('inventory.item.update', $item->id) }}"
         enctype="multipart/form-data">
         @csrf
         @method('PUT')
@@ -51,7 +51,7 @@
             <div class="form-group">
                 <label>Expiration Date</label>
                 <input type="date" name="expiration_date"
-                    value="{{ old('expiration_date', $item->expiration_date ? $item->expiration_date->format('Y-m-d') : '') }}">
+                    value="{{ old('expiration_date', $item->inventory?->expiration_date ? \Carbon\Carbon::parse($item->inventory->expiration_date)->format('Y-m-d') : '') }}">
             </div>
                         <div class="form-group">
                 <label>Image</label>

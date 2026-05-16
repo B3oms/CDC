@@ -149,16 +149,14 @@
             <select name="calamity_id">
               <option value="">Select type</option>
               @if(isset($calamities))
-                <optgroup label="Natural Calamities">
-                  @foreach($calamities->where('type', 'natural') as $calamity)
-                  <option value="{{ $calamity->id }}" {{ old('calamity_id')==$calamity->id?'selected':'' }}>{{ $calamity->name }}</option>
-                  @endforeach
-                </optgroup>
-                <optgroup label="Human-Made Calamities">
-                  @foreach($calamities->where('type', 'human_made') as $calamity)
-                  <option value="{{ $calamity->id }}" {{ old('calamity_id')==$calamity->id?'selected':'' }}>{{ $calamity->name }}</option>
-                  @endforeach
-                </optgroup>
+                <option value="natural" {{ old('calamity_id')=='natural'?'selected':'' }}>Natural Calamities</option>
+                @foreach($calamities->where('type', 'natural') as $calamity)
+                <option value="{{ $calamity->id }}" {{ old('calamity_id')==$calamity->id?'selected':'' }}>{{ $calamity->name }}</option>
+                @endforeach
+                <option value="human_made" {{ old('calamity_id')=='human_made'?'selected':'' }}>Human-Made Calamities</option>
+                @foreach($calamities->where('type', 'human_made') as $calamity)
+                <option value="{{ $calamity->id }}" {{ old('calamity_id')==$calamity->id?'selected':'' }}>{{ $calamity->name }}</option>
+                @endforeach
               @endif
             </select>
           </div>

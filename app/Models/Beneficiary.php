@@ -12,6 +12,7 @@ class Beneficiary extends Model
         'user_id',
         'barangay_id',
         'first_name',
+        'middle_name',
         'last_name',
         'gender',
         'birthdate',

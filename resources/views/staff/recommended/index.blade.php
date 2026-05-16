@@ -31,6 +31,8 @@
             <tr>
                 <th>#</th>
                 <th>Name</th>
+                <th>Gender</th>
+                <th>Age</th>
                 <th>Barangay</th>
                 <th>Contact</th>
                 <th>Address</th>
@@ -43,7 +45,9 @@
             @forelse($recommended as $i => $r)
             <tr>
                 <td>{{ $recommended->firstItem() + $i }}</td>
-                <td>{{ $r->first_name }} {{ $r->last_name }}</td>
+                <td>{{ $r->first_name }}{{ $r->middle_name ? ' ' . $r->middle_name : '' }} {{ $r->last_name }}</td>
+                <td>{{ $r->gender ?? 'N/A' }}</td>
+                <td>{{ $r->age ?? 'N/A' }}</td>
                 <td>{{ $r->barangay->name }}</td>
                 <td>{{ $r->contact_number ?? 'N/A' }}</td>
                 <td>{{ $r->address ?? 'N/A' }}</td>

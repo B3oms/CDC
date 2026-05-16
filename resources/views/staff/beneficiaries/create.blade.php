@@ -27,6 +27,9 @@
 
     <form method="POST" action="{{ route('staff.beneficiaries.store') }}">
         @csrf
+        @if(isset($prefill))
+            <input type="hidden" name="recommended_id" value="{{ $prefill->id }}">
+        @endif
 
         {{-- Section 1: Personal Info --}}
         <div class="interview-section">
@@ -38,6 +41,11 @@
                         value="{{ old('first_name', $prefill->first_name ?? '') }}" required>
                 </div>
                 <div class="form-group">
+                    <label>Middle Name</label>
+                    <input type="text" name="middle_name"
+                        value="{{ old('middle_name', $prefill->middle_name ?? '') }}">
+                </div>
+                <div class="form-group">
                     <label>Last Name</label>
                     <input type="text" name="last_name"
                         value="{{ old('last_name', $prefill->last_name ?? '') }}" required>
@@ -46,9 +54,9 @@
                     <label>Gender</label>
                     <select name="gender" required>
                         <option value="">-- Select --</option>
-                        <option value="Male"   {{ old('gender') == 'Male'   ? 'selected' : '' }}>Male</option>
-                        <option value="Female" {{ old('gender') == 'Female' ? 'selected' : '' }}>Female</option>
-                        <option value="Other"  {{ old('gender') == 'Other'  ? 'selected' : '' }}>Other</option>
+                        <option value="Male"   {{ old('gender', $prefill->gender ?? '') == 'Male'   ? 'selected' : '' }}>Male</option>
+                        <option value="Female" {{ old('gender', $prefill->gender ?? '') == 'Female' ? 'selected' : '' }}>Female</option>
+                        <option value="Other"  {{ old('gender', $prefill->gender ?? '') == 'Other'  ? 'selected' : '' }}>Other</option>
                     </select>
                 </div>
                 <div class="form-group">

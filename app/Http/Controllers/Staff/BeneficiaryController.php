@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Beneficiary;
 use App\Models\Barangay;
 use App\Models\Municipality;
+use App\Models\RecommendedBeneficiary;
 use App\Models\User;
 use App\Models\Role;
 use App\Services\NotificationService;
@@ -62,7 +63,9 @@ class BeneficiaryController extends Controller
             'municipality_id'  => 'required|exists:municipalities,id',
             'barangay_id'     => 'required|exists:barangays,id',
             'region'          => 'required|string',
+            'recommended_id'  => 'nullable|exists:recommended_beneficiaries,id',
             'first_name'      => 'required|string|max:100',
+            'middle_name'     => 'nullable|string|max:100',
             'last_name'       => 'required|string|max:100',
             'gender'          => 'required|in:Male,Female,Other',
             'birthdate'       => 'required|date',
@@ -103,6 +106,7 @@ class BeneficiaryController extends Controller
         $beneficiary = Beneficiary::create([
             'barangay_id'        => $request->barangay_id,
             'first_name'         => $request->first_name,
+            'middle_name'        => $request->middle_name,
             'last_name'          => $request->last_name,
             'gender'             => $request->gender,
             'birthdate'          => $request->birthdate,
@@ -119,6 +123,14 @@ class BeneficiaryController extends Controller
             'interviewed_at'     => now(),
             'is_verified'        => $isVerified,
         ]);
+
+        if ($request->recommended_id) {
+            $recommended = RecommendedBeneficiary::find($request->recommended_id);
+            if ($recommended && $recommended->status === 'Pending') {
+                $recommended->update(['status' => 'Converted']);
+                NotificationService::barangayRecommendationInterviewed($recommended->id);
+            }
+        }
 
         // Create beneficiary account if verified
         if ($isVerified) {

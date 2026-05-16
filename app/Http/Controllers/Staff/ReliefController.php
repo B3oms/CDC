@@ -137,6 +137,10 @@ class ReliefController extends Controller
     // Store relief event
     public function store(Request $request)
     {
+        if (in_array($request->calamity_id, ['natural', 'human_made'], true)) {
+            $request->merge(['calamity_id' => null]);
+        }
+
         $request->validate([
             'name'            => 'required|string|max:150',
             'date'            => 'required|date',

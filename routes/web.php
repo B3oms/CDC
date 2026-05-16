@@ -258,6 +258,13 @@ Route::prefix('barangay')->name('barangay.')->middleware(['isBarangay'])->group(
     Route::get('dashboard',        [EvacuationController::class, 'index'])->name('dashboard');
     Route::post('set-center',      [EvacuationController::class, 'setCenter'])->name('setCenter');
     Route::post('submit-report',   [EvacuationController::class, 'submitReport'])->name('submitReport');
+    Route::post('feedback',        [EvacuationController::class, 'submitFeedback'])->name('feedback.submit');
     Route::get('recommendations',  [RecommendationController::class, 'index'])->name('recommendations.index');
     Route::post('recommendations', [RecommendationController::class, 'store'])->name('recommendations.store');
+    Route::get('recommendations/{id}/edit', [RecommendationController::class, 'edit'])->name('recommendations.edit');
+    Route::put('recommendations/{id}', [RecommendationController::class, 'update'])->name('recommendations.update');
+    Route::delete('recommendations/{id}', [RecommendationController::class, 'destroy'])->name('recommendations.destroy');
+    Route::get('profile', [\App\Http\Controllers\Staff\ProfileController::class, 'show'])->name('profile.show');
+    Route::put('profile', [\App\Http\Controllers\Staff\ProfileController::class, 'update'])->name('profile.update');
+    Route::put('password', [\App\Http\Controllers\Staff\ProfileController::class, 'updatePassword'])->name('password.update');
 });

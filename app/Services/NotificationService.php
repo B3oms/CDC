@@ -7,12 +7,34 @@ use App\Models\User;
 use App\Models\Portal;
 use App\Models\Barangay;
 use App\Models\Inventory;
+use App\Models\Item;
 use App\Models\Beneficiary;
 use App\Models\Event;
 use App\Models\LocationRequest;
+use App\Models\RecommendedBeneficiary;
+use App\Models\ReliefOperationFeedback;
 
 class NotificationService
 {
+    protected static function getAdminUsers()
+    {
+        $users = User::whereHas('role', fn($q) => $q->where('name', 'Admin'))->get();
+        if ($users->isEmpty()) {
+            return User::where('role_id', 1)->get();
+        }
+        return $users;
+    }
+
+    protected static function getStaffUsers()
+    {
+        $staffRoleNames = ['Staff', 'Barangay Partner', 'Volunteer'];
+        $users = User::whereHas('role', fn($q) => $q->whereIn('name', $staffRoleNames))->get();
+        if ($users->isEmpty()) {
+            return User::where('role_id', 2)->get();
+        }
+        return $users;
+    }
+
     /**
      * Create notification when a portal is opened
      */
@@ -22,7 +44,7 @@ class NotificationService
         if (!$portal) return;
 
         // Notify admin users
-        $adminUsers = User::where('role_id', 1)->get();
+        $adminUsers = self::getAdminUsers();
         
         foreach ($adminUsers as $admin) {
             if ($openedByUserId && $admin->id === $openedByUserId) continue; // Don't notify the user who opened it
@@ -47,7 +69,7 @@ class NotificationService
         if (!$barangay) return;
 
         // Notify admin users
-        $adminUsers = User::where('role_id', 1)->get();
+        $adminUsers = self::getAdminUsers();
         
         foreach ($adminUsers as $admin) {
             Notification::createNotification(
@@ -62,26 +84,199 @@ class NotificationService
     }
 
     /**
+     * Create notification when a barangay partner recommendation is submitted
+     */
+    public static function barangayRecommendationSubmitted($recommendationId, $submittedByUserId): void
+    {
+        $recommendation = RecommendedBeneficiary::with('barangay')->find($recommendationId);
+        if (!$recommendation) return;
+
+        $barangayName = $recommendation->barangay?->name ?? 'Unknown Barangay';
+        $fullName = trim("{$recommendation->first_name} {$recommendation->middle_name} {$recommendation->last_name}");
+        $contact = $recommendation->contact_number ?: 'N/A';
+        $address = $recommendation->address ?: 'N/A';
+
+        $gender = $recommendation->gender ? " Gender: {$recommendation->gender}." : '';
+        $age = $recommendation->age ? " Age: {$recommendation->age}." : '';
+        $notes = $recommendation->notes ? " Notes: {$recommendation->notes}." : '';
+        $message = "New beneficiary recommendation from {$barangayName}: {$fullName}.{$gender}{$age} Contact: {$contact}. Address: {$address}.{$notes}";
+
+        $staffUsers = self::getStaffUsers();
+        foreach ($staffUsers as $staff) {
+            if ($staff->id === $submittedByUserId) continue;
+            Notification::createNotification(
+                $staff->id,
+                'recommended_beneficiary',
+                'Barangay Recommendation Submitted',
+                $message,
+                'recommended_beneficiary',
+                $recommendation->id
+            );
+        }
+    }
+
+    /**
+     * Create notification when a barangay partner recommendation is updated
+     */
+    public static function barangayRecommendationUpdated($recommendationId, $updatedByUserId): void
+    {
+        $recommendation = RecommendedBeneficiary::with('barangay')->find($recommendationId);
+        if (!$recommendation) return;
+
+        $barangayName = $recommendation->barangay?->name ?? 'Unknown Barangay';
+        $fullName = trim("{$recommendation->first_name} {$recommendation->middle_name} {$recommendation->last_name}");
+        $contact = $recommendation->contact_number ?: 'N/A';
+        $address = $recommendation->address ?: 'N/A';
+
+        $gender = $recommendation->gender ? " Gender: {$recommendation->gender}." : '';
+        $age = $recommendation->age ? " Age: {$recommendation->age}." : '';
+        $notes = $recommendation->notes ? " Notes: {$recommendation->notes}." : '';
+        $message = "Updated beneficiary recommendation from {$barangayName}: {$fullName}.{$gender}{$age} Contact: {$contact}. Address: {$address}.{$notes}";
+
+        $staffUsers = self::getStaffUsers();
+        foreach ($staffUsers as $staff) {
+            if ($staff->id === $updatedByUserId) continue;
+            Notification::createNotification(
+                $staff->id,
+                'recommended_beneficiary',
+                'Barangay Recommendation Updated',
+                $message,
+                'recommended_beneficiary',
+                $recommendation->id
+            );
+        }
+    }
+
+    /**
+     * Create notification when a barangay partner recommendation is viewed by staff
+     */
+    public static function barangayRecommendationViewed($recommendationId): void
+    {
+        $recommendation = RecommendedBeneficiary::with('barangay')->find($recommendationId);
+        if (!$recommendation) {
+            return;
+        }
+
+        $fullName = trim("{$recommendation->first_name} {$recommendation->middle_name} {$recommendation->last_name}");
+        Notification::createNotification(
+            $recommendation->submitted_by,
+            'recommended_beneficiary_viewed',
+            'Recommendation Viewed',
+            "Your recommendation for {$fullName} has been viewed by staff.",
+            'recommended_beneficiary',
+            $recommendation->id
+        );
+    }
+
+    /**
+     * Create notification when a barangay partner recommendation is rejected by staff
+     */
+    public static function barangayRecommendationRejected($recommendationId): void
+    {
+        $recommendation = RecommendedBeneficiary::with('barangay')->find($recommendationId);
+        if (!$recommendation) {
+            return;
+        }
+
+        $fullName = trim("{$recommendation->first_name} {$recommendation->middle_name} {$recommendation->last_name}");
+        Notification::createNotification(
+            $recommendation->submitted_by,
+            'recommended_beneficiary_rejected',
+            'Recommendation Rejected',
+            "Your recommendation for {$fullName} has been rejected by staff.",
+            'recommended_beneficiary',
+            $recommendation->id
+        );
+    }
+
+    /**
+     * Create notification when a barangay partner recommendation is interviewed by staff
+     */
+    public static function barangayRecommendationInterviewed($recommendationId): void
+    {
+        $recommendation = RecommendedBeneficiary::with('barangay')->find($recommendationId);
+        if (!$recommendation) {
+            return;
+        }
+
+        $fullName = trim("{$recommendation->first_name} {$recommendation->middle_name} {$recommendation->last_name}");
+        Notification::createNotification(
+            $recommendation->submitted_by,
+            'recommended_beneficiary_interviewed',
+            'Recommendation Interviewed',
+            "Your recommendation for {$fullName} has been interviewed by staff.",
+            'recommended_beneficiary',
+            $recommendation->id
+        );
+    }
+
+    /**
+     * Create notification when a barangay submits feedback for a relief operation
+     */
+    public static function barangayFeedbackSubmitted($feedbackId, $submittedByUserId = null): void
+    {
+        $feedback = ReliefOperationFeedback::with(['barangay', 'reliefOperation.calamity'])->find($feedbackId);
+        if (!$feedback) {
+            return;
+        }
+
+        $barangayName = $feedback->barangay?->name ?? 'Unknown Barangay';
+        $reliefName = $feedback->reliefOperation?->calamity?->name ?? 'Relief Operation';
+        $message = "New feedback submitted from {$barangayName} for {$reliefName}: {$feedback->message}";
+
+        $staffUsers = self::getStaffUsers();
+        foreach ($staffUsers as $staff) {
+            if ($submittedByUserId && $staff->id === $submittedByUserId) {
+                continue;
+            }
+            Notification::createNotification(
+                $staff->id,
+                'relief_operation_feedback',
+                'Relief Operation Feedback',
+                $message,
+                'relief_operation_feedback',
+                $feedback->id
+            );
+        }
+    }
+
+    /**
      * Create notification when inventory is added
      */
-    public static function inventoryAdded($inventoryId, $addedByUserId): void
+    public static function inventoryAdded($itemId, $addedByUserId): void
     {
-        $inventory = Inventory::find($inventoryId);
-        if (!$inventory) return;
+        $item = Item::with('inventory')->find($itemId);
+        if (!$item) return;
+
+        $inventory = $item->inventory;
+        $relatedId = $inventory ? $inventory->id : null;
+        $itemName = $item->name;
 
         // Notify admin users
-        $adminUsers = User::where('role_id', 1)->get();
-        
+        $adminUsers = self::getAdminUsers();
         foreach ($adminUsers as $admin) {
-            if ($admin->id === $addedByUserId) continue; // Don't notify the user who added it
-            
+            if ($admin->id === $addedByUserId) continue;
             Notification::createNotification(
                 $admin->id,
                 'inventory_addition',
                 'New Inventory Added',
-                "New inventory '{$inventory->name}' has been added",
+                "New inventory '{$itemName}' has been added",
                 'inventory',
-                $inventory->id
+                $relatedId
+            );
+        }
+
+        // Notify staff users as well
+        $staffUsers = self::getStaffUsers();
+        foreach ($staffUsers as $staff) {
+            if ($staff->id === $addedByUserId) continue;
+            Notification::createNotification(
+                $staff->id,
+                'inventory_addition',
+                'Inventory Updated',
+                "New inventory '{$itemName}' has been added",
+                'inventory',
+                $relatedId
             );
         }
     }
@@ -95,7 +290,7 @@ class NotificationService
         if (!$beneficiary) return;
 
         // Notify admin users
-        $adminUsers = User::where('role_id', 1)->get();
+        $adminUsers = self::getAdminUsers();
         
         foreach ($adminUsers as $admin) {
             if ($admin->id === $addedByUserId) continue; // Don't notify the user who added it
@@ -120,7 +315,7 @@ class NotificationService
         if (!$event) return;
 
         // Notify admin users
-        $adminUsers = User::where('role_id', 1)->get();
+        $adminUsers = self::getAdminUsers();
         
         foreach ($adminUsers as $admin) {
             if ($admin->id === $createdByUserId) continue; // Don't notify the user who created it
@@ -153,6 +348,75 @@ class NotificationService
             'location_request',
             $locationRequest->id
         );
+    }
+
+    /**
+     * Create notification when a location request is submitted
+     */
+    public static function locationRequestSubmitted($requestId, $requestedByUserId = null): void
+    {
+        $locationRequest = LocationRequest::find($requestId);
+        if (!$locationRequest) return;
+
+        $adminUsers = self::getAdminUsers();
+        foreach ($adminUsers as $admin) {
+            Notification::createNotification(
+                $admin->id,
+                'location_request_submitted',
+                'Location Request Submitted',
+                "A new {$locationRequest->type} request for '{$locationRequest->name}' has been submitted",
+                'location_request',
+                $locationRequest->id
+            );
+        }
+
+        $staffUsers = self::getStaffUsers();
+        foreach ($staffUsers as $staff) {
+            if ($requestedByUserId && $staff->id === $requestedByUserId) continue;
+            Notification::createNotification(
+                $staff->id,
+                'location_request_submitted',
+                'Location Request Submitted',
+                "A new {$locationRequest->type} request for '{$locationRequest->name}' has been submitted",
+                'location_request',
+                $locationRequest->id
+            );
+        }
+    }
+
+    /**
+     * Create notification when a location request is updated
+     */
+    public static function locationRequestUpdated($requestId, $updatedByUserId = null): void
+    {
+        $locationRequest = LocationRequest::find($requestId);
+        if (!$locationRequest) return;
+
+        $adminUsers = self::getAdminUsers();
+        foreach ($adminUsers as $admin) {
+            if ($updatedByUserId && $admin->id === $updatedByUserId) continue;
+            Notification::createNotification(
+                $admin->id,
+                'location_request_updated',
+                'Location Request Updated',
+                "The {$locationRequest->type} request for '{$locationRequest->name}' has been updated",
+                'location_request',
+                $locationRequest->id
+            );
+        }
+
+        $staffUsers = self::getStaffUsers();
+        foreach ($staffUsers as $staff) {
+            if ($updatedByUserId && $staff->id === $updatedByUserId) continue;
+            Notification::createNotification(
+                $staff->id,
+                'location_request_updated',
+                'Location Request Updated',
+                "The {$locationRequest->type} request for '{$locationRequest->name}' has been updated",
+                'location_request',
+                $locationRequest->id
+            );
+        }
     }
 
     /**

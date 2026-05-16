@@ -4,7 +4,6 @@
 @section('content')
 <div class="dash-header">
     <h1>Hello, {{ auth()->user()->first_name }}!</h1>
-    <span class="logo-circle" style="border-color:#1a3d1f;"></span>
 </div>
 
 @if(session('success'))
@@ -110,6 +109,7 @@
                 </tbody>
             </table>
         </div>
+
     </div>
 </div>
 
@@ -119,4 +119,79 @@
     <p style="font-size:0.9rem;color:#aaa;margin-top:8px;">You will be notified when the CDC opens a portal.</p>
 </div>
 @endif
+
+<div class="section-card">
+    <h3>Relief Operation History</h3>
+    <table class="dist-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Calamity</th>
+                <th>Status</th>
+                <th>Comments</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($reliefHistory as $operation)
+            <tr>
+                <td>{{ optional($operation->operation_date)->format('M d, Y') ?? 'N/A' }}</td>
+                <td>{{ $operation->calamity->name ?? 'N/A' }}</td>
+                <td><span class="status-badge {{ strtolower($operation->status ?? 'unknown') }}">{{ $operation->status ?? 'Unknown' }}</span></td>
+                <td>{{ $operation->feedbacks_count }}</td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="4" style="text-align:center;color:#888;padding:16px;">
+                    No relief operation history available.
+                </td>
+            </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+
+@if($reliefHistory->isNotEmpty())
+<div class="section-card">
+    <h3>Send Operation Feedback</h3>
+    <form method="POST" action="{{ route('barangay.feedback.submit') }}">
+        @csrf
+        <div class="form-group">
+            <label>Relief Operation</label>
+            <select name="relief_operation_id" required>
+                @foreach($reliefHistory as $operation)
+                    <option value="{{ $operation->id }}"
+                        {{ old('relief_operation_id') == $operation->id ? 'selected' : '' }}>
+                        {{ optional($operation->operation_date)->format('M d, Y') ?? 'N/A' }} — {{ $operation->calamity->name ?? 'N/A' }} ({{ $operation->status ?? 'Unknown' }})
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Feedback / Comment</label>
+            <textarea name="message" rows="4" required placeholder="Share your feedback about this relief operation">{{ old('message') }}</textarea>
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%;margin-top:8px;">Submit Feedback</button>
+    </form>
+</div>
+@else
+<div class="section-card" style="text-align:center;padding:1.5rem;">
+    No relief operations are available to comment on yet.
+</div>
+@endif
+
+@if($recentFeedbacks->isNotEmpty())
+<div class="section-card">
+    <h3>Recent Feedback Sent</h3>
+    <ul class="feedback-list">
+        @foreach($recentFeedbacks as $feedback)
+        <li>
+            <strong>{{ optional($feedback->reliefOperation?->operation_date)->format('M d, Y') ?? 'Date unknown' }}</strong>
+            <span> — {{ $feedback->reliefOperation?->calamity?->name ?? 'Relief operation' }}</span>
+            <p>{{ \Illuminate\Support\Str::limit($feedback->message, 120) }}</p>
+        </li>
+        @endforeach
+    </ul>
+</div>
+@endif
+
 @endsection

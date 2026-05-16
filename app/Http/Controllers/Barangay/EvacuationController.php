@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Calamity;
 use App\Models\EvacuationCenter;
 use App\Models\EvacuationReport;
-use App\Models\CalamityPartner;
+use App\Models\ReliefOperation;
+use App\Models\ReliefOperationFeedback;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class EvacuationController extends Controller
@@ -51,8 +53,21 @@ class EvacuationController extends Controller
                 ->get();
         }
 
+        $reliefHistory = ReliefOperation::with('calamity')
+            ->withCount('feedbacks')
+            ->where('barangay_id', $barangayId)
+            ->orderByDesc('operation_date')
+            ->limit(10)
+            ->get();
+
+        $recentFeedbacks = ReliefOperationFeedback::with('reliefOperation.calamity')
+            ->where('barangay_id', $barangayId)
+            ->latest()
+            ->limit(5)
+            ->get();
+
         return view('barangay.dashboard', compact(
-            'activeCalamity', 'evacuationCenter', 'latestReport', 'rankings'
+            'activeCalamity', 'evacuationCenter', 'latestReport', 'rankings', 'reliefHistory', 'recentFeedbacks'
         ));
     }
 
@@ -114,5 +129,31 @@ class EvacuationController extends Controller
         );
 
         return back()->with('success', 'Report updated successfully.');
+    }
+
+    // Submit feedback for a relief operation
+    public function submitFeedback(Request $request)
+    {
+        $request->validate([
+            'relief_operation_id' => 'required|exists:relief_operations,id',
+            'message' => 'required|string|max:1000',
+        ]);
+
+        $barangayId = auth()->user()->barangay_id;
+
+        $reliefOperation = ReliefOperation::where('id', $request->relief_operation_id)
+            ->where('barangay_id', $barangayId)
+            ->firstOrFail();
+
+        $feedback = ReliefOperationFeedback::create([
+            'relief_operation_id' => $reliefOperation->id,
+            'barangay_id' => $barangayId,
+            'message' => $request->message,
+            'created_by' => auth()->id(),
+        ]);
+
+        NotificationService::barangayFeedbackSubmitted($feedback->id, auth()->id());
+
+        return back()->with('success', 'Thank you for your feedback. The staff has been notified.');
     }
 }

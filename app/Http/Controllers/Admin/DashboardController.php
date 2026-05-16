@@ -251,7 +251,7 @@ class DashboardController extends Controller
             'municipalityCount' => Municipality::count(),
             'regionCount' => Municipality::distinct('province')->count('province'),
             'totalDistributions' => ReliefEvent::count(),
-            'verifiedBeneficiaries' => Beneficiary::where('status', 'verified')->count(),
+            'verifiedBeneficiaries' => Beneficiary::where('is_verified', 1)->count(),
             'totalInventoryItems' => Item::count(),
             'lowStockItems' => Inventory::where('quantity', '<=', DB::raw('reorder_level'))->count(),
             'expiringItems' => Item::where('expiration_date', '<=', now()->addDays(30))->count(),

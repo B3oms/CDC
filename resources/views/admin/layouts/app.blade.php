@@ -93,7 +93,10 @@
         
         <!-- User Profile Section -->
         <div class="user-profile">
-            <a href="/admin/profile" class="profile-circle">
+            @php
+                $profileRoute = auth()->user()->role->name === 'Barangay Partner' ? route('barangay.profile.show') : route('admin.profile');
+            @endphp
+            <a href="{{ $profileRoute }}" class="profile-circle">
                 <div class="user-avatar">
                     {{ strtoupper(substr(auth()->user()->first_name,0,1).substr(auth()->user()->last_name,0,1)) }}
                 </div>
@@ -213,7 +216,12 @@ function toggleNotifications() {
 function loadNotifications() {
     const notificationList = document.getElementById('notificationList');
     
-    fetch('{{ route("admin.notifications.index") }}')
+    fetch('{{ route("admin.notifications.index") }}', {
+        headers: {
+            'Accept': 'application/json'
+        },
+        credentials: 'same-origin'
+    })
         .then(response => response.json())
         .then(data => {
             updateNotificationBadge(data.unread_count);
@@ -221,10 +229,11 @@ function loadNotifications() {
         })
         .catch(error => {
             console.error('Error loading notifications:', error);
+            // If there's an error retrieving notifications, show an empty state
             notificationList.innerHTML = `
                 <div class="notification-empty">
-                    <i class="fas fa-exclamation-triangle" style="color: #ef4444; font-size: 2rem; margin-bottom: 0.5rem;"></i>
-                    <p style="color: #ef4444; margin: 0;">Error loading notifications</p>
+                    <i class="fas fa-bell-slash" style="color: #888780; font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                    <p style="color: #888780; margin: 0;">No notifications</p>
                 </div>
             `;
         });
@@ -273,7 +282,8 @@ function updateNotificationBadge(count) {
 
 // Mark notification as read
 function markNotificationRead(notificationId) {
-    fetch(`{{ route('admin.notifications.read', ':notificationId') }}`.replace(':notificationId', notificationId), {
+    const readUrl = '{{ url('admin/notifications') }}' + '/' + notificationId + '/read';
+    fetch(readUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -303,7 +313,7 @@ function markNotificationRead(notificationId) {
 
 // Mark all notifications as read
 function markAllNotificationsRead() {
-    fetch('{{ route("admin.notifications.readAll") }}', {
+    fetch('{{ url('admin/notifications/read-all') }}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -354,36 +364,6 @@ document.querySelector('.mark-all-read')?.addEventListener('click', function() {
     markAllNotificationsRead();
 });
 
-function markAllNotificationsRead() {
-    document.querySelectorAll('.notification-item.unread').forEach(item => {
-        item.classList.remove('unread');
-    });
-    const badge = document.querySelector('.notification-badge');
-    if (badge) {
-        badge.style.display = 'none';
-    }
-}
-
-function markNotificationRead(notificationId) {
-    const notification = document.querySelector(`[onclick*="${notificationId}"]`);
-    if (notification) {
-        notification.classList.remove('unread');
-        updateNotificationBadge();
-    }
-}
-
-function updateNotificationBadge() {
-    const unreadCount = document.querySelectorAll('.notification-item.unread').length;
-    const badge = document.querySelector('.notification-badge');
-    if (badge) {
-        if (unreadCount > 0) {
-            badge.textContent = unreadCount;
-            badge.style.display = 'block';
-        } else {
-            badge.style.display = 'none';
-        }
-    }
-}
 </script>
 
 <style>

@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\Item;
 use App\Models\Inventory;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -151,7 +152,7 @@ class InventoryController extends Controller
             'unit' => 'required|string|max:50',
             'location' => 'nullable|string|max:255',
             'condition' => 'nullable|string|max:255',
-            'expiry_date' => 'nullable|date',
+            'expiration_date' => 'nullable|date',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
@@ -168,8 +169,11 @@ class InventoryController extends Controller
         Inventory::create([
             'item_id' => $item->id,
             'quantity' => $validated['quantity'],
+            'expiration_date' => $validated['expiration_date'] ?? null,
             'last_updated' => now()
         ]);
+
+        NotificationService::inventoryAdded($item->id, auth()->id());
 
         return redirect()->route('staff.inventory.subcategory.show', $subcategoryId)
             ->with('success', 'Item created successfully.');
@@ -192,7 +196,7 @@ class InventoryController extends Controller
             'unit' => 'required|string|max:50',
             'location' => 'nullable|string|max:255',
             'condition' => 'nullable|string|max:255',
-            'expiry_date' => 'nullable|date',
+            'expiration_date' => 'nullable|date',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
@@ -211,6 +215,7 @@ class InventoryController extends Controller
         if ($item->inventory) {
             $item->inventory->update([
                 'quantity' => $validated['quantity'],
+                'expiration_date' => $validated['expiration_date'] ?? null,
                 'last_updated' => now()
             ]);
         }
