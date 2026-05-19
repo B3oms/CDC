@@ -224,6 +224,249 @@
 </div>
 @endsection
 
+@push('styles')
+<style>
+/* Dashboard Specific Responsive Styles */
+@media (max-width: 1024px) {
+    .dash-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+    
+    .dash-header h1 {
+        font-size: 1.5rem;
+        text-align: center;
+    }
+    
+    .calamity-meter {
+        align-self: center;
+        max-width: 300px;
+    }
+    
+    .stats-row {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .dash-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .chart-card {
+        margin-bottom: 1rem;
+    }
+    
+    .chart-title {
+        font-size: 0.9rem;
+    }
+    
+    .pdf-export-btn {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .dash-header {
+        padding: 1rem;
+    }
+    
+    .dash-header h1 {
+        font-size: 1.25rem;
+    }
+    
+    .calamity-meter {
+        max-width: 100%;
+    }
+    
+    .cal-label {
+        font-size: 0.9rem;
+    }
+    
+    .cal-name {
+        font-size: 0.8rem;
+    }
+    
+    .stats-row {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.75rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .stat-num {
+        font-size: 1.5rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+    }
+    
+    .stat-label i {
+        font-size: 1rem;
+    }
+    
+    .dash-grid {
+        gap: 1rem;
+    }
+    
+    .chart-card {
+        padding: 1rem;
+    }
+    
+    .chart-title {
+        font-size: 0.8rem;
+    }
+    
+    .pdf-export-btn {
+        font-size: 0.75rem;
+        padding: 8px 12px;
+        width: 100%;
+    }
+    
+    .alert {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .badge-intensity {
+        font-size: 0.7rem;
+        padding: 2px 6px;
+    }
+}
+
+@media (max-width: 480px) {
+    .dash-header {
+        padding: 0.75rem;
+    }
+    
+    .dash-header h1 {
+        font-size: 1.1rem;
+    }
+    
+    .calamity-meter {
+        padding: 0.75rem;
+    }
+    
+    .cal-label {
+        font-size: 0.8rem;
+    }
+    
+    .cal-name {
+        font-size: 0.75rem;
+    }
+    
+    .cal-badge {
+        font-size: 0.7rem;
+        padding: 2px 6px;
+    }
+    
+    .stats-row {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .stat-card {
+        padding: 0.75rem;
+    }
+    
+    .stat-num {
+        font-size: 1.25rem;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+    }
+    
+    .stat-label i {
+        font-size: 0.9rem;
+    }
+    
+    .dash-grid {
+        gap: 0.75rem;
+    }
+    
+    .chart-card {
+        padding: 0.75rem;
+    }
+    
+    .chart-title {
+        font-size: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .pdf-export-btn {
+        font-size: 0.7rem;
+        padding: 6px 10px;
+    }
+    
+    .alert {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    .badge-intensity {
+        font-size: 0.6rem;
+        padding: 1px 4px;
+    }
+}
+
+/* Landscape Mobile for Dashboard */
+@media (max-width: 768px) and (orientation: landscape) {
+    .dash-header {
+        flex-direction: row;
+        align-items: center;
+        padding: 0.5rem 1rem;
+    }
+    
+    .dash-header h1 {
+        font-size: 1.1rem;
+    }
+    
+    .calamity-meter {
+        max-width: 200px;
+        padding: 0.5rem;
+    }
+    
+    .stats-row {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.5rem;
+    }
+    
+    .stat-card {
+        padding: 0.5rem;
+    }
+    
+    .stat-num {
+        font-size: 1.1rem;
+    }
+    
+    .stat-label {
+        font-size: 0.7rem;
+    }
+}
+
+/* Tablet Portrait for Dashboard */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+    .stats-row {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .dash-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .yearly-col {
+        max-width: 100%;
+    }
+}
+</style>
+@endpush
+
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
