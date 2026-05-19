@@ -178,15 +178,10 @@ class InventoryController extends Controller
             'name'            => 'required|string|max:150',
             'description'     => 'nullable|string',
             'unit'            => 'required|string|max:50',
-            'image'           => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'color'           => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
             'quantity'        => 'required|integer|min:0',
             'expiration_date' => 'nullable|date',
         ]);
-
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('items', 'public');
-        }
 
         $item = Item::create([
             'category_id'    => $subcategory->category_id,
@@ -194,7 +189,7 @@ class InventoryController extends Controller
             'name'           => $request->name,
             'description'    => $request->description,
             'unit'           => $request->unit,
-            'image'          => $imagePath,
+            'color'          => $request->color,
         ]);
 
         Inventory::create([
@@ -225,22 +220,16 @@ class InventoryController extends Controller
             'name'            => 'required|string|max:150',
             'description'     => 'nullable|string',
             'unit'            => 'required|string|max:50',
-            'image'           => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'color'           => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
             'quantity'        => 'required|integer|min:0',
             'expiration_date' => 'nullable|date',
         ]);
-
-        $imagePath = $item->image;
-        if ($request->hasFile('image')) {
-            if ($imagePath) Storage::disk('public')->delete($imagePath);
-            $imagePath = $request->file('image')->store('items', 'public');
-        }
 
         $item->update([
             'name'        => $request->name,
             'description' => $request->description,
             'unit'        => $request->unit,
-            'image'       => $imagePath,
+            'color'       => $request->color,
         ]);
 
         if ($item->inventory) {

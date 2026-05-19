@@ -35,17 +35,11 @@
     @foreach($items as $item)
     <div class="inventory-item-card">
         <div class="inventory-card-img">
-            @if($item->image)
-                <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->name }}" 
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="inventory-card-placeholder" style="display:none;">
+            <div class="inventory-color-container" style="background-color: {{ $item->color ?? '#3B82F6' }};">
+                <div class="inventory-color-text">
                     {{ strtoupper(substr($item->name, 0, 2)) }}
                 </div>
-            @else
-                <div class="inventory-card-placeholder">
-                    {{ strtoupper(substr($item->name, 0, 2)) }}
-                </div>
-            @endif
+            </div>
         </div>
         <div class="inventory-item-body">
             <div class="inventory-card-name">{{ $item->name }}</div>
@@ -90,3 +84,39 @@
 </div>
 @endif
 @endsection
+
+@push('styles')
+<style>
+.inventory-color-container {
+    width: 100%;
+    height: 120px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.inventory-color-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.inventory-color-text {
+    color: white;
+    font-weight: 600;
+    font-size: 24px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    letter-spacing: 1px;
+}
+
+.inventory-card-img {
+    height: 120px;
+    margin-bottom: 12px;
+}
+</style>
+@endpush
