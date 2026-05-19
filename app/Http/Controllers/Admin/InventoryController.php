@@ -13,6 +13,23 @@ use Illuminate\Support\Facades\Storage;
 
 class InventoryController extends Controller
 {
+    /**
+     * Generate a random color for inventory containers
+     */
+    public function generateRandomColor()
+    {
+        $colors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+            '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2',
+            '#F8B739', '#52B788', '#E76F51', '#8E7CC3', '#F4A261',
+            '#E9C46A', '#2A9D8F', '#E63946', '#A8DADC', '#457B9D',
+            '#1D3557', '#F1FAEE', '#A8DADC', '#457B9D', '#1D3557',
+            '#FF006E', '#FB5607', '#FFBE0B', '#8338EC', '#3A86FF'
+        ];
+        
+        return $colors[array_rand($colors)];
+    }
+
     // Level 1 — All categories
     public function index()
     {
@@ -49,13 +66,12 @@ class InventoryController extends Controller
         $request->validate([
             'name'        => 'required|string|max:100|unique:categories,name',
             'description' => 'nullable|string',
-            'color'       => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
         ]);
 
         Category::create([
             'name'        => $request->name,
             'description' => $request->description,
-            'color'       => $request->color,
+            'color'       => $this->generateRandomColor(),
         ]);
 
         return redirect()->route('admin.inventory.index')
@@ -75,13 +91,11 @@ class InventoryController extends Controller
         $request->validate([
             'name'        => 'required|string|max:100|unique:categories,name,' . $id,
             'description' => 'nullable|string',
-            'color'       => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
         ]);
 
         $category->update([
             'name'        => $request->name,
             'description' => $request->description,
-            'color'       => $request->color,
         ]);
 
         return redirect()->route('admin.inventory.index')
@@ -107,14 +121,13 @@ class InventoryController extends Controller
     public function storeSubcategory(Request $request, $categoryId)
     {
         $request->validate([
-            'name'  => 'required|string|max:100',
-            'color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
+            'name' => 'required|string|max:100',
         ]);
 
         Subcategory::create([
             'category_id' => $categoryId,
             'name'        => $request->name,
-            'color'       => $request->color,
+            'color'       => $this->generateRandomColor(),
         ]);
 
         return redirect()->route('admin.inventory.category.show', $categoryId)
@@ -132,13 +145,11 @@ class InventoryController extends Controller
         $subcategory = Subcategory::findOrFail($id);
 
         $request->validate([
-            'name'  => 'required|string|max:100',
-            'color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
+            'name' => 'required|string|max:100',
         ]);
 
         $subcategory->update([
-            'name'  => $request->name,
-            'color' => $request->color,
+            'name' => $request->name,
         ]);
 
         return redirect()->route('admin.inventory.category.show', $subcategory->category_id)
@@ -170,7 +181,6 @@ class InventoryController extends Controller
             'name'            => 'required|string|max:150',
             'description'     => 'nullable|string',
             'unit'            => 'required|string|max:50',
-            'color'           => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
             'quantity'        => 'required|integer|min:0',
             'expiration_date' => 'nullable|date',
         ]);
@@ -181,7 +191,7 @@ class InventoryController extends Controller
             'name'           => $request->name,
             'description'    => $request->description,
             'unit'           => $request->unit,
-            'color'          => $request->color,
+            'color'          => $this->generateRandomColor(),
         ]);
 
         Inventory::create([
@@ -212,7 +222,6 @@ class InventoryController extends Controller
             'name'            => 'required|string|max:150',
             'description'     => 'nullable|string',
             'unit'            => 'required|string|max:50',
-            'color'           => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
             'quantity'        => 'required|integer|min:0',
             'expiration_date' => 'nullable|date',
         ]);
@@ -221,7 +230,6 @@ class InventoryController extends Controller
             'name'        => $request->name,
             'description' => $request->description,
             'unit'        => $request->unit,
-            'color'       => $request->color,
         ]);
 
         if ($item->inventory) {
