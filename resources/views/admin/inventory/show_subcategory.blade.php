@@ -36,7 +36,11 @@
     <div class="inventory-item-card">
         <div class="inventory-card-img">
             @if($item->image)
-                <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->name }}">
+                <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->name }}" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="inventory-card-placeholder" style="display:none;">
+                    {{ strtoupper(substr($item->name, 0, 2)) }}
+                </div>
             @else
                 <div class="inventory-card-placeholder">
                     {{ strtoupper(substr($item->name, 0, 2)) }}

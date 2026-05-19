@@ -57,7 +57,8 @@
                 @if($item->image)
                     <img src="{{ asset('storage/' . $item->image) }}"
                         id="preview-item"
-                        style="width:80px;height:80px;object-fit:cover;border-radius:8px;margin-bottom:8px;">
+                        style="width:80px;height:80px;object-fit:cover;border-radius:8px;margin-bottom:8px;"
+                        onerror="this.style.display='none';">
                 @else
                     <img id="preview-item" src="#" alt="Preview"
                         style="display:none;width:80px;height:80px;object-fit:cover;border-radius:8px;margin-bottom:8px;">
