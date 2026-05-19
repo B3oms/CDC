@@ -69,7 +69,7 @@
 .cr-benef-pill{display:none;align-items:center;gap:7px;padding:7px 14px;background:#f1efe8;border-radius:100px;font-size:13px;color:#2c2c2a;margin-top:4px}
 .cr-benef-pill strong{color:#2c2c2a;font-weight:600}
 .cr-inv-list{border:1px solid #d3d1c7;border-radius:8px;overflow:hidden}
-.cr-inv-row{display:grid;grid-template-columns:1fr 80px 110px;align-items:center;padding:11px 14px;border-bottom:1px solid #f1efe8;gap:12px}
+.cr-inv-row{display:grid;grid-template-columns:1fr 110px;align-items:center;padding:11px 14px;border-bottom:1px solid #f1efe8;gap:12px}
 .cr-inv-row:last-child{border-bottom:none}
 .cr-inv-row:hover{background:#f1efe8}
 .cr-inv-check{display:flex;align-items:center;gap:10px;cursor:pointer}
@@ -79,15 +79,21 @@
 .cr-inv-stock{text-align:right}
 .cr-stk-n{font-size:14px;font-weight:500;color:#2c2c2a}
 .cr-stk-u{font-size:11px;color:#888780}
-.cr-inv-res{text-align:right}
+.cr-inv-res{text-align:right;gap:6px;display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap}
 .cr-res-val{font-size:13px;font-weight:500;color:#065f46}
 .cr-inv-res.warn .cr-res-val{color:#e24b4a}
-.cr-dist-sum{display:none;margin-top:1rem;padding:1rem;background:#f1efe8;border:1px solid #d3d1c7;border-radius:8px}
+.cr-qty-input{width:60px;padding:6px;border:1px solid #d3d1c7;border-radius:4px;font-size:12px;text-align:center}
+.cr-qty-input:focus{outline:none;border-color:#1a3d1f}
+.cr-calc-display{font-size:10px;color:#065f46;font-weight:500;margin-left:8px;white-space:nowrap;line-height:1.2}
 .cr-dist-ttl{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#888780;margin-bottom:10px}
 .cr-sum-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid #f1efe8;color:#2c2c2a}
 .cr-sum-row:last-child{border-bottom:none}
 .cr-sum-row.warn .cr-sum-st{color:#e24b4a}
 .cr-sum-st{color:#888780}
+.cr-dist-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:0.5rem}
+.cr-dist-table th{background:#e8e4d9;padding:8px;text-align:left;font-weight:600;color:#2c2c2a;border-bottom:2px solid #d3d1c7}
+.cr-dist-table td{padding:8px;border-bottom:1px solid #e8e4d9;color:#2c2c2a}
+.cr-dist-table tr:last-child td{border-bottom:none}
 .cr-footer{display:flex;justify-content:flex-end;align-items:center;gap:8px;padding-top:4px}
 .cr-btn-cancel{padding:9px 18px;border:1px solid #d3d1c7;border-radius:6px;background:#fff;color:#5f5e5a;font-size:14px;font-weight:500;text-decoration:none;display:inline-block}
 .cr-btn-cancel:hover{background:#f1efe8;color:#2c2c2a}
@@ -179,14 +185,16 @@
             <select name="calamity_id">
               <option value="">Select type</option>
               @if(isset($calamities))
-                <option value="natural" {{ old('calamity_id')=='natural'?'selected':'' }}>Natural Calamities</option>
-                @foreach($calamities->where('type', 'natural') as $calamity)
-                <option value="{{ $calamity->id }}" {{ old('calamity_id')==$calamity->id?'selected':'' }}>{{ $calamity->name }}</option>
-                @endforeach
-                <option value="human_made" {{ old('calamity_id')=='human_made'?'selected':'' }}>Human-Made Calamities</option>
-                @foreach($calamities->where('type', 'human_made') as $calamity)
-                <option value="{{ $calamity->id }}" {{ old('calamity_id')==$calamity->id?'selected':'' }}>{{ $calamity->name }}</option>
-                @endforeach
+                <optgroup label="Natural Calamities">
+                  @foreach($calamities->where('type', 'natural') as $calamity)
+                  <option value="{{ $calamity->id }}" {{ old('calamity_id')==$calamity->id?'selected':'' }}>{{ $calamity->name }}</option>
+                  @endforeach
+                </optgroup>
+                <optgroup label="Human-Made Calamities">
+                  @foreach($calamities->where('type', 'human_made') as $calamity)
+                  <option value="{{ $calamity->id }}" {{ old('calamity_id')==$calamity->id?'selected':'' }}>{{ $calamity->name }}</option>
+                  @endforeach
+                </optgroup>
               @endif
             </select>
           </div>
@@ -375,25 +383,25 @@
                     data-name="{{ $item->name }}"
                     onchange="crCalcDist()">
                   <div>
-                    <div class="cr-inv-name">{{ $item->name }}</div>
+                    <div class="cr-inv-name">{{ $item->name }} ({{ $item->inventory?->quantity ?? 0 }} {{ $item->unit }})</div>
                     <div class="cr-inv-cat">{{ $cat->name }} · {{ $sub->name }}</div>
                   </div>
                 </label>
-                <div class="cr-inv-stock">
-                  <div class="cr-stk-n">{{ $item->inventory?->quantity ?? 0 }}</div>
-                  <div class="cr-stk-u">{{ $item->unit }}</div>
-                </div>
                 <div class="cr-inv-res" id="cr-res-{{ $item->id }}">
-                  <span class="cr-res-val">—</span>
+                  <input type="number" name="item_quantities[{{ $item->id }}]" 
+                    min="0" max="{{ $item->inventory?->quantity ?? 0 }}"
+                    placeholder="Qty" 
+                    class="cr-qty-input"
+                    data-max="{{ $item->inventory?->quantity ?? 0 }}"
+                    data-unit="{{ $item->unit }}"
+                    onchange="crCalcDist()"
+                    oninput="crCalcDist()">
+                  <span class="cr-calc-display" id="cr-calc-{{ $item->id }}">— per beneficiary</span>
                 </div>
               </div>
               @endforeach
             @endforeach
           @endforeach
-        </div>
-        <div class="cr-dist-sum" id="cr-dist-sum">
-          <div class="cr-dist-ttl">Distribution summary</div>
-          <div id="cr-sum-content"></div>
         </div>
       </div>
     </div>
@@ -501,41 +509,35 @@ function crUpdateBenef() {
 
 /* ── Inventory calc ──────────────────────────────── */
 function crCalcDist() {
-  var hh      = parseInt(document.getElementById('cr-total-hh').value) || 0;
-  var checked = document.querySelectorAll('input[name="distribute_items[]"]:checked');
-  var sumDiv  = document.getElementById('cr-dist-sum');
-  var sumCont = document.getElementById('cr-sum-content');
-
-  document.querySelectorAll('.cr-inv-res').forEach(function(el) {
-    el.querySelector('.cr-res-val').textContent = '—';
-    el.classList.remove('warn');
-  });
-
-  if (!hh || !checked.length) { sumDiv.style.display = 'none'; return; }
-
-  var rows = [];
-  checked.forEach(function(cb) {
-    var id   = cb.value;
-    var qty  = parseInt(cb.dataset.qty)  || 0;
+  var hh = parseInt(document.getElementById('cr-total-hh').value) || 0;
+  
+  // Update all item calculations
+  document.querySelectorAll('input[name="distribute_items[]"]').forEach(function(cb) {
+    var id = cb.value;
+    var maxQty = parseInt(cb.dataset.qty) || 0;
     var unit = cb.dataset.unit;
-    var name = cb.dataset.name;
-    var per  = Math.floor(qty / hh);
-    var res  = document.getElementById('cr-res-' + id);
-    if (!res) return;
-    var val  = res.querySelector('.cr-res-val');
-
-    if (per <= 0) {
-      val.textContent = 'Insufficient';
-      res.classList.add('warn');
-      rows.push('<div class="cr-sum-row warn"><span>' + name + '</span><span class="cr-sum-st">Not enough (' + qty + ' ' + unit + ')</span></div>');
+    var qtyInput = document.querySelector('input[name="item_quantities[' + id + ']"]');
+    var calcDisplay = document.getElementById('cr-calc-' + id);
+    
+    if (!calcDisplay) return;
+    
+    var qty = qtyInput ? parseInt(qtyInput.value) || 0 : 0;
+    
+    if (cb.checked && hh > 0 && qty > 0) {
+      var per = Math.floor(qty / hh);
+      calcDisplay.textContent = per + ' ' + unit + ' each (' + qty + ' ÷ ' + hh + ' = ' + per + ' per beneficiary)';
+      calcDisplay.style.color = '#065f46';
+    } else if (cb.checked && hh === 0) {
+      calcDisplay.textContent = 'No beneficiaries selected';
+      calcDisplay.style.color = '#e24b4a';
+    } else if (cb.checked && qty === 0) {
+      calcDisplay.textContent = 'Enter quantity';
+      calcDisplay.style.color = '#e24b4a';
     } else {
-      var used = per * hh;
-      val.textContent = per + ' ' + unit;
-      rows.push('<div class="cr-sum-row"><span>' + name + '</span><span class="cr-sum-st">' + per + ' ' + unit + ' × ' + hh + ' = ' + used + ' used, ' + (qty - used) + ' left</span></div>');
+      calcDisplay.textContent = '— per beneficiary';
+      calcDisplay.style.color = '#888780';
     }
   });
-  sumCont.innerHTML    = rows.join('');
-  sumDiv.style.display = 'block';
 }
 
 // Combine facilitator arrays before form submission

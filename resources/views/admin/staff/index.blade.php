@@ -54,8 +54,9 @@
         {{-- Modal Header --}}
         <div style="background:#1a3d1f;padding:1.5rem;display:flex;align-items:center;gap:14px;">
             <div id="modal-avatar"
-                style="width:56px;height:56px;border-radius:50%;background:#f5c300;color:#1a3d1f;
-                display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0;">
+                style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg, #f8fafc, #e2e8f0);color:#475569;
+                display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;flex-shrink:0;
+                border:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0, 0, 0, 0.1);transition:all 0.2s ease;position:relative;overflow:hidden;">
             </div>
             <div>
                 <div id="modal-name" style="font-size:1.1rem;font-weight:700;color:#fff;"></div>

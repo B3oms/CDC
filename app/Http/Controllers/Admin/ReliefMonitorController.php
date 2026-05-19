@@ -115,6 +115,9 @@ class ReliefMonitorController extends Controller
             'intensity'        => 'nullable|in:low,medium,high,critical',
             'facilitator_ids' => 'nullable|array',
             'facilitator_ids.*' => 'exists:users,id',
+            'distribute_items' => 'nullable|array',
+            'distribute_items.*' => 'exists:items,id',
+            'item_quantities' => 'nullable|array',
         ]);
 
         $event = ReliefEvent::create([
@@ -168,6 +171,28 @@ class ReliefMonitorController extends Controller
             }
         }
 
+        // Save distributed items
+        if ($request->distribute_items && $request->item_quantities) {
+            $totalBeneficiaries = ReliefEventBeneficiary::where('relief_event_id', $event->id)->count();
+            
+            foreach ($request->distribute_items as $itemId) {
+                $quantity = $request->item_quantities[$itemId] ?? 0;
+                if ($quantity > 0) {
+                    $item = \App\Models\Item::with('inventory')->find($itemId);
+                    $perBeneficiary = $totalBeneficiaries > 0 ? floor($quantity / $totalBeneficiaries) : 0;
+                    
+                    \App\Models\ReliefEventDistributedItem::create([
+                        'relief_event_id' => $event->id,
+                        'item_id' => $itemId,
+                        'total_quantity' => $quantity,
+                        'per_beneficiary' => $perBeneficiary,
+                        'beneficiaries_count' => $totalBeneficiaries,
+                        'unit' => $item->unit ?? 'pcs',
+                    ]);
+                }
+            }
+        }
+
         return redirect()->route('admin.relief.show', $event->id)
             ->with('success', 'Relief event created successfully.');
     }
@@ -180,6 +205,7 @@ class ReliefMonitorController extends Controller
             'eventBarangays.municipality',
             'facilitators.role',
             'calamity',
+            'distributedItems.item',
         ])->findOrFail($id);
 
         $barangays = $event->eventBarangays;

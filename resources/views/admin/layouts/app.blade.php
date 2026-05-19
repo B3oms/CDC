@@ -35,6 +35,18 @@
                     class="{{ request()->routeIs('barangay.recommendations.*') ? 'active' : '' }}">
                     <i class="fas fa-hand-point-up"></i> Recommend
                 </a>
+                <a href="{{ route('barangay.household_requests.index') }}"
+                    class="{{ request()->routeIs('barangay.household_requests.*') ? 'active' : '' }}">
+                    <i class="fas fa-home"></i> Household Requests
+                </a>
+                <a href="{{ route('barangay.household_requests.households') }}"
+                    class="{{ request()->routeIs('barangay.household_requests.households') ? 'active' : '' }}">
+                    <i class="fas fa-household"></i> Households
+                </a>
+                <a href="{{ route('barangay.beneficiaries.index') }}"
+                    class="{{ request()->routeIs('barangay.beneficiaries.*') ? 'active' : '' }}">
+                    <i class="fas fa-users"></i> Beneficiaries
+                </a>
 
             @elseif($role === 'Staff')
                 <a href="{{ route('staff.dashboard') }}"
@@ -84,6 +96,10 @@
                     class="{{ request()->routeIs('admin.relief.*') ? 'active' : '' }}">
                     <i class="fas fa-hands-helping"></i> Relief Monitor
                 </a>
+                <a href="{{ route('admin.household_requests.index') }}"
+                    class="{{ request()->routeIs('admin.household_requests.*') ? 'active' : '' }}">
+                    <i class="fas fa-clipboard-list"></i> Household Requests
+                </a>
                 <a href="{{ route('admin.locations.index') }}"
                     class="{{ request()->routeIs('admin.locations.*') ? 'active' : '' }}">
                     <i class="fas fa-map-marker-alt"></i> Locations
@@ -93,10 +109,7 @@
         
         <!-- User Profile Section -->
         <div class="user-profile">
-            @php
-                $profileRoute = auth()->user()->role->name === 'Barangay Partner' ? route('barangay.profile.show') : route('admin.profile');
-            @endphp
-            <a href="{{ $profileRoute }}" class="profile-circle">
+            <a href="{{ auth()->user()->role->name === 'Barangay Partner' ? route('barangay.profile.show') : '/admin/profile' }}" class="profile-circle">
                 <div class="user-avatar">
                     {{ strtoupper(substr(auth()->user()->first_name,0,1).substr(auth()->user()->last_name,0,1)) }}
                 </div>
@@ -216,12 +229,7 @@ function toggleNotifications() {
 function loadNotifications() {
     const notificationList = document.getElementById('notificationList');
     
-    fetch('{{ route("admin.notifications.index") }}', {
-        headers: {
-            'Accept': 'application/json'
-        },
-        credentials: 'same-origin'
-    })
+    fetch('{{ route("admin.notifications.index") }}')
         .then(response => response.json())
         .then(data => {
             updateNotificationBadge(data.unread_count);
@@ -229,11 +237,10 @@ function loadNotifications() {
         })
         .catch(error => {
             console.error('Error loading notifications:', error);
-            // If there's an error retrieving notifications, show an empty state
             notificationList.innerHTML = `
                 <div class="notification-empty">
-                    <i class="fas fa-bell-slash" style="color: #888780; font-size: 2rem; margin-bottom: 0.5rem;"></i>
-                    <p style="color: #888780; margin: 0;">No notifications</p>
+                    <i class="fas fa-exclamation-triangle" style="color: #ef4444; font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                    <p style="color: #ef4444; margin: 0;">Error loading notifications</p>
                 </div>
             `;
         });
@@ -282,8 +289,7 @@ function updateNotificationBadge(count) {
 
 // Mark notification as read
 function markNotificationRead(notificationId) {
-    const readUrl = '{{ url('admin/notifications') }}' + '/' + notificationId + '/read';
-    fetch(readUrl, {
+    fetch(`{{ route('admin.notifications.read', ':notificationId') }}`.replace(':notificationId', notificationId), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -313,7 +319,7 @@ function markNotificationRead(notificationId) {
 
 // Mark all notifications as read
 function markAllNotificationsRead() {
-    fetch('{{ url('admin/notifications/read-all') }}', {
+    fetch('{{ route("admin.notifications.readAll") }}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -364,6 +370,36 @@ document.querySelector('.mark-all-read')?.addEventListener('click', function() {
     markAllNotificationsRead();
 });
 
+function markAllNotificationsRead() {
+    document.querySelectorAll('.notification-item.unread').forEach(item => {
+        item.classList.remove('unread');
+    });
+    const badge = document.querySelector('.notification-badge');
+    if (badge) {
+        badge.style.display = 'none';
+    }
+}
+
+function markNotificationRead(notificationId) {
+    const notification = document.querySelector(`[onclick*="${notificationId}"]`);
+    if (notification) {
+        notification.classList.remove('unread');
+        updateNotificationBadge();
+    }
+}
+
+function updateNotificationBadge() {
+    const unreadCount = document.querySelectorAll('.notification-item.unread').length;
+    const badge = document.querySelector('.notification-badge');
+    if (badge) {
+        if (unreadCount > 0) {
+            badge.textContent = unreadCount;
+            badge.style.display = 'block';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+}
 </script>
 
 <style>
@@ -400,7 +436,7 @@ document.querySelector('.mark-all-read')?.addEventListener('click', function() {
 .profile-circle {
     display: block;
     text-decoration: none;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     transition: transform 0.2s ease;
 }
 
@@ -412,21 +448,40 @@ document.querySelector('.mark-all-read')?.addEventListener('click', function() {
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: #3b82f6;
-    color: white;
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    color: #475569;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
-    font-size: 1.25rem;
+    font-weight: 600;
+    font-size: 1.1rem;
     margin: 0 auto;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
     transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-circle .user-avatar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(245, 195, 0, 0.1), rgba(245, 195, 0, 0.05));
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.profile-circle:hover .user-avatar::before {
+    opacity: 1;
 }
 
 .profile-circle:hover .user-avatar {
-    background: #2563eb;
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 </style>
 

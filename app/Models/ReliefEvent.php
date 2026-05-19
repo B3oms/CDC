@@ -46,4 +46,9 @@ class ReliefEvent extends Model
     {
         return $this->hasMany(ReliefEventBeneficiary::class);
     }
+
+    public function distributedItems()
+    {
+        return $this->hasMany(ReliefEventDistributedItem::class);
+    }
 }

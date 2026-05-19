@@ -4,7 +4,7 @@
 @section('content')
 <div class="dash-header">
     <h1>Edit — {{ $subcategory->name }}</h1>
-    <a href="{{ route('admin.inventory.category.show', $subcategory->category_id) }}" class="btn-back">← Back</a>
+    <a href="{{ route('admin.inventory.category', $subcategory->category_id) }}" class="btn-back">← Back</a>
 </div>
 
 <div class="form-card">
@@ -48,7 +48,7 @@
         </div>
         <div class="form-actions">
             <button type="submit" class="btn-primary">Save Changes</button>
-            <a href="{{ route('admin.inventory.category.show', $subcategory->category_id) }}" class="btn-secondary">Cancel</a>
+            <a href="{{ route('admin.inventory.category', $subcategory->category_id) }}" class="btn-secondary">Cancel</a>
         </div>
     </form>
 </div>

@@ -8,15 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('recommended_beneficiaries', function (Blueprint $table) {
-            $table->text('notes')->nullable()->after('address');
+        Schema::table('beneficiaries', function (Blueprint $table) {
+            $table->boolean('is_4ps_member')->default(false)->after('gender');
         });
     }
 
     public function down(): void
     {
-        Schema::table('recommended_beneficiaries', function (Blueprint $table) {
-            $table->dropColumn('notes');
+        Schema::table('beneficiaries', function (Blueprint $table) {
+            $table->dropColumn('is_4ps_member');
         });
     }
 };

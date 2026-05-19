@@ -47,7 +47,7 @@
     <div class="yearly-col">
         <div class="chart-card">
             <div class="chart-title">MONTHLY TREND</div>
-            <canvas id="chart-monthly" height="100" style="height: 100px; width: 100%;"></canvas>
+            <canvas id="chart-monthly" height="120" style="height: 120px; width: 95%; max-width: 500px;"></canvas>
             <button onclick="exportChartToPDF('chart-monthly', 'monthly-trend')" class="pdf-export-btn">
                 <i class="fas fa-file-pdf"></i> Export PDF
             </button>
@@ -60,13 +60,12 @@
             <canvas id="chart-yearly-trend"
                 data-labels="{{ json_encode($yearlyTrendLabels) }}"
                 data-values="{{ json_encode($yearlyTrendValues) }}"
-                height="80" style="height: 80px; width: 100%;">
+                height="90" style="height: 90px; width: 95%; max-width: 500px;">
             </canvas>
             <div class="chart-actions">
                 <button onclick="exportChartToPDF('chart-yearly-trend', 'yearly-trend')" class="pdf-export-btn">
                     <i class="fas fa-file-pdf"></i> Export PDF
                 </button>
-                <a href="{{ route('admin.relief.index') }}" class="view-link">View →</a>
             </div>
         </div>
         @empty
@@ -77,76 +76,12 @@
             </p>
         </div>
         @endforelse
-    </div>
 
-    {{-- RIGHT --}}
-    <div class="right-col">
-
-        {{-- Staff --}}
-        <div class="section-card">
-            <h3>Staff</h3>
-            <div class="staff-row">
-                @forelse($staff as $s)
-                <div class="staff-item">
-                    <div class="avatar">
-                        {{ strtoupper(substr($s->first_name,0,1).substr($s->last_name,0,1)) }}
-                    </div>
-                    <div>
-                        <div class="staff-name">{{ $s->first_name }} {{ $s->last_name }}</div>
-                        <div class="staff-role">{{ $s->role->name }}</div>
-                    </div>
-                </div>
-                @empty
-                <p style="font-size:12px;color:#888;">No staff found.</p>
-                @endforelse
-            </div>
-        </div>
-
-        {{-- Upcoming & Ongoing --}}
-        @if($upcomingEvents->count())
-        <div class="section-card">
-            <h3>Upcoming & Ongoing Relief Events</h3>
-            <table class="dist-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Date</th>
-                        <th>Barangay</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($upcomingEvents as $event)
-                    <tr>
-                        <td>
-                            <a href="{{ route('admin.relief.show', $event->id) }}"
-                                style="color:#185fa5;text-decoration:none;">
-                                {{ $event->name }}
-                            </a>
-                        </td>
-                        <td>{{ \Carbon\Carbon::parse($event->date)->format('M d, Y') }}</td>
-                        <td>
-                            @foreach($event->eventBarangays as $eb)
-                                {{ $eb->barangay->name }}@if(!$loop->last), @endif
-                            @endforeach
-                        </td>
-                        <td>
-                            <span class="relief-status-badge {{ strtolower($event->status) }}">
-                                {{ $event->status }}
-                            </span>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            <a href="{{ route('admin.relief.index') }}" class="see-all">See all →</a>
-        </div>
-        @endif
-
-        {{-- Completed --}}
-        @if($completedEvents->count())
-        <div class="section-card">
-            <h3>Completed Relief Events</h3>
+    {{-- Completed Relief Events --}}
+    @if($completedEvents->count())
+    <div class="section-card">
+        <h3>Completed Relief Events</h3>
+        <div class="scrollable-table">
             <table class="dist-table">
                 <thead>
                     <tr>
@@ -174,29 +109,80 @@
                     @endforeach
                 </tbody>
             </table>
-            <a href="{{ route('admin.relief.index') }}" class="see-all">See all →</a>
+        </div>
+    </div>
+    @endif
+
+    </div>
+
+    {{-- RIGHT --}}
+    <div class="right-col">
+
+        {{-- Staff --}}
+        <div class="section-card">
+            <h3>Staff</h3>
+            <div class="staff-row">
+                @forelse($staff as $s)
+                <div class="staff-item">
+                    <div class="avatar">
+                        {{ strtoupper(substr($s->first_name,0,1).substr($s->last_name,0,1)) }}
+                    </div>
+                    <div>
+                        <div class="staff-name">{{ $s->first_name }} {{ $s->last_name }}</div>
+                        <div class="staff-role">{{ $s->role->name }}</div>
+                    </div>
+                </div>
+                @empty
+                <p style="font-size:12px;color:#888;">No staff found.</p>
+                @endforelse
+            </div>
+        </div>
+
+        {{-- Upcoming & Ongoing --}}
+        @if($upcomingEvents->count())
+        <div class="section-card" style="flex: 1; display: flex; flex-direction: column;">
+            <h3>Upcoming & Ongoing Relief Events</h3>
+            <div class="scrollable-table" style="flex: 1; height: 100%; min-height: 300px;">
+                <table class="dist-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Date</th>
+                            <th>Barangay</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($upcomingEvents as $event)
+                        <tr>
+                            <td>
+                                <a href="{{ route('admin.relief.show', $event->id) }}"
+                                    style="color:#185fa5;text-decoration:none;">
+                                    {{ $event->name }}
+                                </a>
+                            </td>
+                            <td>{{ \Carbon\Carbon::parse($event->date)->format('M d, Y') }}</td>
+                            <td>
+                                @foreach($event->eventBarangays as $eb)
+                                    {{ $eb->barangay->name }}@if(!$loop->last), @endif
+                                @endforeach
+                            </td>
+                            <td>
+                                <span class="relief-status-badge {{ strtolower($event->status) }}">
+                                    {{ $event->status }}
+                                </span>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
         @endif
 
-        {{-- Partners --}}
-        <div class="section-card">
-            <h3>Partners</h3>
-            <div class="partner-row">
-                <div class="p-stat">
-                    <div class="p-num">{{ $barangayCount }}</div>
-                    <div class="p-label">Barangays</div>
-                </div>
-                <div class="p-stat">
-                    <div class="p-num">{{ $municipalityCount }}</div>
-                    <div class="p-label">Municipalities</div>
-                </div>
-                <div class="p-stat">
-                    <div class="p-num">{{ $regionCount }}</div>
-                    <div class="p-label">Regions</div>
-                </div>
+        
+        
             </div>
-        </div>
-    </div>
 </div>
 @endsection
 
@@ -376,6 +362,208 @@ function exportChartToPDF(chartId, filename) {
 
 @push('styles')
 <style>
+/* Dashboard Layout */
+.dash-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.yearly-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Chart Cards */
+.chart-card {
+    background: white;
+    border: 1px solid #d3d1c7;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 550px !important;
+    width: 100% !important;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.chart-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2c2c2a;
+    margin-bottom: 0.75rem;
+    text-align: center;
+    display: block;
+}
+
+.chart-card canvas {
+    max-width: 500px !important;
+    width: 95% !important;
+    height: auto !important;
+    margin: 0 auto;
+    display: block;
+}
+
+/* Scrollable Table */
+.scrollable-table {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.scrollable-table table {
+    margin: 0;
+    border: none;
+}
+
+.scrollable-table thead {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 1;
+}
+
+.scrollable-table thead th {
+    background: #f8f9fa;
+    border-bottom: 2px solid #d3d1c7;
+}
+
+/* Section Cards */
+.section-card {
+    background: white;
+    border: 1px solid #d3d1c7;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.section-card h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c2c2a;
+}
+
+/* Staff Section */
+.staff-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.staff-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.staff-item:hover {
+    background: #f8f9fa;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #1a3d1f;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.staff-name {
+    font-weight: 500;
+    color: #2c2c2a;
+    font-size: 0.9rem;
+}
+
+.staff-role {
+    font-size: 0.8rem;
+    color: #888780;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Distribution Tables */
+.dist-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.dist-table th {
+    background: #f8f9fa;
+    color: #2c2c2a;
+    font-weight: 600;
+    text-align: left;
+    padding: 0.75rem;
+    border-bottom: 1px solid #d3d1c7;
+}
+
+.dist-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #f1efe8;
+    vertical-align: top;
+}
+
+.dist-table tr:hover {
+    background: #f8f9fa;
+}
+
+.see-all {
+    display: inline-block;
+    margin-top: 0.75rem;
+    color: #1a3d1f;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.see-all:hover {
+    text-decoration: underline;
+}
+
+/* Relief Status Badges */
+.relief-status-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.relief-status-badge.upcoming {
+    background: #fffbeb;
+    color: #ef9f27;
+}
+
+.relief-status-badge.ongoing {
+    background: #e3f2fd;
+    color: #185fa5;
+}
+
+.relief-status-badge.completed {
+    background: #f0f9f0;
+    color: #3b6d11;
+}
+
+
 /* PDF Export Buttons */
 .pdf-export-btn {
     background: #dc3545;
@@ -460,5 +648,114 @@ function exportChartToPDF(chartId, filename) {
 
 .calamity-meter.none .cal-label { color: #3b6d11; }
 .calamity-meter.none .cal-name  { color: #27500a; }
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .dash-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .dash-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .stat-num {
+        font-size: 1.5rem;
+    }
+    
+    .chart-card {
+        padding: 0.75rem;
+        max-width: 100%;
+    }
+    
+    .chart-title {
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .section-card {
+        padding: 1rem;
+    }
+    
+    .dist-table {
+        font-size: 0.8rem;
+    }
+    
+    .dist-table th,
+    .dist-table td {
+        padding: 0.5rem;
+    }
+    
+    .staff-item {
+        padding: 0.75rem;
+    }
+    
+    .avatar {
+        width: 35px;
+        height: 35px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .dash-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .calamity-meter {
+        align-self: flex-end;
+        min-width: 120px;
+    }
+    
+    .chart-card {
+        padding: 0.5rem;
+        max-width: 100%;
+    }
+    
+    .chart-title {
+        font-size: 0.8rem;
+        margin-bottom: 0.4rem;
+    }
+    
+    .section-card {
+        padding: 0.75rem;
+    }
+    
+    .section-card h3 {
+        font-size: 0.9rem;
+    }
+    
+    .dist-table {
+        font-size: 0.75rem;
+    }
+    
+    .dist-table th,
+    .dist-table td {
+        padding: 0.4rem;
+    }
+}
 </style>
 @endpush

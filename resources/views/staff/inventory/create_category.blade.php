@@ -19,7 +19,7 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ route('admin.inventory.category.store') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('staff.inventory.category.store') }}" enctype="multipart/form-data">
         @csrf
         <div class="form-grid">
             <div class="form-group">

@@ -7,9 +7,12 @@ use App\Models\Calamity;
 use App\Models\CalamityPartner;
 use App\Models\Barangay;
 use App\Models\Municipality;
+use App\Models\EvacuationCenter;
 use App\Models\EvacuationReport;
+use App\Models\HouseholdRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PDF;
 
 class CalamityController extends Controller
 {
@@ -66,7 +69,7 @@ class CalamityController extends Controller
     // Show calamity portal with rankings
     public function show($id)
     {
-        $calamity = Calamity::with(['barangays', 'evacuationReports.barangay'])
+        $calamity = Calamity::with(['barangays', 'evacuationReports.barangay', 'evacuationReports.evacuationCenter'])
             ->findOrFail($id);
 
         // Get rankings
@@ -121,5 +124,174 @@ class CalamityController extends Controller
             ->get();
 
         return view('admin.calamity.report', compact('calamity', 'rankings'));
+    }
+
+    // Fetch household data for AJAX requests
+    public function getHouseholds($calamityId, $barangayId)
+    {
+        try {
+            $barangay = Barangay::findOrFail($barangayId);
+            
+            // Get the evacuation report for this calamity + barangay
+            $report = EvacuationReport::where('calamity_id', $calamityId)
+                ->where('barangay_id', $barangayId)
+                ->first();
+            
+            // Get the household IDs that were submitted in the portal
+            $submittedIds = [];
+            if ($report) {
+                try {
+                    // Check if household_ids column exists and is accessible
+                    if (isset($report->household_ids)) {
+                        // Manually decode JSON since cast might not be working for existing records
+                        $householdIdsData = $report->household_ids;
+                        if (is_string($householdIdsData)) {
+                            $submittedIds = json_decode($householdIdsData, true) ?: [];
+                        } elseif (is_array($householdIdsData)) {
+                            $submittedIds = $householdIdsData;
+                        } else {
+                            $submittedIds = [];
+                        }
+                    }
+                } catch (\Exception $e) {
+                    $submittedIds = [];
+                }
+            }
+            
+            // Fetch only the households that were actually inputted in the portal
+            $households = collect();
+            if (!empty($submittedIds)) {
+                $households = HouseholdRequest::whereIn('id', $submittedIds)
+                    ->orderBy('head_of_household')
+                    ->get(['id', 'head_of_household', 'family_size', 'contact_number']);
+            }
+
+            return response()->json([
+                'success' => true,
+                'barangay_name' => $barangay->name,
+                'total_households' => $households->count(),
+                'households' => $households->map(function($household) {
+                    return [
+                        'head_name' => $household->head_of_household,
+                        'member_count' => $household->family_size,
+                        'household_code' => 'HH-' . str_pad($household->id, 4, '0', STR_PAD_LEFT),
+                        'contact_number' => $household->contact_number
+                    ];
+                })
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to fetch household data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Delete a calamity and all related data
+    public function destroy($id)
+    {
+        try {
+            $calamity = Calamity::findOrFail($id);
+            
+            // Delete related evacuation centers
+            EvacuationCenter::where('calamity_id', $calamity->id)->delete();
+            
+            // Delete related evacuation reports
+            EvacuationReport::where('calamity_id', $calamity->id)->delete();
+            
+            // Delete related calamity partners
+            CalamityPartner::where('calamity_id', $calamity->id)->delete();
+            
+            // Delete the calamity
+            $calamity->delete();
+            
+            return redirect()->route('admin.calamity.index')
+                ->with('success', 'Calamity portal and all related data deleted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.calamity.index')
+                ->with('error', 'Failed to delete calamity portal: ' . $e->getMessage());
+        }
+    }
+
+    // Download calamity portal details as PDF
+    public function downloadPDF($id)
+    {
+        try {
+            $calamity = Calamity::with(['barangays', 'evacuationReports.barangay', 'evacuationReports.evacuationCenter'])
+                ->findOrFail($id);
+
+            // Get rankings
+            $rankings = EvacuationReport::where('calamity_id', $id)
+                ->select('barangay_id',
+                    \DB::raw('SUM(evacuee_count) as total_evacuees'),
+                    \DB::raw('SUM(household_count) as total_households'),
+                    \DB::raw('MAX(severity_level) as max_severity'),
+                    \DB::raw('(SUM(evacuee_count) * 0.6 + SUM(household_count) * 0.2 + MAX(severity_level) * 0.2) as score')
+                )
+                ->groupBy('barangay_id')
+                ->orderByDesc('score')
+                ->limit(10)
+                ->with('barangay')
+                ->get();
+
+            // Get household data for each barangay
+            $barangayHouseholds = [];
+            foreach ($calamity->barangays as $barangay) {
+                // Get the evacuation report for this calamity + barangay
+                $report = EvacuationReport::where('calamity_id', $id)
+                    ->where('barangay_id', $barangay->id)
+                    ->first();
+                
+                $households = [];
+                if ($report) {
+                    try {
+                        // Get the household IDs that were submitted in the portal
+                        $submittedIds = [];
+                        if (isset($report->household_ids)) {
+                            $householdIdsData = $report->household_ids;
+                            if (is_string($householdIdsData)) {
+                                $submittedIds = json_decode($householdIdsData, true) ?: [];
+                            } elseif (is_array($householdIdsData)) {
+                                $submittedIds = $householdIdsData;
+                            }
+                        }
+                        
+                        if (!empty($submittedIds)) {
+                            // Get household details for submitted IDs
+                            $households = \App\Models\HouseholdRequest::whereIn('id', $submittedIds)
+                                ->where('barangay_id', $barangay->id)
+                                ->orderBy('head_of_household')
+                                ->get(['id', 'head_of_household', 'family_size', 'contact_number']);
+                        }
+                    } catch (\Exception $e) {
+                        $households = [];
+                    }
+                }
+                
+                $barangayHouseholds[$barangay->id] = $households;
+            }
+
+            // Prepare data for PDF
+            $pdfData = [
+                'calamity' => $calamity,
+                'rankings' => $rankings,
+                'barangayHouseholds' => $barangayHouseholds,
+                'generated_date' => now()->format('F d, Y - h:i A')
+            ];
+
+            // Generate PDF
+            $pdf = PDF::loadView('admin.calamity.pdf', $pdfData);
+            
+            // Set paper orientation to landscape for better table display
+            $pdf->setPaper('A4', 'landscape');
+            
+            // Download the PDF
+            return $pdf->download('calamity-portal-' . $calamity->name . '-' . $calamity->id . '.pdf');
+            
+        } catch (\Exception $e) {
+            return redirect()->route('admin.calamity.show', $id)
+                ->with('error', 'Failed to generate PDF: ' . $e->getMessage());
+        }
     }
 }

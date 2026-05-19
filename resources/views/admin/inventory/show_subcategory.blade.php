@@ -14,6 +14,7 @@
     <div style="display:flex;gap:10px;">
         <a href="{{ route('admin.inventory.category.show', $subcategory->category_id) }}" class="btn-back">← Back</a>
         <a href="{{ route('admin.inventory.item.create', $subcategory->id) }}" class="btn-primary">+ Add Item</a>
+        <a href="{{ route('admin.inventory.subcategory.edit', $subcategory->id) }}" class="btn-secondary">Edit Subcategory</a>
     </div>
 </div>
 
@@ -57,9 +58,15 @@
                 <div class="meta-row">
                     <span class="meta-label">Expires</span>
                     <span>
-                        {{ $item->inventory?->expiration_date
-                            ? \Carbon\Carbon::parse($item->inventory->expiration_date)->format('M d, Y')
-                            : 'N/A' }}
+                        @if($item->inventory)
+                            @if($item->inventory->expiration_date)
+                                {{ \Carbon\Carbon::parse($item->inventory->expiration_date)->format('M d, Y') }}
+                            @else
+                                No expiry
+                            @endif
+                        @else
+                            No inventory record
+                        @endif
                     </span>
                 </div>
             </div>

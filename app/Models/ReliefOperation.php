@@ -31,9 +31,4 @@ class ReliefOperation extends Model
     {
         return $this->hasMany(Distribution::class);
     }
-
-    public function feedbacks()
-    {
-        return $this->hasMany(ReliefOperationFeedback::class, 'relief_operation_id');
-    }
 }

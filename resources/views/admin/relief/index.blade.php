@@ -109,14 +109,10 @@
 }
 
 .delete-form {
-    margin: 0;
-}
-
-.relief-card-actions {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    z-index: 10;
 }
 
 .delete-btn {
@@ -191,11 +187,9 @@
     justify-content: space-between;
     padding: 12px 16px;
     border-top: 1px solid #f3f4f6;
-    gap: 8px;
 }
 
 .view-details {
-    margin-left: auto;
     font-size: 12px;
     color: #6b7280;
     text-decoration: none;

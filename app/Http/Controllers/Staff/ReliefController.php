@@ -7,6 +7,7 @@ use App\Models\ReliefEvent;
 use App\Models\ReliefEventBeneficiary;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
+use PDF;
 
 class ReliefController extends Controller
 {
@@ -123,15 +124,27 @@ class ReliefController extends Controller
     // Show relief event details
     public function show($id)
     {
-        $event = ReliefEvent::with(['eventBarangays.barangay', 'eventBarangays.municipality', 'beneficiaries', 'facilitators', 'calamity'])
-            ->findOrFail($id);
+        $event = ReliefEvent::with([
+            'eventBarangays.barangay',
+            'eventBarangays.municipality',
+            'facilitators.role',
+            'calamity',
+            'distributedItems.item',
+        ])->findOrFail($id);
 
-        // Filter beneficiaries by barangay if specified
-        if (request('barangay_id')) {
-            $event->beneficiaries = $event->beneficiaries->where('barangay_id', request('barangay_id'));
-        }
+        $barangays = $event->eventBarangays;
 
-        return view('staff.relief.show', compact('event'));
+        // Filter by barangay if selected
+        $selectedBarangayId = request('barangay_id');
+
+        $beneficiaries = \App\Models\ReliefEventBeneficiary::with('beneficiary')
+            ->where('relief_event_id', $id)
+            ->when($selectedBarangayId, fn($q) => $q->where('barangay_id', $selectedBarangayId))
+            ->get();
+
+        return view('staff.relief.show', compact(
+            'event', 'barangays', 'beneficiaries', 'selectedBarangayId'
+        ));
     }
 
     // Store relief event
@@ -151,6 +164,9 @@ class ReliefController extends Controller
             'intensity'        => 'nullable|in:low,medium,high,critical',
             'facilitator_ids' => 'nullable|array',
             'facilitator_ids.*' => 'exists:users,id',
+            'distribute_items' => 'nullable|array',
+            'distribute_items.*' => 'exists:items,id',
+            'item_quantities' => 'nullable|array',
         ]);
 
         $event = ReliefEvent::create([
@@ -196,6 +212,41 @@ class ReliefController extends Controller
                         'relief_event_id' => $event->id,
                         'user_id'         => $userId,
                     ]);
+                }
+            }
+        }
+
+        // Save distributed items
+        if ($request->distribute_items && $request->item_quantities) {
+            $totalBeneficiaries = \App\Models\ReliefEventBeneficiary::where('relief_event_id', $event->id)->count();
+            
+            foreach ($request->distribute_items as $itemId) {
+                $quantity = $request->item_quantities[$itemId] ?? 0;
+                if ($quantity > 0) {
+                    $item = \App\Models\Item::with('inventory')->find($itemId);
+                    $perBeneficiary = $totalBeneficiaries > 0 ? floor($quantity / $totalBeneficiaries) : 0;
+                    
+                    // Check if enough inventory is available
+                    $availableQuantity = $item->inventory?->quantity ?? 0;
+                    if ($availableQuantity >= $quantity) {
+                        // Deduct from inventory
+                        if ($item->inventory) {
+                            $item->inventory->decrement('quantity', $quantity);
+                            $item->inventory->update(['last_updated' => now()]);
+                        }
+                        
+                        \App\Models\ReliefEventDistributedItem::create([
+                            'relief_event_id' => $event->id,
+                            'item_id' => $itemId,
+                            'total_quantity' => $quantity,
+                            'per_beneficiary' => $perBeneficiary,
+                            'beneficiaries_count' => $totalBeneficiaries,
+                            'unit' => $item->unit ?? 'pcs',
+                        ]);
+                    } else {
+                        // Skip items with insufficient inventory
+                        continue;
+                    }
                 }
             }
         }
@@ -249,5 +300,40 @@ class ReliefController extends Controller
             'message' => 'Event status updated successfully',
             'new_status' => $request->status
         ]);
+    }
+
+    // Download relief event PDF
+    public function downloadPDF($id)
+    {
+        try {
+            $event = ReliefEvent::with([
+                'eventBarangays.barangay', 
+                'eventBarangays.municipality', 
+                'eventBarangays.beneficiaries.beneficiary',
+                'distributedItems.item',
+                'distributedItems.beneficiaries',
+                'creator',
+                'calamity'
+            ])->findOrFail($id);
+
+            // Prepare data for PDF
+            $pdfData = [
+                'event' => $event,
+                'generated_date' => now()->format('F d, Y - h:i A')
+            ];
+
+            // Generate PDF
+            $pdf = PDF::loadView('staff.relief.pdf', $pdfData);
+            
+            // Set paper orientation to landscape for better table display
+            $pdf->setPaper('A4', 'landscape');
+            
+            // Download the PDF
+            return $pdf->download('relief-event-' . $event->name . '-' . $event->id . '.pdf');
+            
+        } catch (\Exception $e) {
+            return redirect()->route('relief.show', $id)
+                ->with('error', 'Failed to generate PDF: ' . $e->getMessage());
+        }
     }
 }

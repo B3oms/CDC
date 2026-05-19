@@ -6,12 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Beneficiary;
 use App\Models\Barangay;
 use App\Models\Municipality;
-use App\Models\RecommendedBeneficiary;
 use App\Models\User;
 use App\Models\Role;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use PDF;
 
 class BeneficiaryController extends Controller
 {
@@ -35,6 +35,14 @@ class BeneficiaryController extends Controller
 
         if ($request->barangay_id) {
             $query->where('barangay_id', $request->barangay_id);
+        }
+
+        if ($request->gender) {
+            $query->where('gender', $request->gender);
+        }
+
+        if ($request->is_4ps_member !== null) {
+            $query->where('is_4ps_member', $request->is_4ps_member);
         }
 
         if ($request->status === 'verified') {
@@ -63,11 +71,10 @@ class BeneficiaryController extends Controller
             'municipality_id'  => 'required|exists:municipalities,id',
             'barangay_id'     => 'required|exists:barangays,id',
             'region'          => 'required|string',
-            'recommended_id'  => 'nullable|exists:recommended_beneficiaries,id',
             'first_name'      => 'required|string|max:100',
-            'middle_name'     => 'nullable|string|max:100',
             'last_name'       => 'required|string|max:100',
             'gender'          => 'required|in:Male,Female,Other',
+            'is_4ps_member'   => 'required|boolean',
             'birthdate'       => 'required|date',
             'contact_number'  => 'nullable|string|max:13',
             'address'         => 'nullable|string',
@@ -93,22 +100,23 @@ class BeneficiaryController extends Controller
             $request->family_size,
             $request->monthly_income,
             $request->has_senior ?? false,
-            $request->children_count
+            $request->children_count,
+            $request->is_4ps_member ?? false
         );
 
-        $isVerified       = $criteriaMet >= 2 ? 1 : 0;
+        $isVerified       = $criteriaMet >= 3 ? 1 : 0;
         $vulnerabilityLevel = match(true) {
-            $criteriaMet >= 3 => 'High',
-            $criteriaMet == 2 => 'Medium',
+            $criteriaMet >= 4 => 'High',
+            $criteriaMet == 3 => 'Medium',
             default           => 'Low',
         };
 
         $beneficiary = Beneficiary::create([
             'barangay_id'        => $request->barangay_id,
             'first_name'         => $request->first_name,
-            'middle_name'        => $request->middle_name,
             'last_name'          => $request->last_name,
             'gender'             => $request->gender,
+            'is_4ps_member'      => $request->is_4ps_member,
             'birthdate'          => $request->birthdate,
             'contact_number'     => $request->contact_number,
             'address'            => $request->address,
@@ -123,14 +131,6 @@ class BeneficiaryController extends Controller
             'interviewed_at'     => now(),
             'is_verified'        => $isVerified,
         ]);
-
-        if ($request->recommended_id) {
-            $recommended = RecommendedBeneficiary::find($request->recommended_id);
-            if ($recommended && $recommended->status === 'Pending') {
-                $recommended->update(['status' => 'Converted']);
-                NotificationService::barangayRecommendationInterviewed($recommended->id);
-            }
-        }
 
         // Create beneficiary account if verified
         if ($isVerified) {
@@ -160,28 +160,34 @@ class BeneficiaryController extends Controller
 
     public function pdf(Request $request)
     {
-        $query = Beneficiary::with('barangay');
+        try {
+            $query = Beneficiary::with('barangay');
 
-        if ($request->municipality_id) {
-            $query->whereHas('barangay', function($q) use ($request) {
-                $q->where('municipality_id', $request->municipality_id);
-            });
+            if ($request->municipality_id) {
+                $query->whereHas('barangay', function($q) use ($request) {
+                    $q->where('municipality_id', $request->municipality_id);
+                });
+            }
+
+            if ($request->barangay_id) {
+                $query->where('barangay_id', $request->barangay_id);
+            }
+
+            if ($request->status === 'verified') {
+                $query->where('is_verified', 1);
+            } elseif ($request->status === 'pending') {
+                $query->where('is_verified', 0);
+            }
+
+            $beneficiaries = $query->latest()->get();
+
+            $pdf = PDF::loadView('staff.beneficiaries.pdf', compact('beneficiaries'));
+            return $pdf->download('beneficiaries-list.pdf');
+            
+        } catch (\Exception $e) {
+            return redirect()->route('staff.beneficiaries.index')
+                ->with('error', 'Failed to generate PDF: ' . $e->getMessage());
         }
-
-        if ($request->barangay_id) {
-            $query->where('barangay_id', $request->barangay_id);
-        }
-
-        if ($request->status === 'verified') {
-            $query->where('is_verified', 1);
-        } elseif ($request->status === 'pending') {
-            $query->where('is_verified', 0);
-        }
-
-        $beneficiaries = $query->latest()->get();
-
-        $pdf = \PDF::loadView('staff.beneficiaries.pdf', compact('beneficiaries'));
-        return $pdf->download('beneficiaries-list.pdf');
     }
 
     private function createBeneficiaryAccount(Beneficiary $beneficiary)

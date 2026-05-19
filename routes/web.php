@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\ReliefMonitorController;
 use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\BeneficiaryController;
+use App\Http\Controllers\Admin\HouseholdRequestController as AdminHouseholdRequestController;
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
 use App\Http\Controllers\Staff\BeneficiaryController as StaffBeneficiaryController;
 use App\Http\Controllers\Staff\RecommendedController as StaffRecommendedController;
@@ -20,6 +21,11 @@ use App\Http\Controllers\Admin\LocationManagementController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Staff\LocationRequestController as StaffLocationRequestController;
+use App\Http\Controllers\Staff\HouseholdController;
+use App\Http\Controllers\Staff\HouseholdRequestController as StaffHouseholdRequestController;
+use App\Http\Controllers\Barangay\HouseholdRequestController as BarangayHouseholdRequestController;
+use App\Http\Controllers\Barangay\BeneficiaryController as BarangayBeneficiaryController;
+use App\Http\Controllers\Barangay\ProfileController as BarangayProfileController;
 
 // ──────────────────────────────────────────────────────────
 // Auth Routes
@@ -103,10 +109,12 @@ Route::middleware(['isAdminOrStaff'])->group(function () {
     Route::get('admin/calamity',            [CalamityController::class, 'index'])->name('admin.calamity.index');
     Route::get('admin/calamity/create',      [CalamityController::class, 'create'])->name('admin.calamity.create');
     Route::post('admin/calamity',            [CalamityController::class, 'store'])->name('admin.calamity.store');
+    Route::get('admin/calamity/households/{calamityId}/{barangayId}', [CalamityController::class, 'getHouseholds'])->name('admin.calamity.households');
     Route::get('admin/calamity/{id}',        [CalamityController::class, 'show'])->name('admin.calamity.show');
-    
     Route::post('admin/calamity/{id}/close', [CalamityController::class, 'close'])->name('admin.calamity.close');
     Route::get('admin/calamity/{id}/report', [CalamityController::class, 'report'])->name('admin.calamity.report');
+    Route::get('admin/calamity/{id}/pdf',    [CalamityController::class, 'downloadPDF'])->name('admin.calamity.pdf');
+    Route::delete('admin/calamity/{id}',     [CalamityController::class, 'destroy'])->name('admin.calamity.destroy');
 
     // Inventory
     Route::get('admin/inventory',                                  [InventoryController::class, 'index'])->name('admin.inventory.index');
@@ -141,6 +149,13 @@ Route::middleware(['isAdminOrStaff'])->group(function () {
     Route::get('admin/relief/report/pdf',   [ReliefMonitorController::class, 'downloadReport'])->name('admin.relief.report.pdf');
     Route::get('admin/relief/{id}/pdf',     [ReliefMonitorController::class, 'downloadEventReport'])->name('admin.relief.event.pdf');
 
+    // Household Requests (Admin)
+    Route::get('admin/household-requests',           [AdminHouseholdRequestController::class, 'index'])->name('admin.household_requests.index');
+    Route::get('admin/household-requests/{id}',      [AdminHouseholdRequestController::class, 'show'])->name('admin.household_requests.show');
+    Route::post('admin/household-requests/{id}/approve', [AdminHouseholdRequestController::class, 'approve'])->name('admin.household_requests.approve');
+    Route::post('admin/household-requests/{id}/reject',  [AdminHouseholdRequestController::class, 'reject'])->name('admin.household_requests.reject');
+    Route::delete('admin/household-requests/{id}',   [AdminHouseholdRequestController::class, 'destroy'])->name('admin.household_requests.destroy');
+
     // Notifications
     Route::get('admin/notifications', [NotificationController::class, 'index'])->name('admin.notifications.index');
     Route::post('admin/notifications/{notificationId}/read', [NotificationController::class, 'markAsRead'])->name('admin.notifications.read');
@@ -162,8 +177,8 @@ Route::prefix('staff')->name('staff.')->middleware(['isStaff'])->group(function 
     Route::get('beneficiaries',           [StaffBeneficiaryController::class, 'index'])->name('beneficiaries.index');
     Route::get('beneficiaries/create',    [StaffBeneficiaryController::class, 'create'])->name('beneficiaries.create');
     Route::post('beneficiaries',          [StaffBeneficiaryController::class, 'store'])->name('beneficiaries.store');
-    Route::get('beneficiaries/{id}',      [StaffBeneficiaryController::class, 'show'])->name('beneficiaries.show');
     Route::get('beneficiaries/pdf',       [StaffBeneficiaryController::class, 'pdf'])->name('beneficiaries.pdf');
+    Route::get('beneficiaries/{id}',      [StaffBeneficiaryController::class, 'show'])->name('beneficiaries.show');
 
     Route::get('locations', [\App\Http\Controllers\Staff\LocationController::class, 'index'])->name('staff.locations.index');
     Route::get('locations/create', [\App\Http\Controllers\Staff\LocationController::class, 'create'])->name('staff.locations.create');
@@ -189,17 +204,35 @@ Route::prefix('staff')->name('staff.')->middleware(['isStaff'])->group(function 
     Route::get('recommended/{id}/convert', [StaffRecommendedController::class, 'convert'])->name('recommended.convert');
     Route::post('recommended/{id}/reject', [StaffRecommendedController::class, 'reject'])->name('recommended.reject');
 
+    // Households
+    Route::get('households',              [HouseholdController::class, 'index'])->name('households.index');
+    Route::get('households/create',       [HouseholdController::class, 'create'])->name('households.create');
+    Route::post('households',             [HouseholdController::class, 'store'])->name('households.store');
+    Route::get('households/{id}',         [HouseholdController::class, 'show'])->name('households.show');
+    Route::get('households/{id}/edit',    [HouseholdController::class, 'edit'])->name('households.edit');
+    Route::put('households/{id}',         [HouseholdController::class, 'update'])->name('households.update');
+    Route::delete('households/{id}',      [HouseholdController::class, 'destroy'])->name('households.destroy');
+
+    // Household Requests (Staff/Admin Approval)
+    Route::get('household-requests',           [StaffHouseholdRequestController::class, 'index'])->name('household_requests.index');
+    Route::get('household-requests/{id}',      [StaffHouseholdRequestController::class, 'show'])->name('household_requests.show');
+    Route::post('household-requests/{id}/approve', [StaffHouseholdRequestController::class, 'approve'])->name('household_requests.approve');
+    Route::post('household-requests/{id}/reject',  [StaffHouseholdRequestController::class, 'reject'])->name('household_requests.reject');
+    Route::delete('household-requests/{id}',   [StaffHouseholdRequestController::class, 'destroy'])->name('household_requests.destroy');
+
     // Relief Monitor (Staff View)
     Route::get('relief',                   [\App\Http\Controllers\Staff\ReliefController::class, 'index'])->name('relief.index');
     Route::get('relief/create',            [\App\Http\Controllers\Staff\ReliefController::class, 'create'])->name('relief.create');
     Route::post('relief',                  [\App\Http\Controllers\Staff\ReliefController::class, 'store'])->name('relief.store');
     Route::get('relief/{id}',              [\App\Http\Controllers\Staff\ReliefController::class, 'show'])->name('relief.show');
     Route::post('relief/{id}/status',    [\App\Http\Controllers\Staff\ReliefController::class, 'updateStatus'])->name('relief.updateStatus');
+    Route::get('relief/{id}/pdf',         [\App\Http\Controllers\Staff\ReliefController::class, 'downloadPDF'])->name('relief.event.pdf');
     Route::get('relief/stats',             [\App\Http\Controllers\Staff\ReliefController::class, 'stats'])->name('relief.stats');
     Route::delete('relief/{id}',           [\App\Http\Controllers\Staff\ReliefController::class, 'destroy'])->name('relief.destroy');
     
     // Inventory (Staff View)
     Route::get('inventory',               [\App\Http\Controllers\Staff\InventoryController::class, 'index'])->name('inventory.index');
+    Route::get('inventory/pdf',            [\App\Http\Controllers\Staff\InventoryController::class, 'pdf'])->name('inventory.pdf');
     
     // Category CRUD - Specific routes first
     Route::get('inventory/category/create', [\App\Http\Controllers\Staff\InventoryController::class, 'createCategory'])->name('inventory.category.create');
@@ -258,13 +291,25 @@ Route::prefix('barangay')->name('barangay.')->middleware(['isBarangay'])->group(
     Route::get('dashboard',        [EvacuationController::class, 'index'])->name('dashboard');
     Route::post('set-center',      [EvacuationController::class, 'setCenter'])->name('setCenter');
     Route::post('submit-report',   [EvacuationController::class, 'submitReport'])->name('submitReport');
-    Route::post('feedback',        [EvacuationController::class, 'submitFeedback'])->name('feedback.submit');
     Route::get('recommendations',  [RecommendationController::class, 'index'])->name('recommendations.index');
     Route::post('recommendations', [RecommendationController::class, 'store'])->name('recommendations.store');
-    Route::get('recommendations/{id}/edit', [RecommendationController::class, 'edit'])->name('recommendations.edit');
-    Route::put('recommendations/{id}', [RecommendationController::class, 'update'])->name('recommendations.update');
-    Route::delete('recommendations/{id}', [RecommendationController::class, 'destroy'])->name('recommendations.destroy');
-    Route::get('profile', [\App\Http\Controllers\Staff\ProfileController::class, 'show'])->name('profile.show');
-    Route::put('profile', [\App\Http\Controllers\Staff\ProfileController::class, 'update'])->name('profile.update');
-    Route::put('password', [\App\Http\Controllers\Staff\ProfileController::class, 'updatePassword'])->name('password.update');
+    
+    // Beneficiaries
+    Route::get('beneficiaries', [BarangayBeneficiaryController::class, 'index'])->name('beneficiaries.index');
+    Route::get('beneficiaries/{id}', [BarangayBeneficiaryController::class, 'show'])->name('beneficiaries.show');
+    
+    // Household Requests
+    Route::get('household-requests',           [BarangayHouseholdRequestController::class, 'index'])->name('household_requests.index');
+    Route::get('household-requests/create',    [BarangayHouseholdRequestController::class, 'create'])->name('household_requests.create');
+    Route::post('household-requests',          [BarangayHouseholdRequestController::class, 'store'])->name('household_requests.store');
+    Route::get('household-requests/{id}/edit', [BarangayHouseholdRequestController::class, 'edit'])->name('household_requests.edit');
+    Route::put('household-requests/{id}',      [BarangayHouseholdRequestController::class, 'update'])->name('household_requests.update');
+    Route::get('household-requests/{id}',      [BarangayHouseholdRequestController::class, 'show'])->name('household_requests.show');
+    Route::get('households',                  [BarangayHouseholdRequestController::class, 'households'])->name('household_requests.households');
+    
+    // Profile
+    Route::get('profile',                     [BarangayProfileController::class, 'show'])->name('profile.show');
+    Route::get('profile/edit',                 [BarangayProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('profile',                     [BarangayProfileController::class, 'update'])->name('profile.update');
+    Route::put('profile/password',             [BarangayProfileController::class, 'updatePassword'])->name('profile.updatePassword');
 });

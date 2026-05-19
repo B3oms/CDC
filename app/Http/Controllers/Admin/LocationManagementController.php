@@ -158,10 +158,10 @@ class LocationManagementController extends Controller
             
             if ($type === 'municipality') {
                 Log::info('Processing municipality request');
-                $region = property_exists($request, 'region') ? $request->region : null;
-                Log::info('Region field value: ' . ($region ?? 'NULL'));
+                Log::info('Region field value: ' . ($request->region ?? 'NULL'));
                 
-                if (!$region) {
+                // Check if region is available
+                if (!$request->region) {
                     Log::info('Region is missing, returning error');
                     return redirect()->back()->with('error', 'Cannot approve municipality request: Region information is missing. Please ask the staff to resubmit the request with region information.');
                 }
@@ -169,7 +169,7 @@ class LocationManagementController extends Controller
                 // Create actual municipality record
                 $municipalityId = DB::table('municipalities')->insertGetId([
                     'name' => $request->name,
-                    'province' => $region,
+                    'province' => $request->region,
                     'status' => 'approved',
                     'created_at' => now(),
                     'updated_at' => now(),

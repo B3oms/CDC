@@ -42,6 +42,25 @@
             @endforeach
         </select>
 
+        {{-- Gender --}}
+        <select name="gender"
+            onchange="document.getElementById('filterForm').submit()"
+            style="padding:6px 12px;border:1px solid #d3d1c7;border-radius:6px;">
+            <option value="">All Gender</option>
+            <option value="male" {{ request('gender') == 'male' ? 'selected' : '' }}>Male</option>
+            <option value="female" {{ request('gender') == 'female' ? 'selected' : '' }}>Female</option>
+            <option value="other" {{ request('gender') == 'other' ? 'selected' : '' }}>Other</option>
+        </select>
+
+        {{-- 4Ps Member --}}
+        <select name="is_4ps_member"
+            onchange="document.getElementById('filterForm').submit()"
+            style="padding:6px 12px;border:1px solid #d3d1c7;border-radius:6px;">
+            <option value="">All 4Ps Status</option>
+            <option value="1" {{ request('is_4ps_member') == '1' ? 'selected' : '' }}>4Ps Member</option>
+            <option value="0" {{ request('is_4ps_member') == '0' ? 'selected' : '' }}>Non-4Ps Member</option>
+        </select>
+
         {{-- Status --}}
         <select name="status"
             onchange="document.getElementById('filterForm').submit()"
@@ -52,7 +71,7 @@
         </select>
 
         {{-- Download PDF --}}
-        <a href="{{ route('staff.beneficiaries.pdf', request()->query()) }}"
+        <a href="{{ route('staff.beneficiaries.pdf') }}"
             class="btn-sm-secondary"
             style="text-decoration:none;">
             Download PDF
@@ -68,6 +87,8 @@
             <tr>
                 <th>#</th>
                 <th>Name</th>
+                <th>Gender</th>
+                <th>4Ps Member</th>
                 <th>Barangay</th>
                 <th>Family Size</th>
                 <th>Income</th>
@@ -82,13 +103,25 @@
             <tr>
                 <td>{{ $beneficiaries->firstItem() + $i }}</td>
                 <td>{{ $b->first_name }} {{ $b->last_name }}</td>
+                <td>
+                    <span style="text-transform: capitalize; font-weight: 500;">
+                        {{ $b->gender ?? 'N/A' }}
+                    </span>
+                </td>
+                <td>
+                    @if($b->is_4ps_member)
+                        <span style="color: #10b981; font-weight: 600;">✓ Yes</span>
+                    @else
+                        <span style="color: #6b7280;">No</span>
+                    @endif
+                </td>
                 <td>{{ $b->barangay->name ?? 'N/A' }}</td>
                 <td>{{ $b->family_size }}</td>
                 <td>₱{{ number_format($b->monthly_income, 0) }}</td>
 
                 <td>
-                    <span style="font-weight:700;color:{{ $b->criteria_met >= 2 ? '#3b6d11' : '#a32d2d' }}">
-                        {{ $b->criteria_met }}/4
+                    <span style="font-weight:700;color:{{ $b->criteria_met >= 3 ? '#3b6d11' : '#a32d2d' }}">
+                        {{ $b->criteria_met }}/5
                     </span>
                 </td>
 

@@ -40,7 +40,7 @@
                         @endif
                     </td>
                 </tr>
-                <tr><td class="meta-label">Criteria Met</td><td>{{ $beneficiary->criteria_met }}/4</td></tr>
+                <tr><td class="meta-label">Criteria Met</td><td>{{ $beneficiary->criteria_met }}/5</td></tr>
                 <tr><td class="meta-label">Vulnerability</td>
                     <td><span class="badge-intensity {{ strtolower($beneficiary->vulnerability_level) }}">{{ $beneficiary->vulnerability_level }}</span></td>
                 </tr>

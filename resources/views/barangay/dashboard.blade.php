@@ -4,6 +4,7 @@
 @section('content')
 <div class="dash-header">
     <h1>Hello, {{ auth()->user()->first_name }}!</h1>
+    <span class="logo-circle" style="border-color:#1a3d1f;"></span>
 </div>
 
 @if(session('success'))
@@ -11,106 +12,130 @@
 @endif
 
 @if($activeCalamity)
-<div class="alert-calamity">
-    <strong>Active Calamity: {{ $activeCalamity->name }}</strong>
+<div class="alert alert-info" style="margin-bottom:1.5rem;">
+    <i class="fas fa-info-circle"></i>
+    <strong>Active Calamity:</strong> {{ $activeCalamity->name }} 
     <span class="badge-intensity {{ strtolower($activeCalamity->intensity) }}">{{ $activeCalamity->intensity }}</span>
 </div>
 
-<div class="dash-grid">
-    <div class="yearly-col">
+<div class="dash-grid" style="grid-template-columns: 1fr; gap: 1.5rem;">
+    {{-- Forms Section --}}
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <div class="dash-grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            {{-- Evacuation Center Form --}}
+            <div class="section-card" style="flex: 1; display: flex; flex-direction: column;">
+                <h3>Evacuation Center</h3>
+                <form method="POST" action="{{ route('barangay.setCenter') }}" style="flex: 1; display: flex; flex-direction: column;">
+                    @csrf
+                    <input type="hidden" name="calamity_id" value="{{ $activeCalamity->id }}">
+                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div class="form-group">
+                                <label>Venue</label>
+                                <input type="text" name="venue" value="{{ $evacuationCenter->venue ?? '' }}" 
+                                       placeholder="e.g. Barangay Hall, Community Center" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Location</label>
+                                <input type="text" name="location" value="{{ $evacuationCenter->location ?? '' }}" 
+                                       placeholder="e.g. Purok 3, Sumacab Este" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width:100%;margin-top:auto;">
+                            {{ $evacuationCenter ? 'Update Center' : 'Set Center' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
 
-        {{-- Evacuation Center Form --}}
-        <div class="section-card">
-            <h3>Evacuation Center</h3>
-            <form method="POST" action="{{ route('barangay.setCenter') }}">
-                @csrf
-                <input type="hidden" name="calamity_id" value="{{ $activeCalamity->id }}">
-                <div class="form-group">
-                    <label>Venue</label>
-                    <input type="text" name="venue" value="{{ $evacuationCenter->venue ?? '' }}" placeholder="e.g. Barangay Hall" required>
+            {{-- Report Form --}}
+            @if($evacuationCenter)
+            <div class="section-card" style="flex: 1; display: flex; flex-direction: column;">
+                <h3>Submit Report</h3>
+                <form method="POST" action="{{ route('barangay.submitReport') }}" style="flex: 1; display: flex; flex-direction: column;">
+                    @csrf
+                    <input type="hidden" name="calamity_id" value="{{ $activeCalamity->id }}">
+                    <input type="hidden" name="evacuation_center_id" value="{{ $evacuationCenter->id }}">
+                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div class="form-group">
+                                <label>Select Households in Evacuation</label>
+                                <div class="collapsible-selector">
+                                    <div class="selector-trigger" onclick="toggleHouseholdSelector()">
+                                        <div class="trigger-content">
+                                            <span class="trigger-icon">▼</span>
+                                            <span class="trigger-text">
+                                                🏠 Select Households 
+                                                <span class="selected-badge" id="selected-count">0</span>
+                                            </span>
+                                            <span class="trigger-info">{{ $households ? $households->count() : 0 }} available</span>
+                                        </div>
+                                    </div>
+                                    <div class="selector-content" id="household-selector-content" style="display: none;">
+                                        <div class="selector-header">
+                                            <span class="selector-info">
+                                                📋 Registered Households: {{ $households ? $households->count() : 0 }}
+                                            </span>
+                                            <span class="selected-info">
+                                                Selected: <strong id="selected-count-inner">0</strong>
+                                            </span>
+                                        </div>
+                                        <div class="household-list">
+                                            @if($households && $households->count() > 0)
+                                                @foreach($households as $household)
+                                                <label class="household-item">
+                                                    <input type="checkbox" name="household_ids[]" value="{{ $household->id }}" 
+                                                           data-family-size="{{ $household->family_size }}"
+                                                           onchange="updateSelectedCount()">
+                                                    <span class="household-info">
+                                                        <span class="household-name">{{ $household->head_of_household }}</span>
+                                                        <span class="family-size">({{ $household->family_size }} members)</span>
+                                                    </span>
+                                                </label>
+                                                @endforeach
+                                            @else
+                                                <div style="padding: 20px; text-align: center; color: #6b7280;">
+                                                    <p>No approved households found for your barangay.</p>
+                                                    <p style="font-size: 0.875rem; margin-top: 8px;">Please contact the administrator if you believe this is an error.</p>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="selector-footer">
+                                            <small class="selector-help">
+                                                💡 Click households to select them for evacuation
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Total Evacuees (Auto-calculated)</label>
+                                <div class="evacuees-display">
+                                    <input type="number" name="evacuee_count" id="evacuee-count" min="0" readonly
+                                           value="{{ $latestReport->evacuee_count ?? 0 }}" required>
+                                    <small class="evacuees-info">
+                                        📊 Calculated from family sizes of selected households
+                                    </small>
+                                </div>
+                            </div>
+                                                </div>
+                        <button type="submit" class="btn-primary" style="width:100%;margin-top:auto;">
+                            Update Report
+                        </button>
+                    </div>
+                </form>
+            </div>
+            @else
+            <div class="section-card" style="opacity:0.7; flex: 1; display: flex; flex-direction: column;">
+                <h3>Submit Report</h3>
+                <div style="flex: 1; display: flex; align-items: center; justify-content: center; color: #6b7280;">
+                    <p>You must set an evacuation center before submitting reports.</p>
                 </div>
-                <div class="form-group">
-                    <label>Location</label>
-                    <input type="text" name="location" value="{{ $evacuationCenter->location ?? '' }}" placeholder="e.g. Purok 3, Sumacab Este" required>
-                </div>
-                <button type="submit" class="btn-primary" style="width:100%;margin-top:8px;">
-                    {{ $evacuationCenter ? 'Update Center' : 'Set Center' }}
-                </button>
-            </form>
+            </div>
+            @endif
         </div>
 
-        {{-- Report Form --}}
-        @if($evacuationCenter)
-        <div class="section-card">
-            <h3>Submit Report</h3>
-            <form method="POST" action="{{ route('barangay.submitReport') }}">
-                @csrf
-                <input type="hidden" name="calamity_id" value="{{ $activeCalamity->id }}">
-                <input type="hidden" name="evacuation_center_id" value="{{ $evacuationCenter->id }}">
-
-                <div class="form-group">
-                    <label>Number of Households</label>
-                    <input type="number" name="household_count" min="0"
-                        value="{{ $latestReport->household_count ?? 0 }}" required>
-                </div>
-                <div class="form-group">
-                    <label>Number of Evacuees</label>
-                    <input type="number" name="evacuee_count" min="0"
-                        value="{{ $latestReport->evacuee_count ?? 0 }}" required>
-                </div>
-                <div class="form-group">
-                    <label>Severity Level (1-5)</label>
-                    <select name="severity_level" required>
-                        @for($i = 1; $i <= 5; $i++)
-                        <option value="{{ $i }}" {{ ($latestReport->severity_level ?? 1) == $i ? 'selected' : '' }}>
-                            {{ $i }} — {{ ['', 'Minor', 'Moderate', 'Serious', 'Critical', 'Catastrophic'][$i] }}
-                        </option>
-                        @endfor
-                    </select>
-                </div>
-                <button type="submit" class="btn-primary" style="width:100%;margin-top:8px;">
-                    Update Report
-                </button>
-            </form>
-        </div>
-        @endif
-
-    </div>
-
-    <div class="right-col">
-        <div class="section-card">
-            <h3>Live Rankings — Top 10</h3>
-            <table class="dist-table">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Barangay</th>
-                        <th>Households</th>
-                        <th>Evacuees</th>
-                        <th>Score</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($rankings as $i => $r)
-                    <tr class="{{ $r->barangay_id == auth()->user()->barangay_id ? 'my-barangay' : '' }}">
-                        <td><strong>#{{ $i + 1 }}</strong></td>
-                        <td>{{ $r->barangay->name }}</td>
-                        <td>{{ $r->total_households }}</td>
-                        <td>{{ $r->total_evacuees }}</td>
-                        <td><strong>{{ number_format($r->score, 2) }}</strong></td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="5" style="text-align:center;color:#888;padding:16px;">
-                            No reports yet.
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-    </div>
+            </div>
 </div>
 
 @else
@@ -120,78 +145,274 @@
 </div>
 @endif
 
-<div class="section-card">
-    <h3>Relief Operation History</h3>
-    <table class="dist-table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Calamity</th>
-                <th>Status</th>
-                <th>Comments</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($reliefHistory as $operation)
-            <tr>
-                <td>{{ optional($operation->operation_date)->format('M d, Y') ?? 'N/A' }}</td>
-                <td>{{ $operation->calamity->name ?? 'N/A' }}</td>
-                <td><span class="status-badge {{ strtolower($operation->status ?? 'unknown') }}">{{ $operation->status ?? 'Unknown' }}</span></td>
-                <td>{{ $operation->feedbacks_count }}</td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="4" style="text-align:center;color:#888;padding:16px;">
-                    No relief operation history available.
-                </td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
-</div>
+@push('styles')
+<style>
+/* Collapsible Household Selector Styles */
+.collapsible-selector {
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    transition: border-color 0.2s ease;
+}
 
-@if($reliefHistory->isNotEmpty())
-<div class="section-card">
-    <h3>Send Operation Feedback</h3>
-    <form method="POST" action="{{ route('barangay.feedback.submit') }}">
-        @csrf
-        <div class="form-group">
-            <label>Relief Operation</label>
-            <select name="relief_operation_id" required>
-                @foreach($reliefHistory as $operation)
-                    <option value="{{ $operation->id }}"
-                        {{ old('relief_operation_id') == $operation->id ? 'selected' : '' }}>
-                        {{ optional($operation->operation_date)->format('M d, Y') ?? 'N/A' }} — {{ $operation->calamity->name ?? 'N/A' }} ({{ $operation->status ?? 'Unknown' }})
-                    </option>
-                @endforeach
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Feedback / Comment</label>
-            <textarea name="message" rows="4" required placeholder="Share your feedback about this relief operation">{{ old('message') }}</textarea>
-        </div>
-        <button type="submit" class="btn-primary" style="width:100%;margin-top:8px;">Submit Feedback</button>
-    </form>
-</div>
-@else
-<div class="section-card" style="text-align:center;padding:1.5rem;">
-    No relief operations are available to comment on yet.
-</div>
-@endif
+.collapsible-selector:hover {
+    border-color: #d1d5db;
+}
 
-@if($recentFeedbacks->isNotEmpty())
-<div class="section-card">
-    <h3>Recent Feedback Sent</h3>
-    <ul class="feedback-list">
-        @foreach($recentFeedbacks as $feedback)
-        <li>
-            <strong>{{ optional($feedback->reliefOperation?->operation_date)->format('M d, Y') ?? 'Date unknown' }}</strong>
-            <span> — {{ $feedback->reliefOperation?->calamity?->name ?? 'Relief operation' }}</span>
-            <p>{{ \Illuminate\Support\Str::limit($feedback->message, 120) }}</p>
-        </li>
-        @endforeach
-    </ul>
-</div>
-@endif
+.selector-trigger {
+    padding: 12px 16px;
+    background: #f9fafb;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+}
+
+.selector-trigger:hover {
+    background: #f3f4f6;
+}
+
+.trigger-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.trigger-icon {
+    font-size: 0.875rem;
+    color: #6b7280;
+    transition: transform 0.2s ease;
+    margin-right: 8px;
+}
+
+.trigger-icon.rotated {
+    transform: rotate(180deg);
+}
+
+.trigger-text {
+    flex: 1;
+    font-weight: 600;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.selected-badge {
+    background: #059669;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    min-width: 20px;
+    text-align: center;
+}
+
+.trigger-info {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.selector-content {
+    border-top: 1px solid #e5e7eb;
+}
+
+.selector-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.selector-info {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.selected-info {
+    font-size: 0.875rem;
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.selected-info strong {
+    color: #059669;
+    font-size: 1rem;
+}
+
+.household-list {
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.household-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    margin: 2px 0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.household-item:hover {
+    background-color: #f3f4f6;
+}
+
+.household-item input[type="checkbox"] {
+    margin-right: 12px;
+    width: 16px;
+    height: 16px;
+    accent-color: #059669;
+}
+
+.household-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.household-name {
+    font-weight: 500;
+    color: #374151;
+    font-size: 0.875rem;
+}
+
+.family-size {
+    color: #6b7280;
+    font-weight: 400;
+    font-size: 0.75rem;
+}
+
+.selector-footer {
+    padding: 8px 16px;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+}
+
+.selector-help {
+    color: #6b7280;
+    font-size: 0.75rem;
+    font-style: italic;
+}
+
+/* Evacuees Display Styling */
+.evacuees-display {
+    position: relative;
+}
+
+.evacuees-display input[readonly] {
+    background: #f9fafb;
+    cursor: not-allowed;
+    border-color: #d1d5db;
+}
+
+.evacuees-info {
+    color: #059669;
+    font-size: 0.75rem;
+    font-weight: 500;
+    display: block;
+    margin-top: 4px;
+}
+
+/* Enhanced form group styling */
+.form-group label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    display: block;
+}
+</style>
+@endpush
+
+@push('scripts')
+<script>
+function toggleHouseholdSelector() {
+    const content = document.getElementById('household-selector-content');
+    const icon = document.querySelector('.trigger-icon');
+    
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        icon.classList.add('rotated');
+    } else {
+        content.style.display = 'none';
+        icon.classList.remove('rotated');
+    }
+}
+
+function updateSelectedCount() {
+    const checkboxes = document.querySelectorAll('input[name="household_ids[]"]:checked');
+    const count = checkboxes.length;
+    
+    // Calculate total evacuees based on family sizes
+    let totalEvacuees = 0;
+    checkboxes.forEach(checkbox => {
+        const familySize = parseInt(checkbox.dataset.familySize) || 0;
+        totalEvacuees += familySize;
+    });
+    
+    // Update both count displays
+    const outerCount = document.getElementById('selected-count');
+    const innerCount = document.getElementById('selected-count-inner');
+    
+    if (outerCount) outerCount.textContent = count;
+    if (innerCount) innerCount.textContent = count;
+    
+    // Update evacuees count
+    const evacueesInput = document.getElementById('evacuee-count');
+    if (evacueesInput) {
+        evacueesInput.value = totalEvacuees;
+    }
+    
+    // Update selected info styling
+    const selectedInfo = document.querySelector('.selected-info');
+    if (selectedInfo) {
+        if (count > 0) {
+            selectedInfo.style.color = '#059669';
+        } else {
+            selectedInfo.style.color = '#1f2937';
+        }
+    }
+    
+    // Update trigger badge visibility
+    const badge = document.querySelector('.selected-badge');
+    if (badge) {
+        if (count > 0) {
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initial count update
+    updateSelectedCount();
+    
+    // Add click handlers to household items for better UX
+    const householdItems = document.querySelectorAll('.household-item');
+    householdItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            // Prevent toggling when clicking on checkbox directly
+            if (e.target.type !== 'checkbox') {
+                const checkbox = this.querySelector('input[type="checkbox"]');
+                if (checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    updateSelectedCount();
+                }
+            }
+        });
+    });
+});
+</script>
+@endpush
 
 @endsection

@@ -80,14 +80,11 @@ nav a.active {
 }
 
 .logout-form {
-    margin-top: 0.9rem;
-    text-align: center;
-    width: 100%;
+    margin-top: auto;
 }
 
 .logout-btn {
     width: 100%;
-    max-width: 175px;
     padding: 8px 12px;
     background: transparent;
     border: 1px solid rgba(255,255,255,0.2);
@@ -95,7 +92,7 @@ nav a.active {
     color: #9fe1cb;
     font-size: 0.9rem;
     cursor: pointer;
-    text-align: center;
+    text-align: left;
     transition: background 0.15s;
 }
 
@@ -407,39 +404,61 @@ nav a.active {
 /* User Profile */
 .user-profile {
     margin-top: auto;
-    padding: 1.25rem 0.75rem 0;
+    padding-top: 1rem;
     border-top: 1px solid rgba(255,255,255,0.1);
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
 .user-info {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
 }
 
 .user-avatar {
-    width: 60px;
-    height: 60px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    background: #f5c300;
-    color: #1a3d1f;
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    color: #475569;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.9rem;
-    font-weight: 700;
+    font-size: 0.85rem;
+    font-weight: 600;
     flex-shrink: 0;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.user-avatar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(245, 195, 0, 0.1), rgba(245, 195, 0, 0.05));
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.user-avatar:hover::before {
+    opacity: 1;
+}
+
+.user-avatar:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .user-details {
-    width: 100%;
+    flex: 1;
     min-width: 0;
-    text-align: center;
+    margin-bottom: 0.5rem;
 }
 
 .user-name {
@@ -450,7 +469,6 @@ nav a.active {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    text-align: center;
 }
 
 .user-role {
@@ -459,8 +477,6 @@ nav a.active {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    text-align: center;
-    text-transform: uppercase;
 }
 
 /* Enhanced Sidebar */
@@ -680,14 +696,40 @@ nav a.active {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: #e6f1fb;
-    color: #185fa5;
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    color: #475569;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
-    font-weight: 700;
+    font-size: 10px;
+    font-weight: 600;
     flex-shrink: 0;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.avatar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(245, 195, 0, 0.1), rgba(245, 195, 0, 0.05));
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.avatar:hover::before {
+    opacity: 1;
+}
+
+.avatar:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .staff-name {
@@ -1397,14 +1439,40 @@ margin-bottom: 1rem;
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: #e6f1fb;
-    color: #185fa5;
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    color: #475569;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
     flex-shrink: 0;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.staff-avatar-lg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(245, 195, 0, 0.1), rgba(245, 195, 0, 0.05));
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.staff-avatar-lg:hover::before {
+    opacity: 1;
+}
+
+.staff-avatar-lg:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .staff-profile-info {

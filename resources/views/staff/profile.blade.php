@@ -1,10 +1,4 @@
-@extends((auth()->user()->role->name ?? null) === 'Barangay Partner' ? 'admin.layouts.app' : 'staff.layouts.app')
-
-@php
-    $dashboardRoute = (auth()->user()->role->name ?? null) === 'Barangay Partner' ? route('barangay.dashboard') : route('staff.dashboard');
-    $profileUpdateRoute = (auth()->user()->role->name ?? null) === 'Barangay Partner' ? route('barangay.profile.update') : route('staff.profile.update');
-    $passwordUpdateRoute = (auth()->user()->role->name ?? null) === 'Barangay Partner' ? route('barangay.password.update') : route('staff.password.update');
-@endphp
+@extends('staff.layouts.app')
 
 @section('breadcrumb', 'Profile')
 
@@ -115,7 +109,7 @@
 
             {{-- Actions --}}
             <div class="profile-actions">
-                <a href="{{ $dashboardRoute }}" class="btn btn-ghost">
+                <a href="{{ route('staff.dashboard') }}" class="btn btn-ghost">
                     <i class="fas fa-arrow-left"></i> Dashboard
                 </a>
                 <button type="button" onclick="showEditMode()" class="btn btn-primary">
@@ -135,7 +129,7 @@
 
         {{-- Edit Mode --}}
         <div id="editMode" style="display: none;">
-            <form method="POST" action="{{ $profileUpdateRoute }}">
+            <form method="POST" action="{{ route('staff.profile.update') }}">
                 @csrf
                 @method('PUT')
 
@@ -223,7 +217,7 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <form method="POST" action="{{ $passwordUpdateRoute }}">
+        <form method="POST" action="{{ route('staff.password.update') }}">
             @csrf
             @method('PUT')
             <div class="modal-body">
@@ -282,16 +276,41 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: #1a3d1f;
-    color: #ffffff;
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    color: #475569;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
-    font-family: 'Segoe UI', sans-serif;
-    flex-shrink: 0;
-    border: 2px solid #f5c300;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-avatar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(245, 195, 0, 0.1), rgba(245, 195, 0, 0.05));
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.profile-avatar:hover::before {
+    opacity: 1;
+}
+
+.profile-avatar:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .profile-meta {

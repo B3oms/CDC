@@ -59,9 +59,15 @@
                 <div class="meta-row">
                     <span class="meta-label">Expires</span>
                     <span>
-                        {{ $item->inventory?->expiration_date
-                            ? \Carbon\Carbon::parse($item->inventory->expiration_date)->format('M d, Y')
-                            : 'N/A' }}
+                        @if($item->inventory)
+                            @if($item->inventory->expiration_date)
+                                {{ \Carbon\Carbon::parse($item->inventory->expiration_date)->format('M d, Y') }}
+                            @else
+                                No expiry
+                            @endif
+                        @else
+                            No inventory record
+                        @endif
                     </span>
                 </div>
             </div>

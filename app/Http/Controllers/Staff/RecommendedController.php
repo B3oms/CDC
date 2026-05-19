@@ -4,9 +4,8 @@ namespace App\Http\Controllers\Staff;
 
 use App\Http\Controllers\Controller;
 use App\Models\RecommendedBeneficiary;
+use App\Models\Beneficiary;
 use App\Models\Barangay;
-use App\Models\Municipality;
-use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class RecommendedController extends Controller
@@ -27,25 +26,18 @@ class RecommendedController extends Controller
     public function convert($id)
     {
         $recommended = RecommendedBeneficiary::findOrFail($id);
-        $municipalities = Municipality::with('barangays')->get();
-        $barangays      = Barangay::all();
+        $barangays   = Barangay::all();
 
-        if ($recommended->status === 'Pending') {
-            NotificationService::barangayRecommendationViewed($recommended->id);
-        }
-
-        return view('staff.beneficiaries.create', compact(
-            'municipalities',
-            'barangays'
-        ))->with('prefill', $recommended);
+        return view('staff.beneficiaries.create', [
+            'barangays'   => $barangays,
+            'prefill'     => $recommended,
+        ]);
     }
 
     public function reject($id)
     {
         $recommended = RecommendedBeneficiary::findOrFail($id);
         $recommended->update(['status' => 'Rejected']);
-
-        NotificationService::barangayRecommendationRejected($recommended->id);
 
         return back()->with('success', 'Recommendation rejected.');
     }

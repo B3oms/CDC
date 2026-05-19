@@ -88,8 +88,8 @@
                 <td>{{ $beneficiary->family_size }}</td>
                 <td>₱{{ number_format($beneficiary->monthly_income, 0) }}</td>
                 <td>
-                    <span class="criteria-met {{ $beneficiary->criteria_met >= 2 ? 'criteria-good' : 'criteria-bad' }}">
-                        {{ $beneficiary->criteria_met }}/4
+                    <span class="criteria-met {{ $beneficiary->criteria_met >= 3 ? 'criteria-good' : 'criteria-bad' }}">
+                        {{ $beneficiary->criteria_met }}/5
                     </span>
                 </td>
                 <td>{{ $beneficiary->vulnerability_level }}</td>

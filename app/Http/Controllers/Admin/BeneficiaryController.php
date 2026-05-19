@@ -28,6 +28,12 @@ class BeneficiaryController extends Controller
         ->when($request->barangay_id, function ($q) use ($request) {
             $q->where('barangay_id', $request->barangay_id);
         })
+        ->when($request->gender, function ($q) use ($request) {
+            $q->where('gender', $request->gender);
+        })
+        ->when($request->is_4ps_member !== null, function ($q) use ($request) {
+            $q->where('is_4ps_member', $request->is_4ps_member);
+        })
         ->when($request->status, function ($q) use ($request) {
             $q->where('is_verified', $request->status == 'verified');
         })

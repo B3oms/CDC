@@ -276,16 +276,41 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: #1a3d1f;
-    color: #ffffff;
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    color: #475569;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
     font-family: 'Segoe UI', sans-serif;
     flex-shrink: 0;
-    border: 2px solid #f5c300;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-avatar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(245, 195, 0, 0.1), rgba(245, 195, 0, 0.05));
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.profile-avatar:hover::before {
+    opacity: 1;
+}
+
+.profile-avatar:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .profile-meta {

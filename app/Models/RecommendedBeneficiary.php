@@ -12,13 +12,9 @@ class RecommendedBeneficiary extends Model
         'barangay_id',
         'submitted_by',
         'first_name',
-        'middle_name',
         'last_name',
-        'gender',
-        'age',
         'contact_number',
         'address',
-        'notes',
         'status',
     ];
 

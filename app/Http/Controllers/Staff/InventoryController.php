@@ -7,9 +7,9 @@ use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\Item;
 use App\Models\Inventory;
-use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use PDF;
 
 class InventoryController extends Controller
 {
@@ -18,6 +18,30 @@ class InventoryController extends Controller
     {
         $categories = Category::withCount('subcategories')->get();
         return view('staff.inventory.index', compact('categories'));
+    }
+
+    // PDF Generation - Inventory by Category
+    public function pdf()
+    {
+        try {
+            // Get all categories with their subcategories and items
+            $categories = Category::with(['subcategories.items.inventory'])
+                ->orderBy('name')
+                ->get();
+
+            $pdfData = [
+                'categories' => $categories,
+                'generated_date' => now()->format('F d, Y - h:i A')
+            ];
+
+            $pdf = PDF::loadView('staff.inventory.pdf', $pdfData);
+            $pdf->setPaper('A4', 'landscape');
+            return $pdf->download('inventory-by-category-' . now()->format('Y-m-d') . '.pdf');
+            
+        } catch (\Exception $e) {
+            return redirect()->route('staff.inventory.index')
+                ->with('error', 'Failed to generate PDF: ' . $e->getMessage());
+        }
     }
 
     // Level 2 — Subcategories under a category
@@ -145,6 +169,8 @@ class InventoryController extends Controller
 
     public function storeItem(Request $request, $subcategoryId)
     {
+        $subcategory = Subcategory::with('category')->findOrFail($subcategoryId);
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -156,24 +182,26 @@ class InventoryController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $validated['subcategory_id'] = $subcategoryId;
-        
+        $imagePath = null;
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('items', 'public');
-            $validated['image'] = $imagePath;
         }
 
-        $item = Item::create($validated);
+        $item = Item::create([
+            'category_id'    => $subcategory->category_id,
+            'subcategory_id' => $subcategoryId,
+            'name'           => $validated['name'],
+            'description'    => $validated['description'],
+            'unit'           => $validated['unit'],
+            'image'          => $imagePath,
+        ]);
 
         // Create inventory record
         Inventory::create([
-            'item_id' => $item->id,
-            'quantity' => $validated['quantity'],
+            'item_id'         => $item->id,
+            'quantity'        => $validated['quantity'],
             'expiration_date' => $validated['expiration_date'] ?? null,
-            'last_updated' => now()
         ]);
-
-        NotificationService::inventoryAdded($item->id, auth()->id());
 
         return redirect()->route('staff.inventory.subcategory.show', $subcategoryId)
             ->with('success', 'Item created successfully.');
@@ -216,7 +244,6 @@ class InventoryController extends Controller
             $item->inventory->update([
                 'quantity' => $validated['quantity'],
                 'expiration_date' => $validated['expiration_date'] ?? null,
-                'last_updated' => now()
             ]);
         }
 
@@ -231,13 +258,13 @@ class InventoryController extends Controller
         
         // Check if category has subcategories
         if ($category->subcategories()->count() > 0) {
-            return redirect()->route('inventory.index')
+            return redirect()->route('staff.inventory.index')
                 ->with('error', 'Cannot delete category with existing subcategories.');
         }
         
         $category->delete();
         
-        return redirect()->route('inventory.index')
+        return redirect()->route('staff.inventory.index')
             ->with('success', 'Category deleted successfully.');
     }
 
@@ -248,13 +275,13 @@ class InventoryController extends Controller
         
         // Check if subcategory has items
         if ($subcategory->items()->count() > 0) {
-            return redirect()->route('inventory.category.show', $subcategory->category_id)
+            return redirect()->route('staff.inventory.category.show', $subcategory->category_id)
                 ->with('error', 'Cannot delete subcategory with existing items.');
         }
         
         $subcategory->delete();
         
-        return redirect()->route('inventory.category.show', $subcategory->category_id)
+        return redirect()->route('staff.inventory.category.show', $subcategory->category_id)
             ->with('success', 'Subcategory deleted successfully.');
     }
 
@@ -262,7 +289,7 @@ class InventoryController extends Controller
     public function destroyItem($id)
     {
         $item = Item::with('subcategory')->findOrFail($id);
-        $categoryId = $item->subcategory->category_id;
+        $subcategoryId = $item->subcategory_id;
         
         // Delete inventory record if exists
         if ($item->inventory) {
@@ -271,7 +298,7 @@ class InventoryController extends Controller
         
         $item->delete();
         
-        return redirect()->route('inventory.category.show', $categoryId)
+        return redirect()->route('staff.inventory.subcategory.show', $subcategoryId)
             ->with('success', 'Item deleted successfully.');
     }
 }

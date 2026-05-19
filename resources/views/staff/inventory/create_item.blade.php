@@ -27,7 +27,7 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ route('inventory.item.store', $subcategory->id) }}"
+    <form method="POST" action="{{ route('staff.inventory.item.store', $subcategory->id) }}"
         enctype="multipart/form-data">
         @csrf
         <div class="form-grid">

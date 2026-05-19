@@ -74,6 +74,33 @@
             @endforeach
         </div>
 
+        {{-- Distributed Items --}}
+        @if($event->distributedItems->isNotEmpty())
+        <div class="section-card">
+            <h3>Distributed Items</h3>
+            <table class="dist-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Total Quantity</th>
+                        <th>Per Beneficiary</th>
+                        <th>Beneficiaries</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($event->distributedItems as $distributedItem)
+                    <tr>
+                        <td>{{ $distributedItem->item->name }}</td>
+                        <td>{{ $distributedItem->total_quantity }} {{ $distributedItem->unit }}</td>
+                        <td>{{ $distributedItem->per_beneficiary }} {{ $distributedItem->unit }}</td>
+                        <td>{{ $distributedItem->beneficiaries_count }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @endif
+
     </div>
 
     <div class="right-col">
@@ -107,15 +134,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($event->beneficiaries as $i => $beneficiary)
+                    @forelse($beneficiaries as $i => $beneficiary)
                     <tr>
                         <td>{{ $i + 1 }}</td>
-                        <td>{{ $beneficiary->first_name }} {{ $beneficiary->last_name }}</td>
-                        <td>{{ $beneficiary->barangay->name ?? 'N/A' }}</td>
-                        <td>{{ $beneficiary->family_size }}</td>
+                        <td>{{ $beneficiary->beneficiary->first_name }} {{ $beneficiary->beneficiary->last_name }}</td>
+                        <td>{{ $beneficiary->beneficiary->barangay->name ?? 'N/A' }}</td>
+                        <td>{{ $beneficiary->beneficiary->family_size }}</td>
                         <td>
-                            <span class="badge-intensity {{ strtolower($beneficiary->vulnerability_level ?? 'medium') }}">
-                                {{ $beneficiary->vulnerability_level ?? 'Medium' }}
+                            <span class="badge-intensity {{ strtolower($beneficiary->beneficiary->vulnerability_level ?? 'medium') }}">
+                                {{ $beneficiary->beneficiary->vulnerability_level ?? 'Medium' }}
                             </span>
                         </td>
                     </tr>
@@ -129,7 +156,7 @@
                 </tbody>
             </table>
 
-            @if($event->beneficiaries->count())
+            @if($beneficiaries->count())
             <div style="margin-top:1rem;text-align:right;">
                 <a href="{{ route('admin.relief.show', $event->id) }}?{{ http_build_query(['barangay_id' => request('barangay_id'), 'pdf' => 1]) }}"
                     class="btn-primary">

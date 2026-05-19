@@ -14,9 +14,14 @@ class EvacuationReport extends Model
         'barangay_id',
         'reported_by',
         'household_count',
+        'household_ids',
         'evacuee_count',
         'severity_level',
         'ranking_score',
+    ];
+
+    protected $casts = [
+        'household_ids' => 'array',
     ];
 
     public function evacuationCenter()

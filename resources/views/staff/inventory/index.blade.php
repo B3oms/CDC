@@ -5,7 +5,12 @@
 @section('content')
 <div class="dash-header">
     <h1>Inventory</h1>
-    <a href="{{ route('staff.inventory.category.create') }}" class="btn-primary">+ Add Category</a>
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <a href="{{ route('staff.inventory.pdf') }}" class="btn-primary" target="_blank" style="text-decoration: none;">
+            <i class="fas fa-file-pdf"></i> Download PDF
+        </a>
+        <a href="{{ route('staff.inventory.category.create') }}" class="btn-primary" style="text-decoration: none;">+ Add Category</a>
+    </div>
 </div>
 
 @if(session('success'))

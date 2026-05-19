@@ -12,9 +12,9 @@ class Beneficiary extends Model
         'user_id',
         'barangay_id',
         'first_name',
-        'middle_name',
         'last_name',
         'gender',
+        'is_4ps_member',
         'birthdate',
         'contact_number',
         'address',
@@ -31,6 +31,7 @@ class Beneficiary extends Model
     ];
 
     protected $casts = [
+        'is_4ps_member' => 'boolean',
         'has_senior'     => 'boolean',
         'interviewed_at' => 'datetime',
     ];
@@ -56,13 +57,14 @@ class Beneficiary extends Model
     }
 
     // Auto-verification logic
-    public static function checkCriteria($familySize, $monthlyIncome, $hasSenior, $childrenCount): int
+    public static function checkCriteria($familySize, $monthlyIncome, $hasSenior, $childrenCount, $is4PsMember = false): int
     {
         $criteria = 0;
         if ($familySize >= 4)          $criteria++;
         if ($monthlyIncome <= 10000)   $criteria++;
         if ($hasSenior)                $criteria++;
         if ($childrenCount >= 2)       $criteria++;
+        if ($is4PsMember)              $criteria++;
         return $criteria;
     }
 }

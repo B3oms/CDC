@@ -72,14 +72,23 @@
         
         <div class="portal-footer">
             <span class="view-portal">Click to view portal →</span>
-            @if($calamity->status === 'Open')
-            <form action="{{ route('admin.calamity.close', $calamity->id) }}" method="POST" onclick="event.stopPropagation()">
-                @csrf
-                <button type="submit" class="btn-close" onclick="return confirm('Are you sure you want to close this calamity portal?')">
-                    <i class="fas fa-times"></i> Close
-                </button>
-            </form>
-            @endif
+            <div class="portal-actions">
+                @if($calamity->status === 'Open')
+                <form action="{{ route('admin.calamity.close', $calamity->id) }}" method="POST" onclick="event.stopPropagation()">
+                    @csrf
+                    <button type="submit" class="btn-close" onclick="return confirm('Are you sure you want to close this calamity portal?')">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </form>
+                @endif
+                <form action="{{ route('admin.calamity.destroy', $calamity->id) }}" method="POST" onclick="event.stopPropagation()">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn-delete" onclick="return confirm('Are you sure you want to delete this calamity portal and all its data? This action cannot be undone.')">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </form>
+            </div>
         </div>
     </a>
     @endforeach
@@ -272,6 +281,12 @@
     font-size: 0.75rem;
 }
 
+.portal-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
 .btn-close {
     padding: 0.3rem 0.6rem;
     border: none;
@@ -285,6 +300,26 @@
     display: flex;
     align-items: center;
     gap: 0.2rem;
+}
+
+.btn-delete {
+    padding: 0.3rem 0.6rem;
+    border: none;
+    border-radius: 4px;
+    background: #dc2626;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.btn-delete:hover {
+    background: #b91c1c;
+    transform: scale(1.05);
 }
 
 .btn-close:hover {

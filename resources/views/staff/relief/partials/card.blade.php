@@ -1,21 +1,8 @@
 <div class="relief-card-wrapper">
-    <div class="relief-card status-{{ strtolower($event->status) }}">
+    <a href="{{ route('staff.relief.show', $event->id) }}" class="relief-card status-{{ strtolower($event->status) }}">
         <div class="relief-card-header">
             <span class="relief-card-name">{{ $event->name }}</span>
-            <div class="relief-card-actions">
-                <span class="relief-status-badge {{ strtolower($event->status) }}">{{ $event->status }}</span>
-                @if($event->status !== 'Ongoing')
-                <form action="{{ route('staff.relief.destroy', $event->id) }}" method="POST" 
-                      onsubmit="return confirm('Are you sure you want to delete this relief event? This action cannot be undone.')" 
-                      class="delete-form">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="delete-btn" title="Delete Event">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </form>
-                @endif
-            </div>
+            <span class="relief-status-badge {{ strtolower($event->status) }}">{{ $event->status }}</span>
         </div>
         <div class="relief-card-meta">
             <div class="meta-row">
@@ -56,7 +43,20 @@
                     </button>
                 @endif
             </div>
-            <a href="{{ route('staff.relief.show', $event->id) }}" class="view-details">View Details →</a>
+            <div class="view-details">View Details →</div>
         </div>
-    </div>
+    </a>
+    
+    {{-- Delete Button --}}
+    @if($event->status !== 'Ongoing')
+    <form action="{{ route('staff.relief.destroy', $event->id) }}" method="POST" 
+          onsubmit="return confirm('Are you sure you want to delete this relief event? This action cannot be undone.')" 
+          class="delete-form">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="delete-btn" title="Delete Event">
+            <i class="fas fa-trash"></i>
+        </button>
+    </form>
+    @endif
 </div>

@@ -27,9 +27,6 @@
 
     <form method="POST" action="{{ route('staff.beneficiaries.store') }}">
         @csrf
-        @if(isset($prefill))
-            <input type="hidden" name="recommended_id" value="{{ $prefill->id }}">
-        @endif
 
         {{-- Section 1: Personal Info --}}
         <div class="interview-section">
@@ -41,11 +38,6 @@
                         value="{{ old('first_name', $prefill->first_name ?? '') }}" required>
                 </div>
                 <div class="form-group">
-                    <label>Middle Name</label>
-                    <input type="text" name="middle_name"
-                        value="{{ old('middle_name', $prefill->middle_name ?? '') }}">
-                </div>
-                <div class="form-group">
                     <label>Last Name</label>
                     <input type="text" name="last_name"
                         value="{{ old('last_name', $prefill->last_name ?? '') }}" required>
@@ -54,9 +46,9 @@
                     <label>Gender</label>
                     <select name="gender" required>
                         <option value="">-- Select --</option>
-                        <option value="Male"   {{ old('gender', $prefill->gender ?? '') == 'Male'   ? 'selected' : '' }}>Male</option>
-                        <option value="Female" {{ old('gender', $prefill->gender ?? '') == 'Female' ? 'selected' : '' }}>Female</option>
-                        <option value="Other"  {{ old('gender', $prefill->gender ?? '') == 'Other'  ? 'selected' : '' }}>Other</option>
+                        <option value="Male"   {{ old('gender') == 'Male'   ? 'selected' : '' }}>Male</option>
+                        <option value="Female" {{ old('gender') == 'Female' ? 'selected' : '' }}>Female</option>
+                        <option value="Other"  {{ old('gender') == 'Other'  ? 'selected' : '' }}>Other</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -128,7 +120,7 @@
         <div class="interview-section">
             <div class="interview-section-title">Verification Criteria</div>
             <p class="hint" style="margin-bottom:1rem;">
-                Beneficiary must meet at least <strong>2 of 4 criteria</strong> to be verified.
+                Beneficiary must meet at least <strong>3 of 5 criteria</strong> to be verified.
             </p>
             <div class="form-grid">
                 <div class="form-group">
@@ -171,11 +163,22 @@
                         <option value="1" {{ old('has_senior') == '1' ? 'selected' : '' }}>Yes</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label>
+                        4Ps Member
+                        <span class="criteria-badge" id="crit-4ps">Criteria 5: 4Ps member</span>
+                    </label>
+                    <select name="is_4ps_member" onchange="updateCriteria()">
+                        <option value="">-- Select --</option>
+                        <option value="0" {{ old('is_4ps_member') == '0' ? 'selected' : '' }}>No</option>
+                        <option value="1" {{ old('is_4ps_member') == '1' ? 'selected' : '' }}>Yes</option>
+                    </select>
+                </div>
             </div>
 
             {{-- Live Criteria Result --}}
             <div class="criteria-result" id="criteria-result">
-                <div class="criteria-count" id="criteria-count">0/4 criteria met</div>
+                <div class="criteria-count" id="criteria-count">0/5 criteria met</div>
                 <div class="criteria-verdict" id="criteria-verdict">Fill in the form above</div>
             </div>
         </div>
@@ -205,38 +208,42 @@ function updateCriteria() {
     const family   = parseInt(document.querySelector('[name="family_size"]').value) || 0;
     const children = parseInt(document.querySelector('[name="children_count"]').value) || 0;
     const senior   = document.querySelector('[name="has_senior"]').value === '1';
+    const fourPs   = document.querySelector('[name="is_4ps_member"]').value === '1';
 
-    let count = 0;
-    const c1 = income > 0 && income <= 10000;
+    const c1 = income <= 10000;
     const c2 = family >= 4;
     const c3 = children >= 2;
     const c4 = senior;
+    const c5 = fourPs;
 
+    let count = 0;
     if (c1) count++;
     if (c2) count++;
     if (c3) count++;
     if (c4) count++;
+    if (c5) count++;
 
     // Update badges
     document.getElementById('crit-income').className   = 'criteria-badge ' + (c1 ? 'met' : '');
     document.getElementById('crit-family').className   = 'criteria-badge ' + (c2 ? 'met' : '');
     document.getElementById('crit-children').className = 'criteria-badge ' + (c3 ? 'met' : '');
     document.getElementById('crit-senior').className   = 'criteria-badge ' + (c4 ? 'met' : '');
+    document.getElementById('crit-4ps').className       = 'criteria-badge ' + (c5 ? 'met' : '');
 
     const countEl   = document.getElementById('criteria-count');
     const verdictEl = document.getElementById('criteria-verdict');
     const resultEl  = document.getElementById('criteria-result');
 
-    countEl.textContent = count + '/4 criteria met';
+    countEl.textContent = count + '/5 criteria met';
 
-    if (count >= 3) {
+    if (count >= 4) {
         verdictEl.textContent = '✓ Will be verified — High Vulnerability';
         resultEl.className    = 'criteria-result high';
-    } else if (count === 2) {
+    } else if (count === 3) {
         verdictEl.textContent = '✓ Will be verified — Medium Vulnerability';
         resultEl.className    = 'criteria-result medium';
     } else {
-        verdictEl.textContent = '✗ Will NOT be verified (' + count + '/4 — needs at least 2)';
+        verdictEl.textContent = '✗ Will NOT be verified (' + count + '/5 — needs at least 3)';
         resultEl.className    = 'criteria-result low';
     }
 }
