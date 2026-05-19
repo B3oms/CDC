@@ -37,12 +37,12 @@
             <div class="form-group">
                 <label>Container Color</label>
                 <div class="color-picker-wrapper">
-                    <input type="color" name="color" id="color-picker" 
+                    <input type="color" name="color" id="subcategory-color-picker" 
                            value="{{ old('color', '#3B82F6') }}" 
                            class="color-input">
-                    <div class="color-preview" id="color-preview" 
+                    <div class="color-preview" id="subcategory-color-preview" 
                          style="background-color: {{ old('color', '#3B82F6') }};">
-                        <span class="color-hex" id="color-hex">{{ old('color', '#3B82F6') }}</span>
+                        <span class="color-hex" id="subcategory-color-hex">{{ old('color', '#3B82F6') }}</span>
                     </div>
                 </div>
                 <small class="form-help">Choose a color for the subcategory container</small>
@@ -112,9 +112,9 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const colorPicker = document.getElementById('color-picker');
-    const colorPreview = document.getElementById('color-preview');
-    const colorHex = document.getElementById('color-hex');
+    const colorPicker = document.getElementById('subcategory-color-picker');
+    const colorPreview = document.getElementById('subcategory-color-preview');
+    const colorHex = document.getElementById('subcategory-color-hex');
     
     if (colorPicker && colorPreview && colorHex) {
         colorPicker.addEventListener('input', function() {

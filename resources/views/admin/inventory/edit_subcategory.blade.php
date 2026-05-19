@@ -31,12 +31,12 @@
             <div class="form-group">
                 <label>Container Color</label>
                 <div class="color-picker-wrapper">
-                    <input type="color" name="color" id="color-picker" 
+                    <input type="color" name="color" id="subcategory-edit-color-picker" 
                            value="{{ old('color', $subcategory->color ?? '#3B82F6') }}" 
                            class="color-input">
-                    <div class="color-preview" id="color-preview" 
+                    <div class="color-preview" id="subcategory-edit-color-preview" 
                          style="background-color: {{ old('color', $subcategory->color ?? '#3B82F6') }};">
-                        <span class="color-hex" id="color-hex">{{ old('color', $subcategory->color ?? '#3B82F6') }}</span>
+                        <span class="color-hex" id="subcategory-edit-color-hex">{{ old('color', $subcategory->color ?? '#3B82F6') }}</span>
                     </div>
                 </div>
                 <small class="form-help">Choose a color for the subcategory container</small>
@@ -101,9 +101,9 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const colorPicker = document.getElementById('color-picker');
-    const colorPreview = document.getElementById('color-preview');
-    const colorHex = document.getElementById('color-hex');
+    const colorPicker = document.getElementById('subcategory-edit-color-picker');
+    const colorPreview = document.getElementById('subcategory-edit-color-preview');
+    const colorHex = document.getElementById('subcategory-edit-color-hex');
     
     if (colorPicker && colorPreview && colorHex) {
         colorPicker.addEventListener('input', function() {

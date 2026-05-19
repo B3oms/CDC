@@ -33,12 +33,12 @@
             <div class="form-group">
                 <label>Container Color</label>
                 <div class="color-picker-wrapper">
-                    <input type="color" name="color" id="color-picker" 
+                    <input type="color" name="color" id="category-edit-color-picker" 
                            value="{{ old('color', $category->color ?? '#10B981') }}" 
                            class="color-input">
-                    <div class="color-preview" id="color-preview" 
+                    <div class="color-preview" id="category-edit-color-preview" 
                          style="background-color: {{ old('color', $category->color ?? '#10B981') }};">
-                        <span class="color-hex" id="color-hex">{{ old('color', $category->color ?? '#10B981') }}</span>
+                        <span class="color-hex" id="category-edit-color-hex">{{ old('color', $category->color ?? '#10B981') }}</span>
                     </div>
                 </div>
                 <small class="form-help">Choose a color for the category container</small>
@@ -109,9 +109,9 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const colorPicker = document.getElementById('color-picker');
-    const colorPreview = document.getElementById('color-preview');
-    const colorHex = document.getElementById('color-hex');
+    const colorPicker = document.getElementById('category-edit-color-picker');
+    const colorPreview = document.getElementById('category-edit-color-preview');
+    const colorHex = document.getElementById('category-edit-color-hex');
     
     if (colorPicker && colorPreview && colorHex) {
         colorPicker.addEventListener('input', function() {
