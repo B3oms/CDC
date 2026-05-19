@@ -49,18 +49,13 @@ class InventoryController extends Controller
         $request->validate([
             'name'        => 'required|string|max:100|unique:categories,name',
             'description' => 'nullable|string',
-            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'color'       => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
         ]);
-
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('categories', 'public');
-        }
 
         Category::create([
             'name'        => $request->name,
             'description' => $request->description,
-            'image'       => $imagePath,
+            'color'       => $request->color,
         ]);
 
         return redirect()->route('admin.inventory.index')
@@ -80,19 +75,13 @@ class InventoryController extends Controller
         $request->validate([
             'name'        => 'required|string|max:100|unique:categories,name,' . $id,
             'description' => 'nullable|string',
-            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'color'       => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
         ]);
-
-        $imagePath = $category->image;
-        if ($request->hasFile('image')) {
-            if ($imagePath) Storage::disk('public')->delete($imagePath);
-            $imagePath = $request->file('image')->store('categories', 'public');
-        }
 
         $category->update([
             'name'        => $request->name,
             'description' => $request->description,
-            'image'       => $imagePath,
+            'color'       => $request->color,
         ]);
 
         return redirect()->route('admin.inventory.index')
@@ -102,7 +91,6 @@ class InventoryController extends Controller
     public function destroyCategory($id)
     {
         $category = Category::findOrFail($id);
-        if ($category->image) Storage::disk('public')->delete($category->image);
         $category->delete();
 
         return redirect()->route('admin.inventory.index')
@@ -119,12 +107,14 @@ class InventoryController extends Controller
     public function storeSubcategory(Request $request, $categoryId)
     {
         $request->validate([
-            'name' => 'required|string|max:100',
+            'name'  => 'required|string|max:100',
+            'color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
         ]);
 
         Subcategory::create([
             'category_id' => $categoryId,
             'name'        => $request->name,
+            'color'       => $request->color,
         ]);
 
         return redirect()->route('admin.inventory.category.show', $categoryId)
@@ -142,11 +132,13 @@ class InventoryController extends Controller
         $subcategory = Subcategory::findOrFail($id);
 
         $request->validate([
-            'name' => 'required|string|max:100',
+            'name'  => 'required|string|max:100',
+            'color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
         ]);
 
         $subcategory->update([
-            'name' => $request->name,
+            'name'  => $request->name,
+            'color' => $request->color,
         ]);
 
         return redirect()->route('admin.inventory.category.show', $subcategory->category_id)

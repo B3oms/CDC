@@ -4,10 +4,11 @@
 @section('content')
 <div class="dash-header">
     <div style="display:flex;align-items:center;gap:14px;">
-        @if($category->image)
-            <img src="{{ asset('storage/' . $category->image) }}"
-                style="width:48px;height:48px;border-radius:8px;object-fit:cover;">
-        @endif
+        <div class="category-color-header" style="background-color: {{ $category->color ?? '#10B981' }};">
+            <span class="category-color-text">
+                {{ strtoupper(substr($category->name, 0, 2)) }}
+            </span>
+        </div>
         <div>
             <div class="breadcrumb-nav">
                 <a href="{{ route('admin.inventory.index') }}">Inventory</a> /
@@ -41,14 +42,12 @@
     <div class="inventory-category-card">
         <a href="{{ route('admin.inventory.subcategory', $subcategory->id) }}" class="inventory-card-link">
             <div class="inventory-card-img">
-                @if($subcategory->image)
-                    <img src="{{ asset('storage/' . $subcategory->image) }}" alt="{{ $subcategory->name }}">
-                @else
-                    <div class="inventory-card-placeholder">
-                        {{ strtoupper(substr($subcategory->name, 0, 2)) }}
-                    </div>
-                @endif
+            <div class="inventory-color-container" style="background-color: {{ $subcategory->color ?? '#3B82F6' }};">
+                <div class="inventory-color-text">
+                    {{ strtoupper(substr($subcategory->name, 0, 2)) }}
+                </div>
             </div>
+        </div>
             <div class="inventory-card-body">
                 <div class="inventory-card-name">{{ $subcategory->name }}</div>
                 <div class="inventory-card-count">{{ $subcategory->items_count }} items</div>
@@ -72,3 +71,58 @@
 </div>
 @endif
 @endsection
+
+@push('styles')
+<style>
+.category-color-header {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.category-color-text {
+    color: white;
+    font-weight: 600;
+    font-size: 18px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    letter-spacing: 1px;
+}
+
+.inventory-color-container {
+    width: 100%;
+    height: 120px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.inventory-color-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.inventory-color-text {
+    color: white;
+    font-weight: 600;
+    font-size: 24px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    letter-spacing: 1px;
+}
+
+.inventory-card-img {
+    height: 120px;
+    margin-bottom: 12px;
+}
+</style>
+@endpush
