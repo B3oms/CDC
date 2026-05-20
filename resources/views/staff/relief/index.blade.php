@@ -129,6 +129,100 @@
     opacity: 1;
 }
 
+/* Mobile responsive styles for relief monitor */
+@media (max-width: 768px) {
+    .relief-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .relief-card {
+        background: #fff;
+        border: 1px solid #d3d1c7;
+        border-radius: 10px;
+        padding: 1rem;
+        transition: border-color 0.2s, transform 0.15s;
+    }
+    
+    .relief-card:hover {
+        border-color: #1a3d1f;
+        transform: translateY(-2px);
+    }
+    
+    .relief-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 0.75rem;
+    }
+    
+    .relief-card-name {
+        font-weight: 700;
+        font-size: 13px;
+        color: #2c2c2a;
+        line-height: 1.3;
+    }
+    
+    .relief-card-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-bottom: 0.75rem;
+    }
+    
+    .meta-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+    }
+    
+    .meta-label {
+        color: #888780;
+        font-weight: 500;
+    }
+    
+    .relief-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid #f3f4f6;
+    }
+    
+    .view-details {
+        font-size: 11px;
+        color: #185fa5;
+    }
+}
+
+@media (max-width: 480px) {
+    .relief-card {
+        padding: 0.75rem;
+    }
+    
+    .relief-card-name {
+        font-size: 12px;
+    }
+    
+    .meta-row {
+        font-size: 10px;
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .relief-card-footer {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: stretch;
+    }
+    
+    .view-details {
+        text-align: center;
+    }
+}
+
 .stat-num.updating {
     color: #10b981;
     transform: scale(1.1);

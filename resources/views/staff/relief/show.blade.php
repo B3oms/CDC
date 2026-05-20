@@ -76,7 +76,7 @@
 
         {{-- Distributed Items --}}
         @if($event->distributedItems->isNotEmpty())
-        <div class="section-card">
+        <div class="section-card distributed-items-card">
             <h3>Distributed Items</h3>
             <table class="dist-table">
                 <thead>
@@ -104,7 +104,7 @@
     </div>
 
     <div class="right-col">
-        <div class="section-card">
+        <div class="section-card beneficiaries-card">
             <h3>Beneficiaries</h3>
 
             {{-- Barangay Filter --}}
@@ -181,53 +181,190 @@
 
 /* Mobile responsive styles */
 @media (max-width: 768px) {
-    .relief-detail-grid {
+    .dash-grid {
         grid-template-columns: 1fr !important;
         gap: 1rem !important;
     }
     
     .section-card {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .section-card h3 {
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    /* Event Details Table */
+    .dist-table {
+        font-size: 0.8rem;
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .dist-table td {
+        padding: 0.5rem;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .dist-table td:first-child {
+        font-weight: 600;
+        color: #374151;
+        width: 120px;
+    }
+    
+    /* Partner items and facilitators */
+    .partner-item {
+        padding: 0.5rem 0;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .dot {
+        width: 6px;
+        height: 6px;
+        flex-shrink: 0;
+    }
+    
+    .role-tag {
+        font-size: 0.7rem;
+        padding: 2px 6px;
+        margin-left: auto;
+    }
+    
+    .hint {
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-left: 0.5rem;
+    }
+    
+    /* Distributed Items and Beneficiaries Tables */
+    .distributed-items-card,
+    .beneficiaries-card {
         max-height: 400px;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
     }
     
-    .dist-table {
+    .dist-table th {
+        padding: 0.5rem;
         font-size: 0.75rem;
-        width: 100%;
+        background: #f8faf8;
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
     
-    .dist-table th,
     .dist-table td {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    /* Fix beneficiaries table column widths */
+    .beneficiaries-card .dist-table th:first-child,
+    .beneficiaries-card .dist-table td:first-child {
+        width: 40px;
+        text-align: center;
         padding: 0.5rem 0.25rem;
+    }
+    
+    .beneficiaries-card .dist-table th:nth-child(2),
+    .beneficiaries-card .dist-table td:nth-child(2) {
+        min-width: 120px;
+        max-width: 180px;
+        padding-left: 0.75rem;
+    }
+    
+    .beneficiaries-card .dist-table th:nth-child(3),
+    .beneficiaries-card .dist-table td:nth-child(3) {
+        min-width: 100px;
+        max-width: 120px;
+        padding-left: 0.5rem;
+    }
+    
+    /* Form controls */
+    select {
+        font-size: 0.8rem !important;
+        padding: 0.5rem !important;
+        width: 100%;
+        margin-bottom: 0.75rem;
+    }
+    
+    .btn-primary {
+        font-size: 0.8rem !important;
+        padding: 0.5rem 1rem !important;
+        width: 100%;
+        margin-top: 0.5rem;
     }
 }
 
 @media (max-width: 480px) {
     .section-card {
-        max-height: 300px;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
+        padding: 0.75rem;
+    }
+    
+    .section-card h3 {
+        font-size: 0.9rem;
     }
     
     .dist-table {
-        font-size: 0.7rem;
-        width: 100%;
+        font-size: 0.75rem;
     }
     
-    .dist-table th,
     .dist-table td {
-        padding: 0.4rem 0.2rem;
+        padding: 0.4rem;
+    }
+    
+    .dist-table td:first-child {
+        width: 100px;
+        font-size: 0.7rem;
+    }
+    
+    .partner-item {
+        font-size: 0.8rem;
+        padding: 0.4rem 0;
+    }
+    
+    .role-tag {
+        font-size: 0.65rem;
+        padding: 1px 4px;
+    }
+    
+    .hint {
+        font-size: 0.7rem;
+        display: block;
+        margin-left: 1rem;
+        margin-top: 0.2rem;
+    }
+    
+    .dist-table th {
+        padding: 0.4rem;
+        font-size: 0.7rem;
+    }
+    
+    .dist-table td {
+        padding: 0.4rem;
+        font-size: 0.7rem;
     }
     
     select {
         font-size: 0.75rem !important;
-        padding: 0.4rem 0.8rem !important;
+        padding: 0.4rem !important;
     }
     
     .btn-primary {
         font-size: 0.75rem !important;
         padding: 0.4rem 0.8rem !important;
+    }
+    
+    /* Make tables scrollable on small screens */
+    .distributed-items-card,
+    .beneficiaries-card {
+        max-height: 300px;
     }
 }
 
