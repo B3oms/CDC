@@ -502,7 +502,7 @@ document.addEventListener('click', function(event) {
     text-transform: uppercase;
     letter-spacing: .4px;
     text-align: center;
-    width: 100%;
+    margin: 0 auto;
 }
 
 /* ============================================
