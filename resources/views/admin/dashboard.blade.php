@@ -378,21 +378,21 @@ canvas { max-width: 100% !important; height: auto !important; }
 }
 
 .db-table-scroll::-webkit-scrollbar {
-    width: 12px;
+    width: 8px;
 }
 
 .db-table-scroll::-webkit-scrollbar-track {
     background: #f1f1f1;
-    border-radius: 6px;
+    border-radius: 4px;
 }
 
 .db-table-scroll::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 6px;
+    background: #ccc;
+    border-radius: 4px;
 }
 
 .db-table-scroll::-webkit-scrollbar-thumb:hover {
-    background: #555;
+    background: #999;
 }
 
 /* ─── Dashboard Tables (fully scoped, no conflicts) ──── */
