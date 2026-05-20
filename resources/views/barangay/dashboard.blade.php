@@ -4,7 +4,6 @@
 @section('content')
 <div class="dash-header">
     <h1>Hello, {{ auth()->user()->first_name }}!</h1>
-    <span class="logo-circle" style="border-color:#1a3d1f;"></span>
 </div>
 
 @if(session('success'))
