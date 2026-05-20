@@ -12,7 +12,7 @@
         </div>
         <h1>{{ $subcategory->name }}</h1>
     </div>
-    <div style="display:flex;gap:10px;">
+    <div class="dash-header-actions">
         <a href="{{ route('staff.inventory.category.show', $subcategory->category_id) }}" class="btn-back">← Back</a>
         <a href="{{ route('staff.inventory.item.create', $subcategory->id) }}" class="btn-primary">+ Add Item</a>
         <a href="{{ route('staff.inventory.subcategory.edit', $subcategory->id) }}" class="btn-secondary">Edit Subcategory</a>
@@ -36,13 +36,11 @@
     @foreach($items as $item)
     <div class="inventory-item-card">
         <div class="inventory-card-img">
-            @if($item->image)
-                <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->name }}">
-            @else
-                <div class="inventory-card-placeholder">
+            <div class="inventory-color-container" style="background-color: {{ $item->color ?? '#3B82F6' }};">
+                <div class="inventory-color-text">
                     {{ strtoupper(substr($item->name, 0, 2)) }}
                 </div>
-            @endif
+            </div>
         </div>
         <div class="inventory-item-body">
             <div class="inventory-card-name">{{ $item->name }}</div>
@@ -51,14 +49,18 @@
             @endif
             <div class="inventory-item-meta">
                 <div class="meta-row">
-                    <span class="meta-label">Quantity</span>
-                    <span class="{{ ($item->inventory?->quantity ?? 0) <= 10 ? 'text-danger' : '' }}">
-                        {{ $item->inventory?->quantity ?? 0 }} {{ $item->unit }}
-                    </span>
+                    <span class="meta-label">Stock</span>
+                    <span class="meta-value">{{ $item->stock ?? 0 }}</span>
                 </div>
+                @if($item->unit)
+                <div class="meta-row">
+                    <span class="meta-label">Unit</span>
+                    <span class="meta-value">{{ $item->unit }}</span>
+                </div>
+                @endif
                 <div class="meta-row">
                     <span class="meta-label">Expires</span>
-                    <span>
+                    <span class="meta-value">
                         @if($item->inventory)
                             @if($item->inventory->expiration_date)
                                 {{ \Carbon\Carbon::parse($item->inventory->expiration_date)->format('M d, Y') }}
@@ -66,7 +68,7 @@
                                 No expiry
                             @endif
                         @else
-                            No inventory record
+                            No record
                         @endif
                     </span>
                 </div>
@@ -86,4 +88,217 @@
     @endforeach
 </div>
 @endif
+
+@push('styles')
+<style>
+/* =============================================
+   HEADER
+   ============================================= */
+.dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.dash-header h1 {
+    font-size: clamp(1.125rem, 3vw, 1.75rem);
+    font-weight: 700;
+    color: #1a3d1f;
+    margin: 0;
+}
+
+.dash-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+.breadcrumb-nav {
+    font-size: 0.78rem;
+    color: #9ca3af;
+    margin-bottom: 0.25rem;
+}
+
+.breadcrumb-nav a {
+    color: #6b7280;
+    text-decoration: none;
+}
+
+.breadcrumb-nav a:hover { text-decoration: underline; }
+
+/* =============================================
+   INVENTORY GRID
+   4 cols maximized → 3 → 2 → 1
+   ============================================= */
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+@media (max-width: 1200px) {
+    .inventory-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+    }
+}
+
+@media (max-width: 860px) {
+    .inventory-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .inventory-grid {
+        grid-template-columns: 1fr;
+        gap: 0.875rem;
+    }
+}
+
+/* =============================================
+   ITEM CARDS
+   ============================================= */
+.inventory-item-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform .2s ease, box-shadow .2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    display: flex;
+    flex-direction: column;
+}
+
+.inventory-item-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,.12);
+}
+
+.inventory-card-img {
+    height: 110px;
+    overflow: hidden;
+    position: relative;
+}
+
+.inventory-color-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform .2s ease;
+}
+
+.inventory-color-text {
+    color: white;
+    font-weight: 700;
+    font-size: 1.4rem;
+    text-shadow: 0 1px 2px rgba(0,0,0,.3);
+    letter-spacing: 1px;
+}
+
+.inventory-item-card:hover .inventory-color-container {
+    transform: scale(1.03);
+}
+
+.inventory-item-body {
+    padding: 1rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.inventory-card-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.inventory-card-desc {
+    font-size: 0.78rem;
+    color: #9ca3af;
+    line-height: 1.4;
+}
+
+.inventory-item-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-top: 0.25rem;
+}
+
+.meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    gap: 0.5rem;
+}
+
+.meta-label {
+    color: #6b7280;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.meta-value {
+    color: #1f2937;
+    font-weight: 600;
+    text-align: right;
+    word-break: break-word;
+}
+
+.inventory-card-actions {
+    padding: 0.75rem 1rem 1rem;
+    display: flex;
+    gap: 0.5rem;
+    border-top: 1px solid #f3f4f6;
+}
+
+/* =============================================
+   RESPONSIVE HEADER
+   ============================================= */
+@media (max-width: 768px) {
+    .dash-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .dash-header-actions {
+        width: 100%;
+    }
+
+    .dash-header-actions a {
+        flex: 1;
+        text-align: center;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 360px) {
+    .dash-header-actions {
+        flex-direction: column;
+    }
+
+    .inventory-card-actions {
+        flex-direction: column;
+    }
+
+    .btn-sm-secondary,
+    .btn-sm-danger {
+        width: 100%;
+        text-align: center;
+    }
+}
+</style>
+@endpush
+
 @endsection

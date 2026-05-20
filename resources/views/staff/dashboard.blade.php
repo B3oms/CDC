@@ -2,85 +2,134 @@
 @section('title', 'Dashboard')
 
 @section('content')
-<div class="dash-header">
-    <h1>Hello, {{ auth()->user()->first_name }}!</h1>
 
+{{-- ===== HEADER ===== --}}
+<div class="dash-header">
+    <div class="dash-greeting">
+        <h1>Hello, {{ auth()->user()->first_name }}!</h1>
+        <p class="dash-date">{{ now()->format('l, F j, Y') }}</p>
+    </div>
     <a href="{{ route('admin.calamity.index') }}"
-    class="calamity-meter {{ $activeCalamity ? 'active' : 'none' }}"
-    style="text-decoration:none;">
-    <div class="cal-label">Calamity Meter ↗</div>
-    @if($activeCalamity)
-    <div class="cal-name">{{ $activeCalamity->name }}</div>
-    <span class="cal-badge">Active</span>
-    @else
-    <div class="cal-name">View All Portals</div>
-    @endif
-</a>
+       class="calamity-meter {{ $activeCalamity ? 'active' : 'none' }}"
+       style="text-decoration:none;">
+        <div class="cal-label">Calamity Meter ↗</div>
+        @if($activeCalamity)
+            <div class="cal-name">{{ $activeCalamity->name }}</div>
+            <span class="cal-badge">Active</span>
+        @else
+            <div class="cal-name">View All Portals</div>
+        @endif
+    </a>
 </div>
 
-{{-- Stats Row --}}
-<div class="stats-row" style="margin-bottom:1.5rem;">
+{{-- ===== STATS ROW ===== --}}
+<div class="stats-row">
     <div class="stat-card">
         <div class="stat-num">{{ $barangayCount }}</div>
-        <div class="stat-label">Barangays</div>
+        <div class="stat-label"><i class="fas fa-map-marker-alt"></i> Barangays</div>
     </div>
     <div class="stat-card">
         <div class="stat-num">{{ $municipalityCount }}</div>
-        <div class="stat-label">Municipalities</div>
+        <div class="stat-label"><i class="fas fa-city"></i> Municipalities</div>
     </div>
     <div class="stat-card">
-        <div class="stat-num" style="color:#185fa5;">
-            {{ $upcomingEvents->count() }}
-        </div>
-        <div class="stat-label">Upcoming Events</div>
+        <div class="stat-num upcoming-num">{{ $upcomingEvents->count() }}</div>
+        <div class="stat-label"><i class="fas fa-calendar-alt"></i> Upcoming Events</div>
     </div>
     <div class="stat-card">
-        <div class="stat-num" style="color:#3b6d11;">
-            {{ $completedEvents->count() }}
-        </div>
-        <div class="stat-label">Completed Events</div>
+        <div class="stat-num completed-num">{{ $completedEvents->count() }}</div>
+        <div class="stat-label"><i class="fas fa-check-circle"></i> Completed Events</div>
     </div>
 </div>
 
-<div class="dash-grid">
-    {{-- LEFT: Charts --}}
-    <div class="yearly-col">
+{{-- ===== CHARTS SECTION ===== --}}
+<div class="charts-section">
+
+    {{-- Charts side by side --}}
+    <div class="charts-row">
+        {{-- Monthly Chart --}}
         <div class="chart-card">
-            <div class="chart-title">MONTHLY TREND</div>
-            <canvas id="chart-monthly" height="120" style="height: 120px; width: 95%; max-width: 500px;"></canvas>
+            <div class="chart-title">Monthly Trend</div>
+            <div class="chart-wrap">
+                <canvas id="chart-monthly"></canvas>
+            </div>
             <button onclick="exportChartToPDF('chart-monthly', 'monthly-trend')" class="pdf-export-btn">
                 <i class="fas fa-file-pdf"></i> Export PDF
             </button>
         </div>
 
+        {{-- Yearly Trend --}}
         @forelse($yearlyData as $year => $months)
-{{-- Yearly Trend Chart --}}
         <div class="chart-card">
-            <div class="chart-title">YEARLY TREND</div>
-            <canvas id="chart-yearly-trend"
-                data-labels="{{ json_encode($yearlyTrendLabels) }}"
-                data-values="{{ json_encode($yearlyTrendValues) }}"
-                height="90" style="height: 90px; width: 95%; max-width: 500px;">
-            </canvas>
-            <div class="chart-actions">
-                <button onclick="exportChartToPDF('chart-yearly-trend', 'yearly-trend')" class="pdf-export-btn">
-                    <i class="fas fa-file-pdf"></i> Export PDF
-                </button>
+            <div class="chart-title">Yearly Trend</div>
+            <div class="chart-wrap">
+                <canvas id="chart-yearly-trend"
+                    data-labels="{{ json_encode($yearlyTrendLabels) }}"
+                    data-values="{{ json_encode($yearlyTrendValues) }}">
+                </canvas>
             </div>
+            <button onclick="exportChartToPDF('chart-yearly-trend', 'yearly-trend')" class="pdf-export-btn">
+                <i class="fas fa-file-pdf"></i> Export PDF
+            </button>
         </div>
         @empty
-        <div class="chart-card">
+        <div class="chart-card empty-chart">
             <div class="chart-title">No relief data yet</div>
-            <p style="font-size:12px;color:#888;margin-top:8px;">
-                Create relief events to see charts.
-            </p>
+            <p>Create relief events to see charts.</p>
         </div>
         @endforelse
+    </div>
 
-    {{-- Completed Relief Events --}}
+</div>{{-- /.charts-section --}}
+
+{{-- ===== EVENTS SECTION ===== --}}
+<div class="events-section">
+
+    {{-- Upcoming & Ongoing Events --}}
+    @if($upcomingEvents->count())
+    <div class="section-card events-card">
+        <h3><i class="fas fa-calendar-alt"></i> Upcoming & Ongoing Relief Events</h3>
+        <div class="scrollable-table">
+            <table class="dist-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Barangay</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($upcomingEvents as $event)
+                    <tr>
+                        <td>
+                            <a href="{{ route('admin.relief.show', $event->id) }}" class="table-link">
+                                {{ $event->name }}
+                            </a>
+                        </td>
+                        <td>{{ \Carbon\Carbon::parse($event->date)->format('M d, Y') }}</td>
+                        <td>
+                            @foreach($event->eventBarangays as $eb)
+                                {{ $eb->barangay->name }}@if(!$loop->last), @endif
+                            @endforeach
+                        </td>
+                        <td>
+                            <span class="relief-status-badge {{ strtolower($event->status) }}">
+                                {{ $event->status }}
+                            </span>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+
+    {{-- Completed Events --}}
     @if($completedEvents->count())
     <div class="section-card">
-        <h3>Completed Relief Events</h3>
+        <h3><i class="fas fa-check-circle"></i> Completed Relief Events</h3>
         <div class="scrollable-table">
             <table class="dist-table">
                 <thead>
@@ -94,8 +143,7 @@
                     @foreach($completedEvents->take(5) as $event)
                     <tr>
                         <td>
-                            <a href="{{ route('admin.relief.show', $event->id) }}"
-                                style="color:#185fa5;text-decoration:none;">
+                            <a href="{{ route('admin.relief.show', $event->id) }}" class="table-link">
                                 {{ $event->name }}
                             </a>
                         </td>
@@ -113,77 +161,8 @@
     </div>
     @endif
 
-    </div>
+</div>{{-- /.events-section --}}
 
-    {{-- RIGHT --}}
-    <div class="right-col">
-
-        {{-- Staff --}}
-        <div class="section-card">
-            <h3>Staff</h3>
-            <div class="staff-row">
-                @forelse($staff as $s)
-                <div class="staff-item">
-                    <div class="avatar">
-                        {{ strtoupper(substr($s->first_name,0,1).substr($s->last_name,0,1)) }}
-                    </div>
-                    <div>
-                        <div class="staff-name">{{ $s->first_name }} {{ $s->last_name }}</div>
-                        <div class="staff-role">{{ $s->role->name }}</div>
-                    </div>
-                </div>
-                @empty
-                <p style="font-size:12px;color:#888;">No staff found.</p>
-                @endforelse
-            </div>
-        </div>
-
-        {{-- Upcoming & Ongoing --}}
-        @if($upcomingEvents->count())
-        <div class="section-card" style="flex: 1; display: flex; flex-direction: column;">
-            <h3>Upcoming & Ongoing Relief Events</h3>
-            <div class="scrollable-table" style="flex: 1; height: 100%; min-height: 300px;">
-                <table class="dist-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Date</th>
-                            <th>Barangay</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($upcomingEvents as $event)
-                        <tr>
-                            <td>
-                                <a href="{{ route('admin.relief.show', $event->id) }}"
-                                    style="color:#185fa5;text-decoration:none;">
-                                    {{ $event->name }}
-                                </a>
-                            </td>
-                            <td>{{ \Carbon\Carbon::parse($event->date)->format('M d, Y') }}</td>
-                            <td>
-                                @foreach($event->eventBarangays as $eb)
-                                    {{ $eb->barangay->name }}@if(!$loop->last), @endif
-                                @endforeach
-                            </td>
-                            <td>
-                                <span class="relief-status-badge {{ strtolower($event->status) }}">
-                                    {{ $event->status }}
-                                </span>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        @endif
-
-        
-        
-            </div>
-</div>
 @endsection
 
 @push('scripts')
@@ -191,18 +170,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
+
     // Monthly Chart
     const monthlyCtx = document.getElementById('chart-monthly');
     if (monthlyCtx) {
-        // Process actual database data
         const monthlyRaw = @json($monthlyData);
         const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
         const monthlyValues = monthNames.map((_, i) => {
             const found = monthlyRaw.find(m => m.month === i + 1);
             return found ? found.total : 0;
         });
-
         new Chart(monthlyCtx, {
             type: 'bar',
             data: {
@@ -218,35 +196,22 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             options: {
                 responsive: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
+                maintainAspectRatio: true,
+                plugins: { legend: { display: false } },
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    }
+                    y: { beginAtZero: true, ticks: { precision: 0 } },
+                    x: { grid: { display: false } }
                 }
             }
         });
     }
 
     // Yearly Trend Chart
-    const yearlyTrendCanvas = document.getElementById('chart-yearly-trend');
-    if (yearlyTrendCanvas && yearlyTrendCanvas.dataset.labels && yearlyTrendCanvas.dataset.values) {
-        const yearLabels = JSON.parse(yearlyTrendCanvas.dataset.labels);
-        const yearValues = JSON.parse(yearlyTrendCanvas.dataset.values);
-        
-        new Chart(yearlyTrendCanvas, {
+    const yearlyCanvas = document.getElementById('chart-yearly-trend');
+    if (yearlyCanvas && yearlyCanvas.dataset.labels) {
+        const yearLabels = JSON.parse(yearlyCanvas.dataset.labels);
+        const yearValues = JSON.parse(yearlyCanvas.dataset.values);
+        new Chart(yearlyCanvas, {
             type: 'line',
             data: {
                 labels: yearLabels,
@@ -263,98 +228,42 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             options: {
                 responsive: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
+                maintainAspectRatio: true,
+                plugins: { legend: { display: false } },
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    }
+                    y: { beginAtZero: true, ticks: { precision: 0 } },
+                    x: { grid: { display: false } }
                 }
             }
         });
     }
 });
 
-// PDF Export Function
 function exportChartToPDF(chartId, filename) {
     const { jsPDF } = window.jspdf;
-    const chartElement = document.getElementById(chartId);
-    
-    // Get chart title for PDF header
-    const chartTitle = chartElement.closest('.chart-card').querySelector('.chart-title').textContent;
-    
-    html2canvas(chartElement, {
-        backgroundColor: '#ffffff',
-        scale: 3,
-        useCORS: true,
-        allowTaint: true
-    }).then(canvas => {
-        const imgData = canvas.toDataURL('image/png', 1.0);
-        const pdf = new jsPDF({
-            orientation: 'portrait',
-            unit: 'mm',
-            format: 'a4'
-        });
-        
-        // PDF dimensions
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        const margin = 20;
-        
-        // Calculate optimal image dimensions
-        const maxWidth = pageWidth - (margin * 2);
-        const maxHeight = pageHeight - (margin * 3); // Leave space for title
-        
-        // Calculate image dimensions maintaining aspect ratio
-        const imgWidth = maxWidth;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        
-        // Adjust if image is too tall
-        let finalHeight = imgHeight;
-        if (imgHeight > maxHeight) {
-            finalHeight = maxHeight;
-            const finalWidth = (canvas.width * finalHeight) / canvas.height;
-            // Recenter if width changed
-            const xPosition = (pageWidth - finalWidth) / 2;
-            
-            // Add title
-            pdf.setFontSize(16);
-            pdf.setFont('helvetica', 'bold');
-            pdf.text(chartTitle, pageWidth / 2, margin, { align: 'center' });
-            
-            // Add chart image
-            pdf.addImage(imgData, 'PNG', xPosition, margin + 15, finalWidth, finalHeight);
-        } else {
-            // Add title
-            pdf.setFontSize(16);
-            pdf.setFont('helvetica', 'bold');
-            pdf.text(chartTitle, pageWidth / 2, margin, { align: 'center' });
-            
-            // Add chart image centered
-            const xPosition = (pageWidth - imgWidth) / 2;
-            pdf.addImage(imgData, 'PNG', xPosition, margin + 15, imgWidth, finalHeight);
-        }
-        
-        // Add footer with timestamp
-        pdf.setFontSize(10);
-        pdf.setFont('helvetica', 'normal');
-        const timestamp = new Date().toLocaleString();
-        pdf.text(`Generated: ${timestamp}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
-        
-        // Save PDF with professional filename
-        const cleanFilename = filename.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        pdf.save(`${cleanFilename}_report_${new Date().toISOString().split('T')[0]}.pdf`);
+    const chartEl   = document.getElementById(chartId);
+    const title     = chartEl.closest('.chart-card').querySelector('.chart-title').textContent;
+
+    html2canvas(chartEl, { backgroundColor: '#ffffff', scale: 3, useCORS: true }).then(canvas => {
+        const imgData  = canvas.toDataURL('image/png', 1.0);
+        const pdf      = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const pw       = pdf.internal.pageSize.getWidth();
+        const ph       = pdf.internal.pageSize.getHeight();
+        const margin   = 20;
+        const maxW     = pw - margin * 2;
+        const imgH     = (canvas.height * maxW) / canvas.width;
+        const finalH   = Math.min(imgH, ph - margin * 3);
+        const finalW   = (canvas.width * finalH) / canvas.height;
+        const x        = (pw - finalW) / 2;
+
+        pdf.setFontSize(16); pdf.setFont('helvetica', 'bold');
+        pdf.text(title, pw / 2, margin, { align: 'center' });
+        pdf.addImage(imgData, 'PNG', x, margin + 15, finalW, finalH);
+
+        pdf.setFontSize(10); pdf.setFont('helvetica', 'normal');
+        pdf.text(`Generated: ${new Date().toLocaleString()}`, pw / 2, ph - 10, { align: 'center' });
+
+        pdf.save(`${filename.replace(/[^a-z0-9]/gi,'_').toLowerCase()}_${new Date().toISOString().split('T')[0]}.pdf`);
     });
 }
 </script>
@@ -362,399 +271,411 @@ function exportChartToPDF(chartId, filename) {
 
 @push('styles')
 <style>
-/* Dashboard Layout */
-.dash-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 1.5rem;
-    margin-top: 1rem;
+/* ============================================
+   CSS VARIABLES
+   ============================================ */
+:root {
+    --primary:       #1a3d1f;
+    --primary-light: #2d6a35;
+    --bg:            #f2f0eb;
+    --white:         #ffffff;
+    --border:        #d3d1c7;
+    --text:          #2c2c2a;
+    --muted:         #888780;
+    --blue:          #185fa5;
+    --green:         #3b6d11;
+    --amber:         #ef9f27;
+    --red:           #e24b4a;
+
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --shadow:    0 2px 6px rgba(0,0,0,.08);
+    --shadow-md: 0 4px 14px rgba(0,0,0,.12);
 }
 
-.yearly-col {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.right-col {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-/* Chart Cards */
-.chart-card {
-    background: white;
-    border: 1px solid #d3d1c7;
-    border-radius: 8px;
-    padding: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    max-width: 550px !important;
-    width: 100% !important;
-    overflow: hidden;
-    margin: 0 auto;
-}
-
-.chart-title {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #2c2c2a;
-    margin-bottom: 0.75rem;
-    text-align: center;
-    display: block;
-}
-
-.chart-card canvas {
-    max-width: 500px !important;
-    width: 95% !important;
-    height: auto !important;
-    margin: 0 auto;
-    display: block;
-}
-
-/* Scrollable Table */
-.scrollable-table {
-    max-height: 200px;
-    overflow-y: auto;
-    border: 1px solid #e9ecef;
-    border-radius: 4px;
-    margin-bottom: 1rem;
-}
-
-.scrollable-table table {
-    margin: 0;
-    border: none;
-}
-
-.scrollable-table thead {
-    position: sticky;
-    top: 0;
-    background: white;
-    z-index: 1;
-}
-
-.scrollable-table thead th {
-    background: #f8f9fa;
-    border-bottom: 2px solid #d3d1c7;
-}
-
-/* Section Cards */
-.section-card {
-    background: white;
-    border: 1px solid #d3d1c7;
-    border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.section-card h3 {
-    margin: 0 0 1rem 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #2c2c2a;
-}
-
-/* Staff Section */
-.staff-row {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.staff-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.5rem;
-    border-radius: 6px;
-    transition: background-color 0.2s;
-}
-
-.staff-item:hover {
-    background: #f8f9fa;
-}
-
-.avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #1a3d1f;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-.staff-name {
-    font-weight: 500;
-    color: #2c2c2a;
-    font-size: 0.9rem;
-}
-
-.staff-role {
-    font-size: 0.8rem;
-    color: #888780;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* Distribution Tables */
-.dist-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.85rem;
-}
-
-.dist-table th {
-    background: #f8f9fa;
-    color: #2c2c2a;
-    font-weight: 600;
-    text-align: left;
-    padding: 0.75rem;
-    border-bottom: 1px solid #d3d1c7;
-}
-
-.dist-table td {
-    padding: 0.75rem;
-    border-bottom: 1px solid #f1efe8;
-    vertical-align: top;
-}
-
-.dist-table tr:hover {
-    background: #f8f9fa;
-}
-
-.see-all {
-    display: inline-block;
-    margin-top: 0.75rem;
-    color: #1a3d1f;
-    text-decoration: none;
-    font-size: 0.85rem;
-    font-weight: 500;
-}
-
-.see-all:hover {
-    text-decoration: underline;
-}
-
-/* Relief Status Badges */
-.relief-status-badge {
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    text-transform: uppercase;
-}
-
-.relief-status-badge.upcoming {
-    background: #fffbeb;
-    color: #ef9f27;
-}
-
-.relief-status-badge.ongoing {
-    background: #e3f2fd;
-    color: #185fa5;
-}
-
-.relief-status-badge.completed {
-    background: #f0f9f0;
-    color: #3b6d11;
-}
-
-
-/* PDF Export Buttons */
-.pdf-export-btn {
-    background: #dc3545;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 12px;
-    cursor: pointer;
-    margin-top: 8px;
-    transition: background-color 0.3s;
-}
-
-.pdf-export-btn:hover {
-    background: #c82333;
-}
-
-.pdf-export-btn i {
-    margin-right: 4px;
-}
-
-.chart-actions {
+/* ============================================
+   HEADER
+   ============================================ */
+.dash-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-top: 8px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
 }
 
-.view-link {
-    color: #1a3d1f;
-    text-decoration: none;
-    font-size: 12px;
-    font-weight: 500;
+.dash-greeting h1 {
+    font-size: clamp(1.25rem, 4vw, 1.875rem);
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0 0 0.25rem;
+    line-height: 1.2;
 }
 
-.view-link:hover {
-    text-decoration: underline;
+.dash-date {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin: 0;
 }
 
-/* Smaller calamity meter */
+/* ============================================
+   CALAMITY METER
+   ============================================ */
 .calamity-meter {
     background: #faeeda;
-    border: 1px solid #ef9f27;
-    border-radius: 6px;
-    padding: 8px 12px;
+    border: 1px solid var(--amber);
+    border-radius: var(--radius-md);
+    padding: 8px 14px;
     text-align: right;
-    min-width: 140px;
-    font-size: 0.85rem;
+    min-width: 130px;
+    flex-shrink: 0;
 }
 
-.calamity-meter .cal-label {
+.cal-label {
     font-size: 9px;
     text-transform: uppercase;
-    letter-spacing: 0.8px;
+    letter-spacing: .8px;
     color: #b8860b;
     margin-bottom: 2px;
     font-weight: 500;
 }
 
-.calamity-meter .cal-name {
+.cal-name {
     font-size: 11px;
     font-weight: 600;
     color: #633806;
-    line-height: 1.2;
+    line-height: 1.3;
 }
 
-.calamity-meter .cal-badge {
+.cal-badge {
     display: inline-block;
-    background: #e24b4a;
+    background: var(--red);
     color: #fff;
     font-size: 8px;
     padding: 2px 6px;
     border-radius: 4px;
     font-weight: 500;
-    margin-top: 2px;
+    margin-top: 3px;
 }
 
-.calamity-meter.none {
-    background: #eaf3de;
-    border-color: #639922;
-}
-
+.calamity-meter.none { background: #eaf3de; border-color: #639922; }
 .calamity-meter.none .cal-label { color: #3b6d11; }
 .calamity-meter.none .cal-name  { color: #27500a; }
 
-/* Responsive Design */
+/* ============================================
+   STATS ROW
+   ============================================ */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    box-shadow: var(--shadow);
+    transition: box-shadow .2s;
+}
+
+.stat-card:hover { box-shadow: var(--shadow-md); }
+
+.stat-num {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.upcoming-num  { color: var(--blue); }
+.completed-num { color: var(--green); }
+
+.stat-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+/* ============================================
+   CHARTS SECTION
+   ============================================ */
+.charts-section {
+    margin-bottom: 1.5rem;
+}
+
+/* ============================================
+   EVENTS SECTION
+   ============================================ */
+.events-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* ============================================
+   CHARTS ROW — side by side
+   ============================================ */
+.charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+}
+
+/* ============================================
+   CHART CARDS
+   ============================================ */
+.chart-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    box-shadow: var(--shadow);
+}
+
+.chart-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    margin-bottom: 0.875rem;
+    text-align: center;
+}
+
+/* Constrain canvas height so charts don't blow up */
+.chart-wrap {
+    position: relative;
+    width: 100%;
+}
+
+.chart-wrap canvas {
+    display: block;
+    width: 100% !important;
+    max-height: 180px;
+}
+
+.empty-chart p {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin: 0.5rem 0 0;
+    text-align: center;
+}
+
+/* ============================================
+   PDF EXPORT BUTTON
+   ============================================ */
+.pdf-export-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 5px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    cursor: pointer;
+    margin-top: 0.75rem;
+    transition: opacity .2s;
+}
+
+.pdf-export-btn:hover { opacity: .85; }
+
+/* ============================================
+   SECTION CARDS
+   ============================================ */
+.section-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    box-shadow: var(--shadow);
+}
+
+.section-card h3 {
+    margin: 0 0 1rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-card h3 i {
+    color: var(--primary);
+    font-size: 0.85rem;
+}
+
+.events-card {
+    flex: 1;
+}
+
+/* ============================================
+   SCROLLABLE TABLE
+   ============================================ */
+.scrollable-table {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 280px;
+    border-radius: var(--radius-sm);
+    border: 1px solid #e9ecef;
+    -webkit-overflow-scrolling: touch;
+}
+
+.dist-table {
+    width: 100%;
+    min-width: 380px;   /* prevents squish on small screens */
+    border-collapse: collapse;
+    font-size: 0.82rem;
+}
+
+.dist-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.dist-table th {
+    background: #f8f9fa;
+    color: var(--text);
+    font-weight: 600;
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+}
+
+.dist-table td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid #f1efe8;
+    vertical-align: top;
+    color: var(--text);
+}
+
+.dist-table tr:last-child td { border-bottom: none; }
+.dist-table tr:hover td { background: #f8f9fa; }
+
+.table-link {
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.table-link:hover { text-decoration: underline; }
+
+/* ============================================
+   STATUS BADGES
+   ============================================ */
+.relief-status-badge {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+    white-space: nowrap;
+}
+
+.relief-status-badge.upcoming  { background: #fffbeb; color: var(--amber); }
+.relief-status-badge.ongoing   { background: #e3f2fd; color: var(--blue);  }
+.relief-status-badge.completed { background: #f0f9f0; color: var(--green); }
+
+/* ============================================
+   RESPONSIVE — Tablet (≤ 1024px)
+   ============================================ */
 @media (max-width: 1024px) {
-    .dash-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
     .stats-row {
         grid-template-columns: repeat(2, 1fr);
     }
-}
 
-@media (max-width: 768px) {
-    .dash-grid {
+    .charts-row {
         grid-template-columns: 1fr;
-        gap: 0.75rem;
-    }
-    
-    .stats-row {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
-    }
-    
-    .stat-card {
-        padding: 1rem;
-    }
-    
-    .stat-num {
-        font-size: 1.5rem;
-    }
-    
-    .chart-card {
-        padding: 0.75rem;
-        max-width: 100%;
-    }
-    
-    .chart-title {
-        font-size: 0.85rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    .section-card {
-        padding: 1rem;
-    }
-    
-    .dist-table {
-        font-size: 0.8rem;
-    }
-    
-    .dist-table th,
-    .dist-table td {
-        padding: 0.5rem;
-    }
-    
-    .staff-item {
-        padding: 0.75rem;
-    }
-    
-    .avatar {
-        width: 35px;
-        height: 35px;
-        font-size: 0.8rem;
     }
 }
 
-@media (max-width: 480px) {
-    .stats-row {
-        grid-template-columns: 1fr;
-    }
-    
+/* ============================================
+   RESPONSIVE — Mobile (≤ 640px)
+   ============================================ */
+@media (max-width: 640px) {
     .dash-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 1rem;
     }
-    
+
     .calamity-meter {
-        align-self: flex-end;
-        min-width: 120px;
+        align-self: stretch;
+        text-align: left;
+        min-width: unset;
     }
-    
-    .chart-card {
-        padding: 0.5rem;
-        max-width: 100%;
+
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
     }
-    
-    .chart-title {
-        font-size: 0.8rem;
-        margin-bottom: 0.4rem;
+
+    .stat-card {
+        padding: 1rem;
     }
-    
+
+    .charts-row {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-card,
     .section-card {
-        padding: 0.75rem;
+        padding: 1rem;
     }
-    
-    .section-card h3 {
-        font-size: 0.9rem;
+
+    .chart-wrap canvas {
+        max-height: 150px;
     }
-    
-    .dist-table {
-        font-size: 0.75rem;
+
+    .scrollable-table {
+        max-height: 220px;
     }
-    
-    .dist-table th,
-    .dist-table td {
-        padding: 0.4rem;
+}
+
+/* ============================================
+   RESPONSIVE — Small phones (≤ 400px)
+   ============================================ */
+@media (max-width: 400px) {
+    .stats-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.625rem;
+    }
+
+    .stat-card {
+        padding: 0.875rem 0.75rem;
+    }
+
+    .stat-num {
+        font-size: 1.375rem;
+    }
+
+    .stat-label {
+        font-size: 0.65rem;
+    }
+
+    .chart-card,
+    .section-card {
+        padding: 0.875rem;
+    }
+
+    .chart-wrap canvas {
+        max-height: 130px;
     }
 }
 </style>

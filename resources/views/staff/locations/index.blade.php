@@ -3,8 +3,15 @@
 
 @section('content')
 <div class="dash-header">
-    <h1>Location Requests</h1>
-    <p style="color:#666;font-size:0.9rem;margin-top:0.5rem;">Submit requests for new municipalities and barangays to be added to the system</p>
+    <div class="dash-header-content">
+        <h1>Location Requests</h1>
+        <p style="color:#666;font-size:0.9rem;margin-top:0.5rem;">Submit requests for new municipalities and barangays to be added to the system</p>
+    </div>
+    <div class="dash-header-actions">
+        <a href="{{ route('staff.dashboard') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
 </div>
 
 @if(session('success'))
@@ -141,10 +148,74 @@
     </div>
 </div>
 
-<div class="form-actions" style="margin-top: 2rem; text-align: center;">
-    <a href="{{ route('staff.dashboard') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i> Back to Dashboard
-    </a>
-</div>
+
+@push('styles')
+<style>
+.dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    background: white;
+    padding: 1.25rem 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.dash-header-content {
+    flex: 1;
+}
+
+.dash-header-actions {
+    flex-shrink: 0;
+}
+
+.dash-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2c2c2a;
+    margin: 0 0 0.25rem;
+}
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: #6b7280;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+}
+
+@media (max-width: 768px) {
+    .dash-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .dash-header-actions {
+        width: 100%;
+    }
+    
+    .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+@endpush
 
 @endsection

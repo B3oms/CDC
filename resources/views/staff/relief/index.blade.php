@@ -5,8 +5,26 @@
 @section('content')
 <div class="dash-header">
     <h1>Relief Monitor</h1>
-    <a href="{{ route('staff.relief.create') }}" class="btn-primary" style="margin: 0 auto; display: block; width: fit-content;">+ Create Event</a>
+    <div class="dash-header-actions">
+        <a href="{{ route('staff.relief.create') }}" class="btn-primary">+ Create Event</a>
+    </div>
 </div>
+
+<style>
+@media (max-width: 768px) {
+    .dash-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .dash-header-actions {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+}
+</style>
 
 {{-- Stats Row --}}
 <div class="stats-row" style="margin-bottom:1.5rem;">

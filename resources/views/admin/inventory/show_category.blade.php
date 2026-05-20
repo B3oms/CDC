@@ -74,6 +74,33 @@
 
 @push('styles')
 <style>
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+@media (max-width: 1200px) {
+    .inventory-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+    }
+}
+
+@media (max-width: 860px) {
+    .inventory-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .inventory-grid {
+        grid-template-columns: 1fr;
+        gap: 0.875rem;
+    }
+}
+
 .category-color-header {
     width: 48px;
     height: 48px;
@@ -123,6 +150,24 @@
 .inventory-card-img {
     height: 120px;
     margin-bottom: 12px;
+}
+
+@media (max-width: 768px) {
+    .dash-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .dash-header > div:last-child {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .inventory-card-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
 }
 </style>
 @endpush

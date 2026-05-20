@@ -7,7 +7,7 @@ use App\Models\ReliefEvent;
 use App\Models\ReliefEventBeneficiary;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
-use PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReliefController extends Controller
 {
@@ -306,33 +306,27 @@ class ReliefController extends Controller
     public function downloadPDF($id)
     {
         try {
-            $event = ReliefEvent::with([
-                'eventBarangays.barangay', 
-                'eventBarangays.municipality', 
-                'eventBarangays.beneficiaries.beneficiary',
-                'distributedItems.item',
-                'distributedItems.beneficiaries',
-                'creator',
-                'calamity'
-            ])->findOrFail($id);
-
-            // Prepare data for PDF
-            $pdfData = [
-                'event' => $event,
-                'generated_date' => now()->format('F d, Y - h:i A')
+            // Test PDF with view rendering and mock data
+            $mockEvent = (object)[
+                'name' => 'Test Relief Event',
+                'date' => now(),
+                'venue' => 'Test Venue',
+                'status' => 'Ongoing'
             ];
-
-            // Generate PDF
-            $pdf = PDF::loadView('staff.relief.pdf', $pdfData);
             
-            // Set paper orientation to landscape for better table display
-            $pdf->setPaper('A4', 'landscape');
-            
-            // Download the PDF
-            return $pdf->download('relief-event-' . $event->name . '-' . $event->id . '.pdf');
+            $html = view('staff.relief.pdf', ['event' => $mockEvent])->render();
+            $dompdf = new \Dompdf\Dompdf();
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'portrait');
+            $dompdf->render();
+            return $dompdf->stream('test-view.pdf');
             
         } catch (\Exception $e) {
-            return redirect()->route('relief.show', $id)
+            // Log the error for debugging
+            \Log::error('PDF Generation Error: ' . $e->getMessage());
+            \Log::error('PDF Generation Trace: ' . $e->getTraceAsString());
+            
+            return redirect()->route('staff.relief.show', $id)
                 ->with('error', 'Failed to generate PDF: ' . $e->getMessage());
         }
     }
