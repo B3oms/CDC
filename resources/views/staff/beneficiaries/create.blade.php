@@ -55,7 +55,7 @@
                 </div>
                 <div class="form-group">
                     <label>Suffix (Optional)</label>
-                    <select name="suffix" id="suffix-select" onchange="toggleCustomSuffix()">
+                    <select name="suffix">
                         <option value="">-- None --</option>
                         <option value="Jr." {{ old('suffix', $prefill->suffix ?? '') == 'Jr.' ? 'selected' : '' }}>Jr.</option>
                         <option value="Sr." {{ old('suffix', $prefill->suffix ?? '') == 'Sr.' ? 'selected' : '' }}>Sr.</option>
@@ -64,12 +64,7 @@
                         <option value="III" {{ old('suffix', $prefill->suffix ?? '') == 'III' ? 'selected' : '' }}>III</option>
                         <option value="IV" {{ old('suffix', $prefill->suffix ?? '') == 'IV' ? 'selected' : '' }}>IV</option>
                         <option value="V" {{ old('suffix', $prefill->suffix ?? '') == 'V' ? 'selected' : '' }}>V</option>
-                        <option value="Other" {{ old('suffix', $prefill->suffix ?? '') == 'Other' || (isset($prefill) && $prefill->suffix && !in_array($prefill->suffix, ['Jr.', 'Sr.', 'I', 'II', 'III', 'IV', 'V'])) ? 'selected' : '' }}>Other</option>
                     </select>
-                </div>
-                <div class="form-group" id="custom-suffix-group" style="display: {{ (old('suffix', $prefill->suffix ?? '') == 'Other' || (isset($prefill) && $prefill->suffix && !in_array($prefill->suffix, ['Jr.', 'Sr.', 'I', 'II', 'III', 'IV', 'V']))) ? 'flex' : 'none' }};">
-                    <label>Custom Suffix</label>
-                    <input type="text" name="custom_suffix" id="custom-suffix-input" value="{{ old('custom_suffix') ?? (isset($prefill) && $prefill->suffix && !in_array($prefill->suffix, ['Jr.', 'Sr.', 'I', 'II', 'III', 'IV', 'V']) ? $prefill->suffix : '') }}" placeholder="Enter custom suffix">
                 </div>
                 <div class="form-group">
                     <label>Gender</label>
@@ -280,23 +275,7 @@ function updateCriteria() {
     }
 }
 
-function toggleCustomSuffix() {
-    const select = document.getElementById('suffix-select');
-    const customGroup = document.getElementById('custom-suffix-group');
-    const customInput = document.getElementById('custom-suffix-input');
-
-    if (select && select.value === 'Other') {
-        customGroup.style.display = 'flex';
-        customInput.required = true;
-    } else if (select) {
-        customGroup.style.display = 'none';
-        customInput.required = false;
-        customInput.value = '';
-    }
-}
-
 updateCriteria();
-toggleCustomSuffix();
 
 // Municipality data for dynamic loading
 const municipalityData = @json($municipalities->load('barangays'));
