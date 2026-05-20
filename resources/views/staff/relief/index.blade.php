@@ -26,11 +26,11 @@
 }
 
 .stat-card {
-    text-align: center;
+    text-align: center !important;
 }
 
 .stat-label {
-    text-align: center;
+    text-align: center !important;
 }
 </style>
 
