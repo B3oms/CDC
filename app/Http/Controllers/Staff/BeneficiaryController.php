@@ -181,9 +181,14 @@ class BeneficiaryController extends Controller
 
             $beneficiaries = $query->latest()->get();
 
+            // Get paper size and orientation from request (default to A4 portrait)
+            $paperSize = $request->input('paper_size', 'A4');
+            $orientation = $request->input('orientation', 'portrait');
+
             $pdf = PDF::loadView('staff.beneficiaries.pdf', compact('beneficiaries'));
+            $pdf->setPaper($paperSize, $orientation);
             return $pdf->download('beneficiaries-list.pdf');
-            
+
         } catch (\Exception $e) {
             return redirect()->route('staff.beneficiaries.index')
                 ->with('error', 'Failed to generate PDF: ' . $e->getMessage());

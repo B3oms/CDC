@@ -303,7 +303,7 @@ class ReliefController extends Controller
     }
 
     // Download relief event PDF
-    public function downloadPDF($id)
+    public function downloadPDF(Request $request, $id)
     {
         try {
             // Test PDF with view rendering and mock data
@@ -313,19 +313,23 @@ class ReliefController extends Controller
                 'venue' => 'Test Venue',
                 'status' => 'Ongoing'
             ];
-            
+
+            // Get paper size and orientation from request (default to A4 portrait)
+            $paperSize = $request->input('paper_size', 'A4');
+            $orientation = $request->input('orientation', 'portrait');
+
             $html = view('staff.relief.pdf', ['event' => $mockEvent])->render();
             $dompdf = new \Dompdf\Dompdf();
             $dompdf->loadHtml($html);
-            $dompdf->setPaper('A4', 'portrait');
+            $dompdf->setPaper($paperSize, $orientation);
             $dompdf->render();
             return $dompdf->stream('test-view.pdf');
-            
+
         } catch (\Exception $e) {
             // Log the error for debugging
             \Log::error('PDF Generation Error: ' . $e->getMessage());
             \Log::error('PDF Generation Trace: ' . $e->getTraceAsString());
-            
+
             return redirect()->route('staff.relief.show', $id)
                 ->with('error', 'Failed to generate PDF: ' . $e->getMessage());
         }

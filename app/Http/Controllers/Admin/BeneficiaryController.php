@@ -73,7 +73,12 @@ class BeneficiaryController extends Controller
         })
         ->get();
 
+    // Get paper size and orientation from request (default to A4 portrait)
+    $paperSize = $request->input('paper_size', 'A4');
+    $orientation = $request->input('orientation', 'portrait');
+
     $pdf = Pdf::loadView('admin.beneficiaries.pdf', compact('beneficiaries'));
+    $pdf->setPaper($paperSize, $orientation);
 
     return $pdf->download('beneficiaries.pdf');
 }
