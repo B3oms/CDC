@@ -37,7 +37,7 @@ class BeneficiaryController extends Controller
         ->when($request->status, function ($q) use ($request) {
             $q->where('is_verified', $request->status == 'verified');
         })
-        ->paginate(10);
+        ->get();
 
     return view('admin.beneficiaries.index', compact(
         'beneficiaries',

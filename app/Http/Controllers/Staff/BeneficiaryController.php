@@ -51,7 +51,7 @@ class BeneficiaryController extends Controller
             $query->where('is_verified', 0);
         }
 
-        $beneficiaries = $query->latest()->paginate(20);
+        $beneficiaries = $query->latest()->get();
 
         return view('staff.beneficiaries.index', compact(
             'beneficiaries', 'municipalities', 'barangays'

@@ -163,10 +163,6 @@
                 </tbody>
             </table>
         </div>
-
-        <div class="table-pagination">
-            {{ $beneficiaries->withQueryString()->links() }}
-        </div>
     </div>
 </div>
 @endsection
