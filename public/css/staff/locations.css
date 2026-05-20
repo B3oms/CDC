@@ -117,10 +117,6 @@
     vertical-align: top;
 }
 
-.table tbody tr:hover {
-    background: #f8f9fa;
-}
-
 .table tbody tr:last-child td {
     border-bottom: none;
 }

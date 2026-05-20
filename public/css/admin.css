@@ -3198,10 +3198,6 @@ margin-bottom: 1rem;
     z-index: 10;
 }
 
-.data-table tr:hover {
-    background: #f8f9fa;
-}
-
 .data-table .actions {
     display: flex;
     gap: 0.5rem;
@@ -4261,10 +4257,6 @@ margin-bottom: 1rem;
         scrollbar-width: thin;
     }
     
-    .dist-table tr:hover {
-        background: transparent;
-    }
-    
     .dist-table tr:active {
         background: #f0f0f0;
     }
@@ -4307,10 +4299,6 @@ margin-bottom: 1rem;
     
     .dist-table td {
         border-bottom-color: #444;
-    }
-    
-    .dist-table tr:hover {
-        background: #3d3d3d;
     }
     
     .relief-status-badge.upcoming {
