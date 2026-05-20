@@ -480,6 +480,7 @@ document.addEventListener('click', function(event) {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
 }
 
 .stat-card:hover { box-shadow: var(--shadow-md); }
