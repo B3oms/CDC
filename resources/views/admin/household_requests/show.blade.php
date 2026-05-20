@@ -22,8 +22,10 @@
 
 <div class="dash-grid">
     <div class="yearly-col">
-        <div class="section-card">
-            <h3>Head of Household</h3>
+        <div class="section-card" style="display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h3 style="margin: 0;">Head of Household</h3>
+            </div>
             <table class="dist-table">
                 <tr><td class="meta-label">Name</td><td>{{ $request->head_of_household }}</td></tr>
                 <tr><td class="meta-label">Age</td><td>{{ $request->head_age ?? 'Not specified' }} years old</td></tr>
