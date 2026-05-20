@@ -1,5 +1,5 @@
 @extends('staff.layouts.app')
-@section('title', 'Calamity Portal')
+@section('title', 'Calamity')
 
 @section('content')
 <div class="dash-header">
@@ -10,15 +10,15 @@
     <div style="display:flex;gap:10px;align-items:center;">
         <a href="{{ route('admin.calamity.index') }}" class="btn-back">← Back</a>
         @if($calamity->status === 'Open')
-        <span class="status-open">● PORTAL OPEN</span>
+        <span class="status-open">● OPEN</span>
         <form method="POST" action="{{ route('admin.calamity.close', $calamity->id) }}">
             @csrf
-            <button type="submit" class="btn-danger" onclick="return confirm('Close this portal and generate report?')">
-                Close Portal
+            <button type="submit" class="btn-danger" onclick="return confirm('Close this calamity and generate report?')">
+                Close
             </button>
         </form>
         @else
-        <span class="status-closed">● PORTAL CLOSED</span>
+        <span class="status-closed">● CLOSED</span>
         <a href="{{ route('admin.calamity.report', $calamity->id) }}" class="btn-primary">View Report</a>
         <a href="{{ route('admin.calamity.pdf', $calamity->id) }}" class="btn-export-pdf"
            style="display: inline-flex !important; align-items: center !important; gap: 6px !important; padding: 8px 16px !important; background: #10b981 !important; color: white !important; text-decoration: none !important; border-radius: 6px !important; font-size: 13px !important; font-weight: 500 !important; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3) !important; letter-spacing: 0.5px !important;"

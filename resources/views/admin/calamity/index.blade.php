@@ -1,13 +1,13 @@
 @extends('staff.layouts.app')
-@section('title', 'Calamity Portals')
+@section('title', 'Calamities')
 
 @section('content')
 <div class="dash-header">
-    <h1>Calamity Portals</h1>
+    <h1>Calamities</h1>
     <div style="display:flex;gap:10px;align-items:center;">
         <a href="{{ route('staff.dashboard') }}" class="btn-back">← Back</a>
         <a href="{{ route('admin.calamity.create') }}" class="btn-primary">
-            <i class="fas fa-plus"></i> Create Portal
+            <i class="fas fa-plus"></i> Create
         </a>
     </div>
 </div>
@@ -25,10 +25,10 @@
     <div class="empty-icon">
         <i class="fas fa-cloud-sun-rain"></i>
     </div>
-    <h3>No Calamity Portals Yet</h3>
-    <p>Create your first calamity portal to start monitoring and managing disaster response operations.</p>
+    <h3>No Calamities Yet</h3>
+    <p>Create your first calamity to start monitoring and managing disaster response operations.</p>
     <a href="{{ route('admin.calamity.create') }}" class="btn-primary btn-large">
-        <i class="fas fa-plus"></i> Create First Portal
+        <i class="fas fa-plus"></i> Create First
     </a>
 </div>
 @else
@@ -71,12 +71,12 @@
         </div>
         
         <div class="portal-footer">
-            <span class="view-portal">Click to view portal →</span>
+            <span class="view-portal">Click to view →</span>
             <div class="portal-actions">
                 @if($calamity->status === 'Open')
                 <form action="{{ route('admin.calamity.close', $calamity->id) }}" method="POST" onclick="event.stopPropagation()">
                     @csrf
-                    <button type="submit" class="btn-close" onclick="return confirm('Are you sure you want to close this calamity portal?')">
+                    <button type="submit" class="btn-close" onclick="return confirm('Are you sure you want to close this calamity?')">
                         <i class="fas fa-times"></i> Close
                     </button>
                 </form>
@@ -84,7 +84,7 @@
                 <form action="{{ route('admin.calamity.destroy', $calamity->id) }}" method="POST" onclick="event.stopPropagation()">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn-delete" onclick="return confirm('Are you sure you want to delete this calamity portal and all its data? This action cannot be undone.')">
+                    <button type="submit" class="btn-delete" onclick="return confirm('Are you sure you want to delete this calamity and all its data? This action cannot be undone.')">
                         <i class="fas fa-trash"></i> Delete
                     </button>
                 </form>

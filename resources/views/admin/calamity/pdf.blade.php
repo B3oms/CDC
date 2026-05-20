@@ -136,7 +136,7 @@
 <body>
     <div class="header">
         <h1>{{ $calamity->name }}</h1>
-        <div class="subtitle">Calamity Portal Report</div>
+        <div class="subtitle">Calamity Report</div>
     </div>
 
     <div class="info-section">

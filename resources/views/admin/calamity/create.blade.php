@@ -148,7 +148,7 @@
       <a href="{{ route('admin.calamity.index') }}" class="cr-btn-cancel">← Back</a>
       <button type="submit" class="cr-btn-submit">
         <i class="fas fa-plus"></i>
-        Create Portal
+        Create
       </button>
     </div>
   </form>

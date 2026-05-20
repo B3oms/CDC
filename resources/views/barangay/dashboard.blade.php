@@ -140,8 +140,8 @@
 
 @else
 <div class="section-card" style="text-align:center;padding:3rem;">
-    <p style="font-size:1.1rem;color:#888;">No active calamity portal at the moment.</p>
-    <p style="font-size:0.9rem;color:#aaa;margin-top:8px;">You will be notified when the CDC opens a portal.</p>
+    <p style="font-size:1.1rem;color:#888;">No active calamity at the moment.</p>
+    <p style="font-size:0.9rem;color:#aaa;margin-top:8px;">You will be notified when the CDC opens one.</p>
 </div>
 @endif
 
