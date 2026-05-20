@@ -2361,8 +2361,8 @@ margin-bottom: 1rem;
     border-bottom: none;
 }
 
-.table tr:hover {
-    background: #faf9f6;
+.table tr {
+    background: #fff;
 }
 
 .table-responsive {
