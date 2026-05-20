@@ -27,16 +27,46 @@
                 @endif
                 <div class="form-group" style="margin-bottom:10px;">
                     <label>First Name</label>
-                    <input type="text" name="first_name" value="{{ old('first_name') }}" required>
+                    <input type="text" name="first_name" value="{{ old('first_name') }}" required
+                        oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
+                        onkeypress="return (event.charCode >= 65 && event.charCode <= 90) || (event.charCode >= 97 && event.charCode <= 122) || event.charCode === 32">
+                </div>
+                <div class="form-group" style="margin-bottom:10px;">
+                    <label>Middle Name (Optional)</label>
+                    <input type="text" name="middle_name" value="{{ old('middle_name') }}"
+                        oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
+                        onkeypress="return (event.charCode >= 65 && event.charCode <= 90) || (event.charCode >= 97 && event.charCode <= 122) || event.charCode === 32">
                 </div>
                 <div class="form-group" style="margin-bottom:10px;">
                     <label>Last Name</label>
-                    <input type="text" name="last_name" value="{{ old('last_name') }}" required>
+                    <input type="text" name="last_name" value="{{ old('last_name') }}" required
+                        oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
+                        onkeypress="return (event.charCode >= 65 && event.charCode <= 90) || (event.charCode >= 97 && event.charCode <= 122) || event.charCode === 32">
+                </div>
+                <div class="form-group" style="margin-bottom:10px;">
+                    <label>Suffix (Optional)</label>
+                    <select name="suffix">
+                        <option value="">-- None --</option>
+                        <option value="Jr." {{ old('suffix') == 'Jr.' ? 'selected' : '' }}>Jr.</option>
+                        <option value="Sr." {{ old('suffix') == 'Sr.' ? 'selected' : '' }}>Sr.</option>
+                        <option value="I" {{ old('suffix') == 'I' ? 'selected' : '' }}>I</option>
+                        <option value="II" {{ old('suffix') == 'II' ? 'selected' : '' }}>II</option>
+                        <option value="III" {{ old('suffix') == 'III' ? 'selected' : '' }}>III</option>
+                        <option value="IV" {{ old('suffix') == 'IV' ? 'selected' : '' }}>IV</option>
+                        <option value="V" {{ old('suffix') == 'V' ? 'selected' : '' }}>V</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:10px;">
+                    <label>Age</label>
+                    <input type="number" name="age" value="{{ old('age') }}" min="0" max="120" required>
                 </div>
                 <div class="form-group" style="margin-bottom:10px;">
                     <label>Contact Number</label>
                     <input type="text" name="contact_number" value="{{ old('contact_number') }}"
-                        placeholder="09XXXXXXXXX">
+                        placeholder="09XXXXXXXXX"
+                        maxlength="11"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                        onkeypress="return (event.charCode >= 48 && event.charCode <= 57)">
                 </div>
                 <div class="form-group" style="margin-bottom:10px;">
                     <label>Address</label>

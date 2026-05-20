@@ -20,9 +20,12 @@ class RecommendationController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'first_name'     => 'required|string|max:100',
-            'last_name'      => 'required|string|max:100',
-            'contact_number' => 'nullable|string|max:13',
+            'first_name'     => 'required|string|max:100|regex:/^[a-zA-Z\s]+$/',
+            'middle_name'    => 'nullable|string|max:100|regex:/^[a-zA-Z\s]*$/',
+            'last_name'      => 'required|string|max:100|regex:/^[a-zA-Z\s]+$/',
+            'suffix'         => 'nullable|string|max:20',
+            'age'            => 'required|integer|min:0|max:120',
+            'contact_number' => 'nullable|string|max:11|regex:/^[0-9]{11}$/',
             'address'        => 'nullable|string',
         ]);
 
@@ -30,7 +33,10 @@ class RecommendationController extends Controller
             'barangay_id'    => auth()->user()->barangay_id,
             'submitted_by'   => auth()->id(),
             'first_name'     => $request->first_name,
+            'middle_name'    => $request->middle_name,
             'last_name'      => $request->last_name,
+            'suffix'         => $request->suffix,
+            'age'            => $request->age,
             'contact_number' => $request->contact_number,
             'address'        => $request->address,
             'status'         => 'Pending',
