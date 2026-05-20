@@ -477,10 +477,7 @@ document.addEventListener('click', function(event) {
     padding: 1.25rem 1.5rem;
     box-shadow: var(--shadow);
     transition: box-shadow .2s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    text-align: center;
 }
 
 .stat-card:hover { box-shadow: var(--shadow-md); }
@@ -492,6 +489,7 @@ document.addEventListener('click', function(event) {
     line-height: 1;
     margin-bottom: 0.5rem;
     text-align: center;
+    display: block;
 }
 
 .upcoming-num  { color: var(--blue); }
@@ -505,6 +503,7 @@ document.addEventListener('click', function(event) {
     letter-spacing: .4px;
     text-align: center;
     margin: 0 auto;
+    display: block;
 }
 
 /* ============================================
