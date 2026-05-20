@@ -31,14 +31,14 @@ class HouseholdRequestController extends Controller
     {
         $validated = $request->validate([
             'head_name' => 'required|string|max:255',
-            'head_age' => 'required|integer|min:1|max:120',
+            'head_age' => 'required|integer|min:18|max:110',
             'head_sex' => 'required|in:male,female',
             'head_date_of_birth' => 'required|date|before:today',
             'address' => 'required|string',
             'contact_number' => 'required|string|max:20',
             'members' => 'required|array|min:0',
             'members.*.name' => 'required|string|max:255',
-            'members.*.age' => 'required|integer|min:1|max:120',
+            'members.*.age' => 'required|integer|min:18|max:110',
             'members.*.sex' => 'required|in:male,female',
         ]);
 
@@ -97,14 +97,14 @@ class HouseholdRequestController extends Controller
     {
         $validated = $request->validate([
             'head_name' => 'required|string|max:255',
-            'head_age' => 'required|integer|min:1|max:120',
+            'head_age' => 'required|integer|min:18|max:110',
             'head_sex' => 'required|in:male,female',
             'head_date_of_birth' => 'required|date|before:today',
             'address' => 'required|string',
             'contact_number' => 'required|string|max:20',
             'members' => 'required|array|min:0',
             'members.*.name' => 'required|string|max:255',
-            'members.*.age' => 'required|integer|min:1|max:120',
+            'members.*.age' => 'required|integer|min:18|max:110',
             'members.*.sex' => 'required|in:male,female',
         ]);
 
