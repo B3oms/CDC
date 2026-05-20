@@ -5,14 +5,7 @@
 @section('content')
 <div class="dash-header">
     <h1>Relief Monitor</h1>
-    <div style="display: flex; align-items: center; gap: 1rem;">
-        <div class="realtime-indicator" style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #10b981;">
-            <span class="realtime-dot" style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite;"></span>
-            <span>Real-time</span>
-            <span class="last-updated" style="color: #6b7280;">(Updated: <span id="lastUpdated">just now</span>)</span>
-        </div>
-        <a href="{{ route('admin.relief.create') }}" class="btn-primary">+ Create Event</a>
-    </div>
+    <a href="{{ route('admin.relief.create') }}" class="btn-primary" style="margin: 0 auto; display: block; width: fit-content;">+ Create Event</a>
 </div>
 
 {{-- Stats Row --}}
@@ -110,9 +103,14 @@
 
 .delete-form {
     position: absolute;
-    bottom: 8px;
-    left: 8px;
+    top: 8px;
+    right: 8px;
     z-index: 10;
+}
+
+/* Make space for delete button */
+.relief-card-header {
+    padding-right: 40px;
 }
 
 .delete-btn {

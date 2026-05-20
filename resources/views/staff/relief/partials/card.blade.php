@@ -45,18 +45,18 @@
             </div>
             <div class="view-details">View Details →</div>
         </div>
+        
+        {{-- Delete Button - Inside the card --}}
+        @if($event->status !== 'Ongoing')
+        <form action="{{ route('staff.relief.destroy', $event->id) }}" method="POST" 
+              onsubmit="return confirm('Are you sure you want to delete this relief event? This action cannot be undone.')" 
+              class="delete-form">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="delete-btn" title="Delete Event">
+                <i class="fas fa-trash"></i>
+            </button>
+        </form>
+        @endif
     </a>
-    
-    {{-- Delete Button --}}
-    @if($event->status !== 'Ongoing')
-    <form action="{{ route('staff.relief.destroy', $event->id) }}" method="POST" 
-          onsubmit="return confirm('Are you sure you want to delete this relief event? This action cannot be undone.')" 
-          class="delete-form">
-        @csrf
-        @method('DELETE')
-        <button type="submit" class="delete-btn" title="Delete Event">
-            <i class="fas fa-trash"></i>
-        </button>
-    </form>
-    @endif
 </div>

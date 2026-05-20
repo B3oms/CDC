@@ -273,7 +273,7 @@ class ReliefMonitorController extends Controller
 
         // Delete related records
         $event->eventBarangays()->delete();
-        $event->facilitators()->delete();
+        $event->facilitators()->detach();
         $event->beneficiaries()->delete();
         
         // Delete the event

@@ -4,8 +4,8 @@
 
 @section('content')
 <div class="dash-header">
-    <div>
-        <h1>{{ $event->name }}</h1>
+    <div style="text-align: left !important;">
+        <h1 style="text-align: left !important;">{{ $event->name }}</h1>
         <p class="sub">
             {{ is_string($event->date) ? date('M d, Y', strtotime($event->date)) : \Carbon\Carbon::parse($event->date)->format('M d, Y') }} ·
             {{ $event->venue }} ·
@@ -177,6 +177,68 @@
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 500;
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+    .relief-detail-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+    
+    .dist-table {
+        font-size: 0.75rem;
+    }
+    
+    .dist-table th,
+    .dist-table td {
+        padding: 0.5rem 0.25rem;
+    }
+    
+    .dist-table th:nth-child(3),
+    .dist-table th:nth-child(4),
+    .dist-table td:nth-child(3),
+    .dist-table td:nth-child(4) {
+        display: none;
+    }
+    
+    /* For beneficiaries table on mobile */
+    .dist-table th:nth-child(5),
+    .dist-table td:nth-child(5) {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .dist-table {
+        font-size: 0.7rem;
+    }
+    
+    .dist-table th,
+    .dist-table td {
+        padding: 0.4rem 0.2rem;
+    }
+    
+    .dist-table th:nth-child(2),
+    .dist-table td:nth-child(2) {
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    select {
+        font-size: 0.75rem !important;
+        padding: 0.4rem 0.8rem !important;
+    }
+    
+    .btn-primary {
+        font-size: 0.75rem !important;
+        padding: 0.4rem 0.8rem !important;
+    }
+}
+
+.relief-status-badge {
     text-transform: uppercase;
 }
 

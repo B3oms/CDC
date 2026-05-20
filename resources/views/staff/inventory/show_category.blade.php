@@ -20,7 +20,7 @@
     <div style="display:flex;gap:10px;">
         <a href="{{ route('staff.inventory.index') }}" class="btn-back">← Back</a>
         <a href="{{ route('staff.inventory.subcategory.create', $category->id) }}" class="btn-primary">+ Add Subcategory</a>
-        <a href="{{ route('staff.inventory.category.edit', $category->id) }}" class="btn-secondary">Edit Category</a>
+        <a href="{{ route('inventory.category.edit', $category->id) }}" class="btn-secondary">Edit Category</a>
     </div>
 </div>
 

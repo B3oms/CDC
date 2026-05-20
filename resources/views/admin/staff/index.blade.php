@@ -5,7 +5,7 @@
 @section('content')
 <div class="dash-header">
     <h1>Staff Management</h1>
-    <a href="{{ route('admin.staff.create') }}" class="btn-primary">+ Create</a>
+    <a href="{{ route('admin.staff.create') }}" class="btn-primary" style="flex-shrink: 0; white-space: nowrap; align-self: center; width: auto !important; max-width: none !important;">+ Create</a>
 </div>
 
 @if(session('success'))

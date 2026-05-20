@@ -48,7 +48,9 @@
             </div>
         </a>
         <div class="inventory-card-actions">
-            <a href="{{ route('staff.inventory.category.edit', $category->id) }}" class="btn-sm-secondary">Edit</a>
+            <form method="GET" action="{{ route('inventory.category.edit', $category->id) }}" style="display:inline;">
+                <button type="submit" class="btn-sm-secondary">Edit</button>
+            </form>
             <form method="POST" action="{{ route('staff.inventory.category.destroy', $category->id) }}"
                 style="display:inline;"
                 onsubmit="return confirm('Delete {{ $category->name }}?')">
