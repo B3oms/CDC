@@ -477,7 +477,9 @@ document.addEventListener('click', function(event) {
     padding: 1.25rem 1.5rem;
     box-shadow: var(--shadow);
     transition: box-shadow .2s;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .stat-card:hover { box-shadow: var(--shadow-md); }
@@ -500,6 +502,7 @@ document.addEventListener('click', function(event) {
     text-transform: uppercase;
     letter-spacing: .4px;
     text-align: center;
+    width: 100%;
 }
 
 /* ============================================
