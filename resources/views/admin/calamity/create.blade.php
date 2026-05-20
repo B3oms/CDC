@@ -1,4 +1,4 @@
-@extends('staff.layouts.app')
+@extends('admin.layouts.app')
 @section('title', 'Add Calamity Event')
 
 @section('content')
