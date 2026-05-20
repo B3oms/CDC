@@ -369,8 +369,10 @@ canvas { max-width: 100% !important; height: auto !important; }
 /* ─── Table Scroll Wrapper ───────────────────────────── */
 .db-table-scroll {
     overflow-x: auto;
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     width: 100%;
+    max-height: 300px;
     border-radius: 6px;
     border: 1px solid #e5e7eb;
 }
