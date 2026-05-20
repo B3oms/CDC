@@ -107,5 +107,9 @@
     background: #fee2e2;
     color: #991b1b;
 }
+
+.dist-table tr:hover td {
+    background: transparent !important;
+}
 </style>
 @endsection
