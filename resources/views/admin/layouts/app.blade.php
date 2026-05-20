@@ -79,6 +79,10 @@
                     class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
+                <a href="{{ route('admin.staff.index') }}"
+                    class="{{ request()->routeIs('admin.staff.*') ? 'active' : '' }}">
+                    <i class="fas fa-user-tie"></i> Staff
+                </a>
                 <a href="{{ route('admin.beneficiaries.index') }}"
                     class="{{ request()->routeIs('admin.beneficiaries.*') ? 'active' : '' }}">
                     <i class="fas fa-users"></i> Beneficiaries
@@ -87,18 +91,13 @@
                     class="{{ request()->routeIs('admin.inventory.*') ? 'active' : '' }}">
                     <i class="fas fa-boxes"></i> Inventory
                 </a>
-                <a href="{{ route('admin.staff.index') }}"
-                    class="{{ request()->routeIs('admin.staff.*') ? 'active' : '' }}">
-                    <i class="fas fa-user-tie"></i> Staff
+                <a href="{{ route('admin.relief.index') }}"
+                    class="{{ request()->routeIs('admin.relief.*') ? 'active' : '' }}">
+                    <i class="fas fa-hands-helping"></i> Relief Monitor
                 </a>
                 <a href="{{ route('admin.calamity.index') }}"
                     class="{{ request()->routeIs('admin.calamity.*') ? 'active' : '' }}">
                     <i class="fas fa-cloud-sun-rain"></i> Calamities
-                </a>
-
-                <a href="{{ route('admin.relief.index') }}"
-                    class="{{ request()->routeIs('admin.relief.*') ? 'active' : '' }}">
-                    <i class="fas fa-hands-helping"></i> Relief Monitor
                 </a>
                 <a href="{{ route('admin.household_requests.index') }}"
                     class="{{ request()->routeIs('admin.household_requests.*') ? 'active' : '' }}">
