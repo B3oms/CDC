@@ -302,6 +302,7 @@ let dropdownOpenTime = 0;
 function togglePdfDropdown(event) {
     if (event) {
         event.stopPropagation();
+        event.preventDefault();
     }
     const dropdown = document.getElementById('pdfOptions');
     if (dropdown.style.display === 'none') {
@@ -311,6 +312,28 @@ function togglePdfDropdown(event) {
         dropdown.style.display = 'none';
     }
 }
+
+// Prevent dropdown from closing when clicking inside
+document.getElementById('pdfOptions').addEventListener('click', function(event) {
+    event.stopPropagation();
+    event.preventDefault();
+});
+
+// Close dropdown when clicking outside (with delay to prevent immediate closing)
+document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('pdfOptions');
+    const button = event.target.closest('.pdf-export-dropdown');
+    const insideDropdown = event.target.closest('#pdfOptions');
+    
+    // Don't close if just opened (within 200ms)
+    if (Date.now() - dropdownOpenTime < 200) {
+        return;
+    }
+    
+    if (!button && !insideDropdown && dropdown && dropdown.style.display === 'block') {
+        dropdown.style.display = 'none';
+    }
+});
 
 function exportPdf() {
     const paperSize = document.getElementById('paperSize').value;

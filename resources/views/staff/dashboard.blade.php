@@ -325,6 +325,7 @@ let dropdownOpenTime = 0;
 function toggleChartPdfDropdown(event, chartType) {
     if (event) {
         event.stopPropagation();
+        event.preventDefault();
     }
     const dropdown = document.getElementById(`pdfOptions-${chartType}`);
     if (dropdown.style.display === 'none') {
@@ -335,7 +336,34 @@ function toggleChartPdfDropdown(event, chartType) {
     }
 }
 
-// Removed click-outside listener to prevent dropdown from closing unexpectedly
+// Prevent dropdown from closing when clicking inside
+['monthly', 'yearly'].forEach(chartType => {
+    const dropdown = document.getElementById(`pdfOptions-${chartType}`);
+    if (dropdown) {
+        dropdown.addEventListener('click', function(event) {
+            event.stopPropagation();
+            event.preventDefault();
+        });
+    }
+});
+
+// Close dropdowns when clicking outside (with delay to prevent immediate closing)
+document.addEventListener('click', function(event) {
+    ['monthly', 'yearly'].forEach(chartType => {
+        const dropdown = document.getElementById(`pdfOptions-${chartType}`);
+        const button = event.target.closest('.pdf-export-btn');
+        const insideDropdown = event.target.closest(`#pdfOptions-${chartType}`);
+        
+        // Don't close if just opened (within 200ms)
+        if (Date.now() - dropdownOpenTime < 200) {
+            return;
+        }
+        
+        if (!button && !insideDropdown && dropdown && dropdown.style.display === 'block') {
+            dropdown.style.display = 'none';
+        }
+    });
+});
 </script>
 @endpush
 
