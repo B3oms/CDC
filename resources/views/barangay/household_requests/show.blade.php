@@ -135,8 +135,10 @@
     border-bottom: none;
 }
 
-.family-member-item:hover {
-    background: #f9fafb;
+.family-member-item {
+    font-weight: 600;
+    color: #374151;
+    flex: 1;
 }
 
 .member-name {

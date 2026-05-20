@@ -188,14 +188,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-weight: 600;
+    color: #374151;
+    flex: 1;
 }
 
 .family-member-item:last-child {
     border-bottom: none;
-}
-
-.family-member-item:hover {
-    background: #f9fafb;
 }
 
 .member-name {
