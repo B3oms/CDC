@@ -202,7 +202,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($completedEvents->take(5) as $event)
+                    @foreach($completedEvents as $event)
                     <tr>
                         <td>
                             <a href="{{ route('admin.relief.show', $event->id) }}" class="db-link">
