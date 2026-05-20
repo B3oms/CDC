@@ -499,10 +499,6 @@ document.addEventListener('click', function(event) {
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: .4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.35rem;
     text-align: center;
 }
 
