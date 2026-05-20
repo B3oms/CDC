@@ -491,6 +491,7 @@ document.addEventListener('click', function(event) {
     color: var(--primary);
     line-height: 1;
     margin-bottom: 0.5rem;
+    text-align: center;
 }
 
 .upcoming-num  { color: var(--blue); }
