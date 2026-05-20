@@ -102,10 +102,6 @@
                 class="{{ request()->routeIs('staff.inventory.*') ? 'active' : '' }}">
                 <i class="fas fa-boxes"></i> Inventory
             </a>
-            <a href="{{ route('admin.calamity.index') }}"
-                class="{{ request()->routeIs('admin.calamity.*') ? 'active' : '' }}">
-                <i class="fas fa-cloud-sun-rain"></i> Calamities
-            </a>
             <a href="{{ route('staff.relief.index') }}"
                 class="{{ request()->routeIs('staff.relief.*') ? 'active' : '' }}"
                 style="display: block !important; visibility: visible !important;">
