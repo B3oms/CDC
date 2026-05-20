@@ -55,6 +55,7 @@ Route::prefix('admin')->name('admin.')->middleware(['isAdmin'])->group(function 
     Route::get('dashboard/notifications', [DashboardController::class, 'getNotifications'])->name('dashboard.notifications');
     Route::post('dashboard/notifications/{notificationId}/read', [DashboardController::class, 'markNotificationRead'])->name('dashboard.notifications.read');
     Route::post('dashboard/notifications/read-all', [DashboardController::class, 'markAllNotificationsRead'])->name('dashboard.notifications.readAll');
+    Route::get('dashboard/chart/{type}/pdf', [DashboardController::class, 'exportChartPdf'])->name('dashboard.chart.pdf');
     
     // Profile
     Route::get('profile', [DashboardController::class, 'profile'])->name('profile');

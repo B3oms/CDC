@@ -587,7 +587,7 @@ document.addEventListener('DOMContentLoaded', function () {
 function exportChartPdf(chartType) {
     const paperSize = document.getElementById(`paperSize-${chartType}`).value;
     const orientation = document.getElementById(`orientation-${chartType}`).value;
-    const url = `{{ route('admin.dashboard.chart.pdf', ':type') }}`.replace(':type', chartType);
+    const url = `{{ route('admin.dashboard.chart.pdf', ['type' => '__type__']) }}`.replace('__type__', chartType);
     
     // Create a hidden form to submit for download
     const form = document.createElement('form');
