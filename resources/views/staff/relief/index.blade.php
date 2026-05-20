@@ -36,21 +36,21 @@
 
 {{-- Stats Row --}}
 <div class="stats-row" style="margin-bottom:1.5rem;">
-    <div class="stat-card">
-        <div class="stat-num" id="ongoingCount">{{ $ongoingCount ?? 0 }}</div>
-        <div class="stat-label">Ongoing Events</div>
+    <div class="stat-card" style="text-align: center;">
+        <div class="stat-num" id="ongoingCount" style="text-align: center;">{{ $ongoingCount ?? 0 }}</div>
+        <div class="stat-label" style="text-align: center;">Ongoing Events</div>
     </div>
-    <div class="stat-card">
-        <div class="stat-num" id="upcomingCount">{{ $upcomingCount ?? 0 }}</div>
-        <div class="stat-label">Upcoming Events</div>
+    <div class="stat-card" style="text-align: center;">
+        <div class="stat-num" id="upcomingCount" style="text-align: center;">{{ $upcomingCount ?? 0 }}</div>
+        <div class="stat-label" style="text-align: center;">Upcoming Events</div>
     </div>
-    <div class="stat-card">
-        <div class="stat-num" id="completedCount">{{ $completedCount ?? 0 }}</div>
-        <div class="stat-label">Completed Events</div>
+    <div class="stat-card" style="text-align: center;">
+        <div class="stat-num" id="completedCount" style="text-align: center;">{{ $completedCount ?? 0 }}</div>
+        <div class="stat-label" style="text-align: center;">Completed Events</div>
     </div>
-    <div class="stat-card">
-        <div class="stat-num" id="totalBeneficiaries">{{ $totalBeneficiaries ?? 0 }}</div>
-        <div class="stat-label">Total Beneficiaries</div>
+    <div class="stat-card" style="text-align: center;">
+        <div class="stat-num" id="totalBeneficiaries" style="text-align: center;">{{ $totalBeneficiaries ?? 0 }}</div>
+        <div class="stat-label" style="text-align: center;">Total Beneficiaries</div>
     </div>
 </div>
 
