@@ -215,7 +215,7 @@ class CalamityController extends Controller
     }
 
     // Download calamity portal details as PDF
-    public function downloadPDF($id)
+    public function downloadPDF(Request $request, $id)
     {
         try {
             $calamity = Calamity::with(['barangays', 'evacuationReports.barangay', 'evacuationReports.evacuationCenter'])
@@ -242,7 +242,7 @@ class CalamityController extends Controller
                 $report = EvacuationReport::where('calamity_id', $id)
                     ->where('barangay_id', $barangay->id)
                     ->first();
-                
+
                 $households = [];
                 if ($report) {
                     try {
@@ -256,7 +256,7 @@ class CalamityController extends Controller
                                 $submittedIds = $householdIdsData;
                             }
                         }
-                        
+
                         if (!empty($submittedIds)) {
                             // Get household details for submitted IDs
                             $households = \App\Models\HouseholdRequest::whereIn('id', $submittedIds)
@@ -268,7 +268,7 @@ class CalamityController extends Controller
                         $households = [];
                     }
                 }
-                
+
                 $barangayHouseholds[$barangay->id] = $households;
             }
 
@@ -280,15 +280,19 @@ class CalamityController extends Controller
                 'generated_date' => now()->format('F d, Y - h:i A')
             ];
 
+            // Get paper size and orientation from request (default to A4 landscape)
+            $paperSize = $request->input('paper_size', 'A4');
+            $orientation = $request->input('orientation', 'landscape');
+
             // Generate PDF
             $pdf = PDF::loadView('admin.calamity.pdf', $pdfData);
-            
-            // Set paper orientation to landscape for better table display
-            $pdf->setPaper('A4', 'landscape');
-            
+
+            // Set paper size and orientation
+            $pdf->setPaper($paperSize, $orientation);
+
             // Download the PDF
-            return $pdf->download('calamity-portal-' . $calamity->name . '-' . $calamity->id . '.pdf');
-            
+            return $pdf->download('calamity-' . $calamity->name . '-' . $calamity->id . '.pdf');
+
         } catch (\Exception $e) {
             return redirect()->route('admin.calamity.show', $id)
                 ->with('error', 'Failed to generate PDF: ' . $e->getMessage());

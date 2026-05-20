@@ -309,10 +309,10 @@ class ReliefMonitorController extends Controller
     }
 
     // Download individual event report as PDF
-    public function downloadEventReport($id)
+    public function downloadEventReport(Request $request, $id)
     {
         $event = ReliefEvent::with([
-            'eventBarangays.barangay', 
+            'eventBarangays.barangay',
             'eventBarangays.municipality',
             'beneficiaries',
             'creator',
@@ -320,7 +320,12 @@ class ReliefMonitorController extends Controller
             'facilitators.role'
         ])->findOrFail($id);
 
+        // Get paper size and orientation from request (default to A4 portrait)
+        $paperSize = $request->input('paper_size', 'A4');
+        $orientation = $request->input('orientation', 'portrait');
+
         $pdf = Pdf::loadView('admin.relief.pdf.event', compact('event'));
+        $pdf->setPaper($paperSize, $orientation);
 
         return $pdf->download('relief-event-' . $event->name . '-' . now()->format('Y-m-d') . '.pdf');
     }

@@ -262,7 +262,7 @@ class InventoryController extends Controller
     }
 
     // PDF Generation - Inventory by Category
-    public function pdf()
+    public function pdf(Request $request)
     {
         try {
             // Get all categories with their subcategories and items
@@ -286,12 +286,12 @@ class InventoryController extends Controller
                     foreach ($subcategory->items as $item) {
                         if ($item->inventory) {
                             $totalQuantity += $item->inventory->quantity;
-                            
+
                             // Check low stock (10 or less)
                             if ($item->inventory->quantity <= 10) {
                                 $lowStockItems++;
                             }
-                            
+
                             // Check expiring items (within 30 days)
                             if ($item->inventory->expiration_date) {
                                 $expirationDate = \Carbon\Carbon::parse($item->inventory->expiration_date);
@@ -319,10 +319,14 @@ class InventoryController extends Controller
                 'generated_date' => now()->format('F d, Y - h:i A')
             ];
 
+            // Get paper size and orientation from request (default to A4 landscape)
+            $paperSize = $request->input('paper_size', 'A4');
+            $orientation = $request->input('orientation', 'landscape');
+
             $pdf = PDF::loadView('admin.inventory.pdf', $pdfData);
-            $pdf->setPaper('A4', 'landscape');
+            $pdf->setPaper($paperSize, $orientation);
             return $pdf->download('inventory-by-category-' . now()->format('Y-m-d') . '.pdf');
-            
+
         } catch (\Exception $e) {
             return redirect()->route('admin.inventory.index')
                 ->with('error', 'Failed to generate PDF: ' . $e->getMessage());
