@@ -3992,10 +3992,6 @@ margin-bottom: 1rem;
     border-bottom: 2px solid #d3d1c7;
 }
 
-.dist-table tr:hover {
-    background: #f8f9fa;
-}
-
 .dist-table tr:last-child td {
     border-bottom: none;
 }
