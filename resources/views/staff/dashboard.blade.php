@@ -26,19 +26,19 @@
 <div class="stats-row">
     <div class="stat-card">
         <div class="stat-num">{{ $barangayCount }}</div>
-        <div class="stat-label"><i class="fas fa-map-marker-alt"></i> Barangays</div>
+        <div class="stat-label">Barangays</div>
     </div>
     <div class="stat-card">
         <div class="stat-num">{{ $municipalityCount }}</div>
-        <div class="stat-label"><i class="fas fa-city"></i> Municipalities</div>
+        <div class="stat-label">Municipalities</div>
     </div>
     <div class="stat-card">
         <div class="stat-num upcoming-num">{{ $upcomingEvents->count() }}</div>
-        <div class="stat-label"><i class="fas fa-calendar-alt"></i> Upcoming Events</div>
+        <div class="stat-label">Upcoming Events</div>
     </div>
     <div class="stat-card">
         <div class="stat-num completed-num">{{ $completedEvents->count() }}</div>
-        <div class="stat-label"><i class="fas fa-check-circle"></i> Completed Events</div>
+        <div class="stat-label">Completed Events</div>
     </div>
 </div>
 
