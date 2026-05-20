@@ -20,7 +20,7 @@
 <div class="dash-grid">
     <div class="yearly-col">
         <div class="section-card">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h3 style="margin: 0;">Head of Household</h3>
                 <span class="status-badge {{ $request->status }}" style="font-size: 12px; padding: 6px 12px;">
                     {{ ucfirst($request->status) }}
