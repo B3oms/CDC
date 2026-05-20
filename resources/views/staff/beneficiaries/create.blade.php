@@ -55,8 +55,16 @@
                 </div>
                 <div class="form-group">
                     <label>Suffix (Optional)</label>
-                    <input type="text" name="suffix"
-                        value="{{ old('suffix', $prefill->suffix ?? '') }}" placeholder="e.g. Jr., Sr., III">
+                    <select name="suffix">
+                        <option value="">-- None --</option>
+                        <option value="Jr." {{ old('suffix', $prefill->suffix ?? '') == 'Jr.' ? 'selected' : '' }}>Jr.</option>
+                        <option value="Sr." {{ old('suffix', $prefill->suffix ?? '') == 'Sr.' ? 'selected' : '' }}>Sr.</option>
+                        <option value="I" {{ old('suffix', $prefill->suffix ?? '') == 'I' ? 'selected' : '' }}>I</option>
+                        <option value="II" {{ old('suffix', $prefill->suffix ?? '') == 'II' ? 'selected' : '' }}>II</option>
+                        <option value="III" {{ old('suffix', $prefill->suffix ?? '') == 'III' ? 'selected' : '' }}>III</option>
+                        <option value="IV" {{ old('suffix', $prefill->suffix ?? '') == 'IV' ? 'selected' : '' }}>IV</option>
+                        <option value="V" {{ old('suffix', $prefill->suffix ?? '') == 'V' ? 'selected' : '' }}>V</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>Gender</label>

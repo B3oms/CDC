@@ -46,7 +46,16 @@
 
             <div class="form-group">
                 <label>Suffix (Optional)</label>
-                <input type="text" name="suffix" value="{{ old('suffix') }}" placeholder="e.g. Jr., Sr., III">
+                <select name="suffix">
+                    <option value="">-- None --</option>
+                    <option value="Jr." {{ old('suffix') == 'Jr.' ? 'selected' : '' }}>Jr.</option>
+                    <option value="Sr." {{ old('suffix') == 'Sr.' ? 'selected' : '' }}>Sr.</option>
+                    <option value="I" {{ old('suffix') == 'I' ? 'selected' : '' }}>I</option>
+                    <option value="II" {{ old('suffix') == 'II' ? 'selected' : '' }}>II</option>
+                    <option value="III" {{ old('suffix') == 'III' ? 'selected' : '' }}>III</option>
+                    <option value="IV" {{ old('suffix') == 'IV' ? 'selected' : '' }}>IV</option>
+                    <option value="V" {{ old('suffix') == 'V' ? 'selected' : '' }}>V</option>
+                </select>
             </div>
 
             <div class="form-group">
