@@ -21,13 +21,11 @@
         <span class="status-closed">● CLOSED</span>
         <a href="{{ route('admin.calamity.report', $calamity->id) }}" class="btn-primary">View Report</a>
         <div class="pdf-export-dropdown">
-            <button onclick="togglePdfDropdown(event)" class="btn-export-pdf"
-               style="display: inline-flex !important; align-items: center !important; gap: 6px !important; padding: 8px 16px !important; background: #10b981 !important; color: white !important; text-decoration: none !important; border-radius: 6px !important; font-size: 13px !important; font-weight: 500 !important; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3) !important; letter-spacing: 0.5px !important; border:none !important; cursor:pointer !important;"
-               onmouseover="this.style.background='#059669'"
-               onmouseout="this.style.background='#10b981'">
+            <button type="button" id="exportPdfBtn" class="btn-export-pdf"
+               style="display: inline-flex !important; align-items: center !important; gap: 6px !important; padding: 8px 16px !important; background: #10b981 !important; color: white !important; text-decoration: none !important; border-radius: 6px !important; font-size: 13px !important; font-weight: 500 !important; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3) !important; letter-spacing: 0.5px !important; border:none !important; cursor:pointer !important;">
                 <i class="fas fa-file-pdf"></i> Export PDF
             </button>
-            <div id="pdfOptions" class="pdf-options" style="display:none;position:absolute;top:100%;right:0;background:white;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:12px;min-width:200px;z-index:1001;">
+            <div id="pdfOptions" class="pdf-options" data-open="false" style="display:none;position:absolute;top:100%;right:0;background:white;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:12px;min-width:200px;z-index:1001;">
                 <div style="margin-bottom:12px;">
                     <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Paper Size</label>
                     <select id="paperSize" style="width:100%;padding:6px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;color:#374151;">
@@ -366,20 +364,28 @@ function toggleHouseholds(barangayId) {
 }
 
 // PDF Export Functions
-let dropdownOpenTime = 0;
-
-function togglePdfDropdown(event) {
-    if (event) {
-        event.stopPropagation();
-    }
+document.addEventListener('DOMContentLoaded', function() {
+    const exportBtn = document.getElementById('exportPdfBtn');
     const dropdown = document.getElementById('pdfOptions');
-    if (dropdown.style.display === 'none') {
-        dropdown.style.display = 'block';
-        dropdownOpenTime = Date.now();
-    } else {
-        dropdown.style.display = 'none';
+    
+    if (exportBtn && dropdown) {
+        exportBtn.addEventListener('click', function(e) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const isOpen = dropdown.getAttribute('data-open') === 'true';
+            if (isOpen) {
+                dropdown.style.display = 'none';
+                dropdown.setAttribute('data-open', 'false');
+            } else {
+                dropdown.style.display = 'block';
+                dropdown.setAttribute('data-open', 'true');
+            }
+            return false;
+        }, true); // Use capture phase
     }
-}
+});
 
 function exportPdf(calamityId) {
     const paperSize = document.getElementById('paperSize').value;
