@@ -378,17 +378,17 @@ canvas { max-width: 100% !important; height: auto !important; }
 }
 
 .db-table-scroll::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
 }
 
 .db-table-scroll::-webkit-scrollbar-track {
     background: #f1f1f1;
-    border-radius: 4px;
+    border-radius: 3px;
 }
 
 .db-table-scroll::-webkit-scrollbar-thumb {
     background: #ccc;
-    border-radius: 4px;
+    border-radius: 3px;
 }
 
 .db-table-scroll::-webkit-scrollbar-thumb:hover {
