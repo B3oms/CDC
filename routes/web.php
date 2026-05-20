@@ -174,6 +174,7 @@ Route::prefix('staff')->name('staff.')->middleware(['isStaff'])->group(function 
     Route::get('dashboard/notifications', [StaffDashboardController::class, 'getNotifications'])->name('dashboard.notifications');
     Route::post('dashboard/notifications/{notificationId}/read', [StaffDashboardController::class, 'markNotificationRead'])->name('dashboard.notifications.read');
     Route::post('dashboard/notifications/read-all', [StaffDashboardController::class, 'markAllNotificationsRead'])->name('dashboard.notifications.readAll');
+    Route::get('dashboard/chart/{type}/pdf', [StaffDashboardController::class, 'exportChartPdf'])->name('dashboard.chart.pdf');
 
     // Beneficiaries
     Route::get('beneficiaries',           [StaffBeneficiaryController::class, 'index'])->name('beneficiaries.index');

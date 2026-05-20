@@ -9,6 +9,7 @@ use App\Models\Calamity;
 use App\Models\Barangay;
 use App\Models\Municipality;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
@@ -180,5 +181,25 @@ class DashboardController extends Controller
         // For now, just return success since we don't have a notifications table
         // In a real implementation, you would update all notifications for the user
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Export chart as PDF
+     */
+    public function exportChartPdf(Request $request, $type)
+    {
+        $paperSize = $request->query('paper_size', 'A4');
+        $orientation = $request->query('orientation', 'portrait');
+        
+        // Generate PDF based on chart type
+        // This is a placeholder implementation
+        // You'll need to implement actual PDF generation based on your requirements
+        
+        return response()->json([
+            'message' => 'PDF export not yet implemented',
+            'type' => $type,
+            'paper_size' => $paperSize,
+            'orientation' => $orientation
+        ]);
     }
 }
