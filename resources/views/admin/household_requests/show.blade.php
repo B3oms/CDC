@@ -8,10 +8,7 @@
         <h1>Household Request #{{ $request->id }}</h1>
         <p class="sub">Review and approve/reject household assistance request</p>
     </div>
-    <div style="display: flex; align-items: center; gap: 10px;">
-        <span class="status-badge {{ $request->status }}" style="font-size: 11px; padding: 4px 10px;">
-            {{ ucfirst($request->status) }}
-        </span>
+    <div>
         <a href="{{ route('admin.household_requests.index') }}" class="btn-back">← Back</a>
     </div>
 </div>
@@ -25,6 +22,9 @@
         <div class="section-card" style="display: flex; flex-direction: column;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <h3 style="margin: 0;">Head of Household</h3>
+                <span class="status-badge {{ $request->status }}" style="font-size: 11px; padding: 4px 10px;">
+                    {{ ucfirst($request->status) }}
+                </span>
             </div>
             <table class="dist-table">
                 <tr><td class="meta-label">Name</td><td>{{ $request->head_of_household }}</td></tr>
