@@ -437,6 +437,8 @@ function updateNotificationBadge() {
     display: block;
     text-decoration: none;
     margin-bottom: 1.5rem;
+    width: 100%;
+    text-align: center;
     transition: transform 0.2s ease;
 }
 

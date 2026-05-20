@@ -14,12 +14,22 @@
     text-decoration: none;
     color: inherit;
     display: block;
+    width: 100%;
+    text-align: center;
     cursor: pointer;
 }
 
 .user-info:hover {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 8px;
+}
+
+.user-info .user-name {
+    color: #fff;
+}
+
+.user-info .user-avatar {
+    margin: 0 auto;
 }
 
 /* Back Button for Small Screens */
