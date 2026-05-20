@@ -15,7 +15,7 @@
             <div class="cal-name">{{ $activeCalamity->name }}</div>
             <span class="cal-badge">Active</span>
         @else
-            <div class="cal-name">View All Portals</div>
+            <div class="cal-name">View All</div>
         @endif
     </a>
 </div>
