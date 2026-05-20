@@ -210,14 +210,6 @@ function exportPdf() {
     document.getElementById('pdfOptions').style.display = 'none';
 }
 
-// Close dropdown when clicking outside
-document.addEventListener('click', function(event) {
-    const dropdown = document.getElementById('pdfOptions');
-    const button = event.target.closest('.pdf-export-dropdown');
-    const insideDropdown = event.target.closest('#pdfOptions');
-    if (!button && !insideDropdown && dropdown && dropdown.style.display === 'block') {
-        dropdown.style.display = 'none';
-    }
-});
+// Removed click-outside listener to prevent dropdown from closing unexpectedly
 </script>
 @endpush

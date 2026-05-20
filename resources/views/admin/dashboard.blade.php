@@ -635,17 +635,7 @@ function toggleChartPdfDropdown(event, chartType) {
     }
 }
 
-// Close dropdowns when clicking outside
-document.addEventListener('click', function(event) {
-    ['monthly', 'yearly'].forEach(chartType => {
-        const dropdown = document.getElementById(`pdfOptions-${chartType}`);
-        const button = event.target.closest('.pdf-export-btn');
-        const insideDropdown = event.target.closest(`#pdfOptions-${chartType}`);
-        if (!button && !insideDropdown && dropdown && dropdown.style.display === 'block') {
-            dropdown.style.display = 'none';
-        }
-    });
-});
+// Removed click-outside listener to prevent dropdown from closing unexpectedly
 
 let refreshInterval;
 let isUpdating = false;
