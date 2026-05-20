@@ -19,8 +19,11 @@
 
 <div class="dash-grid">
     <div class="yearly-col">
-        <div class="section-card">
+        <div class="section-card" style="position: relative;">
             <h3>Head of Household</h3>
+            <span class="status-badge {{ $request->status }}" style="position: absolute; top: 15px; right: 15px; font-size: 12px; padding: 6px 12px;">
+                {{ ucfirst($request->status) }}
+            </span>
             <table class="dist-table">
                 <tr><td class="meta-label">Name</td><td>{{ $request->head_of_household }}</td></tr>
                 <tr><td class="meta-label">Contact Number</td><td>{{ $request->formatted_contact_number ?: 'Not provided' }}</td></tr>
