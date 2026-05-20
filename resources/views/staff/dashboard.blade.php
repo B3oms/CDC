@@ -500,7 +500,9 @@ document.addEventListener('click', function(event) {
     letter-spacing: .4px;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.35rem;
+    text-align: center;
 }
 
 /* ============================================
