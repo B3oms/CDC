@@ -287,37 +287,35 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-function exportChartToPDF(chartId, filename, chartType) {
-    const { jsPDF } = window.jspdf;
-    const chartEl   = document.getElementById(chartId);
-    const title     = chartEl.closest('.chart-card').querySelector('.chart-title').textContent;
-
+function exportChartPdf(chartType) {
     const paperSize = document.getElementById(`paperSize-${chartType}`).value;
     const orientation = document.getElementById(`orientation-${chartType}`).value;
-
-    html2canvas(chartEl, { backgroundColor: '#ffffff', scale: 3, useCORS: true }).then(canvas => {
-        const imgData  = canvas.toDataURL('image/png', 1.0);
-        const pdf      = new jsPDF({ orientation: orientation, unit: 'mm', format: paperSize.toLowerCase() });
-        const pw       = pdf.internal.pageSize.getWidth();
-        const ph       = pdf.internal.pageSize.getHeight();
-        const margin   = 20;
-        const maxW     = pw - margin * 2;
-        const imgH     = (canvas.height * maxW) / canvas.width;
-        const finalH   = Math.min(imgH, ph - margin * 3);
-        const finalW   = (canvas.width * finalH) / canvas.height;
-        const x        = (pw - finalW) / 2;
-
-        pdf.setFontSize(16); pdf.setFont('helvetica', 'bold');
-        pdf.text(title, pw / 2, margin, { align: 'center' });
-        pdf.addImage(imgData, 'PNG', x, margin + 15, finalW, finalH);
-
-        pdf.setFontSize(10); pdf.setFont('helvetica', 'normal');
-        pdf.text(`Generated: ${new Date().toLocaleString()}`, pw / 2, ph - 10, { align: 'center' });
-
-        pdf.save(`${filename.replace(/[^a-z0-9]/gi,'_').toLowerCase()}_${new Date().toISOString().split('T')[0]}.pdf`);
-
-        document.getElementById(`pdfOptions-${chartType}`).style.display = 'none';
-    });
+    const url = `{{ route('staff.dashboard.chart.pdf', ':type') }}`.replace(':type', chartType);
+    
+    // Create a hidden form to submit for download
+    const form = document.createElement('form');
+    form.method = 'GET';
+    form.action = url;
+    form.style.display = 'none';
+    
+    const paperSizeInput = document.createElement('input');
+    paperSizeInput.type = 'hidden';
+    paperSizeInput.name = 'paper_size';
+    paperSizeInput.value = paperSize;
+    form.appendChild(paperSizeInput);
+    
+    const orientationInput = document.createElement('input');
+    orientationInput.type = 'hidden';
+    orientationInput.name = 'orientation';
+    orientationInput.value = orientation;
+    form.appendChild(orientationInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+    
+    // Close dropdown after submission
+    document.getElementById(`pdfOptions-${chartType}`).style.display = 'none';
 }
 
 let dropdownOpenTime = 0;

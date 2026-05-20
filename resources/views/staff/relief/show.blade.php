@@ -579,8 +579,30 @@ function exportPdf(eventId) {
     const paperSize = document.getElementById('paperSize').value;
     const orientation = document.getElementById('orientation').value;
     const url = `{{ route('staff.relief.event.pdf', ':id') }}`.replace(':id', eventId);
-    const fullUrl = `${url}?paper_size=${paperSize}&orientation=${orientation}`;
-    window.open(fullUrl, '_blank');
+    
+    // Create a hidden form to submit for download
+    const form = document.createElement('form');
+    form.method = 'GET';
+    form.action = url;
+    form.style.display = 'none';
+    
+    const paperSizeInput = document.createElement('input');
+    paperSizeInput.type = 'hidden';
+    paperSizeInput.name = 'paper_size';
+    paperSizeInput.value = paperSize;
+    form.appendChild(paperSizeInput);
+    
+    const orientationInput = document.createElement('input');
+    orientationInput.type = 'hidden';
+    orientationInput.name = 'orientation';
+    orientationInput.value = orientation;
+    form.appendChild(orientationInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+    
+    // Close dropdown after submission
     document.getElementById('pdfOptions').style.display = 'none';
 }
 

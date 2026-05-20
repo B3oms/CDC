@@ -538,11 +538,30 @@ function exportPdf() {
     const orientation = document.getElementById('orientation').value;
     const currentUrl = new URL(window.location.href);
     const baseUrl = currentUrl.origin + currentUrl.pathname;
-    const queryParams = new URLSearchParams(currentUrl.search);
-    queryParams.set('paper_size', paperSize);
-    queryParams.set('orientation', orientation);
-    const fullUrl = `${baseUrl}?${queryParams.toString()}`;
-    window.open(fullUrl, '_blank');
+    
+    // Create a hidden form to submit for download
+    const form = document.createElement('form');
+    form.method = 'GET';
+    form.action = baseUrl;
+    form.style.display = 'none';
+    
+    const paperSizeInput = document.createElement('input');
+    paperSizeInput.type = 'hidden';
+    paperSizeInput.name = 'paper_size';
+    paperSizeInput.value = paperSize;
+    form.appendChild(paperSizeInput);
+    
+    const orientationInput = document.createElement('input');
+    orientationInput.type = 'hidden';
+    orientationInput.name = 'orientation';
+    orientationInput.value = orientation;
+    form.appendChild(orientationInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+    
+    // Close dropdown after submission
     document.getElementById('pdfOptions').style.display = 'none';
 }
 
