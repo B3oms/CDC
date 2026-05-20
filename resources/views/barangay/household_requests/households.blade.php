@@ -189,10 +189,6 @@
     vertical-align: middle;
 }
 
-.dist-table tr:hover {
-    background: #f9fafb;
-}
-
 /* Column Specific Styling */
 .actions-column {
     width: 120px;

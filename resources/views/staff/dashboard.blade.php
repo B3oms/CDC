@@ -661,7 +661,6 @@ document.addEventListener('click', function(event) {
 }
 
 .dist-table tr:last-child td { border-bottom: none; }
-.dist-table tr:hover td { background: #f8f9fa; }
 
 .table-link {
     color: var(--blue);
