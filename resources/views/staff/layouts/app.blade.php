@@ -21,6 +21,46 @@
     background: rgba(255, 255, 255, 0.1);
     border-radius: 8px;
 }
+
+/* Back Button for Small Screens */
+.back-button {
+    display: none;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.back-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.back-button i {
+    margin-right: 0.5rem;
+}
+
+/* Show back button on smaller screens */
+@media (max-width: 768px) {
+    .back-button {
+        display: flex;
+    }
+}
+
+@media (max-width: 480px) {
+    .back-button {
+        padding: 0.625rem 0.875rem;
+        font-size: 13px;
+    }
+}
 </style>
 @stack('styles')
 </head>
@@ -39,13 +79,27 @@
         </div>
         
         <nav>
-            <a href="{{ route('staff.dashboard') }}"
-                class="{{ request()->routeIs('staff.dashboard') ? 'active' : '' }}">
-                <i class="fas fa-tachometer-alt"></i> Dashboard
+            <!-- Back Button for Small Screens -->
+            <a href="javascript:history.back()" class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Back
             </a>
+            
             <a href="{{ route('staff.beneficiaries.index') }}"
                 class="{{ request()->routeIs('staff.beneficiaries.*') ? 'active' : '' }}">
                 <i class="fas fa-users"></i> Beneficiaries
+            </a>
+            <a href="{{ route('staff.inventory.index') }}"
+                class="{{ request()->routeIs('staff.inventory.*') ? 'active' : '' }}">
+                <i class="fas fa-boxes"></i> Inventory
+            </a>
+            <a href="{{ route('staff.relief.index') }}"
+                class="{{ request()->routeIs('staff.relief.*') ? 'active' : '' }}"
+                style="display: block !important; visibility: visible !important;">
+                <i class="fas fa-hands-helping"></i> Relief Monitor
+            </a>
+            <a href="{{ route('staff.dashboard') }}"
+                class="{{ request()->routeIs('staff.dashboard') ? 'active' : '' }}">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
             </a>
             <a href="{{ route('staff.locations.index') }}"
                 class="{{ request()->routeIs('staff.locations.*') ? 'active' : '' }}">
@@ -58,15 +112,6 @@
             <a href="{{ route('staff.household_requests.index') }}"
                 class="{{ request()->routeIs('staff.household_requests.*') ? 'active' : '' }}">
                 <i class="fas fa-clipboard-list"></i> Household Requests
-            </a>
-            <a href="{{ route('staff.inventory.index') }}"
-                class="{{ request()->routeIs('staff.inventory.*') ? 'active' : '' }}">
-                <i class="fas fa-boxes"></i> Inventory
-            </a>
-            <a href="{{ route('staff.relief.index') }}"
-                class="{{ request()->routeIs('staff.relief.*') ? 'active' : '' }}"
-                style="display: block !important; visibility: visible !important;">
-                <i class="fas fa-hands-helping"></i> Relief Monitor
             </a>
             {{-- Debug: Current route is {{ request()->route()->getName() }} --}}
 {{-- Debug: Relief monitor route match: {{ request()->routeIs('staff.relief.*') ? 'YES' : 'NO' }} --}}
@@ -337,6 +382,16 @@ function markAllNotificationsRead() {
 }
 
 // Initialize notification badge (could be loaded from backend)
+// Back button functionality
+function goBack() {
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        // If no history, go to dashboard
+        window.location.href = '{{ route("staff.dashboard") }}';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Set initial notification count if needed
     const badge = document.getElementById('notificationBadge');
