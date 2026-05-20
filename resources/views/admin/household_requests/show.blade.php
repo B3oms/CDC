@@ -19,7 +19,7 @@
 
 <div class="dash-grid">
     <div class="yearly-col">
-        <div class="section-card" style="position: relative;">
+        <div class="section-card" style="position: relative; padding-top: 40px;">
             <h3>Head of Household</h3>
             <span class="status-badge {{ $request->status }}" style="position: absolute; top: 15px; right: 15px; font-size: 12px; padding: 6px 12px;">
                 {{ ucfirst($request->status) }}
