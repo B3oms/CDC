@@ -382,10 +382,6 @@ document.getElementById('municipality').addEventListener('change', function () {
     vertical-align: middle;
 }
 
-.modern-table tbody tr:hover {
-    background: #f0fdf4;
-}
-
 .modern-table tbody tr:last-child td {
     border-bottom: none;
 }

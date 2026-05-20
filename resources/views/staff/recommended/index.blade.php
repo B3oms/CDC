@@ -178,10 +178,6 @@
     vertical-align: top;
 }
 
-.responsive-table tr:hover td {
-    background: #f9fafb;
-}
-
 /* Cell Content Styling */
 .name-cell strong {
     color: #1f2937;
