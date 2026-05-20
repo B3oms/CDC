@@ -655,7 +655,7 @@ document.addEventListener('click', function(event) {
 
 .dist-table td {
     padding: 0.6rem 0.75rem;
-    border-bottom: 1px solid #f1efe8;
+    border-bottom: 1px solid transparent;
     vertical-align: top;
     color: var(--text);
 }
