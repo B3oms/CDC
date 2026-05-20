@@ -19,11 +19,13 @@
 
 <div class="dash-grid">
     <div class="yearly-col">
-        <div class="section-card" style="position: relative; padding-top: 40px;">
-            <h3>Head of Household</h3>
-            <span class="status-badge {{ $request->status }}" style="position: absolute; top: 15px; right: 15px; font-size: 12px; padding: 6px 12px;">
-                {{ ucfirst($request->status) }}
-            </span>
+        <div class="section-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                <h3 style="margin: 0;">Head of Household</h3>
+                <span class="status-badge {{ $request->status }}" style="font-size: 12px; padding: 6px 12px;">
+                    {{ ucfirst($request->status) }}
+                </span>
+            </div>
             <table class="dist-table">
                 <tr><td class="meta-label">Name</td><td>{{ $request->head_of_household }}</td></tr>
                 <tr><td class="meta-label">Age</td><td>{{ $request->head_age ?? 'Not specified' }} years old</td></tr>
