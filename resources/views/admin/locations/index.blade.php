@@ -376,11 +376,8 @@
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: .4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.375rem;
-    width: 100%;
+    text-align: center;
+    padding: 0.25rem 0;
 }
 
 /* =============================================
