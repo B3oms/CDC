@@ -379,6 +379,7 @@
     display: flex;
     align-items: center;
     gap: 0.375rem;
+    text-align: center;
 }
 
 /* =============================================
