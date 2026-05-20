@@ -8,7 +8,10 @@
         <h1>Household Request #{{ $request->id }}</h1>
         <p class="sub">Review and approve/reject household assistance request</p>
     </div>
-    <div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <span class="status-badge {{ $request->status }}" style="font-size: 11px; padding: 4px 10px;">
+            {{ ucfirst($request->status) }}
+        </span>
         <a href="{{ route('admin.household_requests.index') }}" class="btn-back">← Back</a>
     </div>
 </div>
@@ -33,36 +36,27 @@
             </table>
         </div>
 
-        <div class="section-card">
-            <h3>Request Status</h3>
-            <div style="text-align: center; padding: 20px;">
-                <span class="status-badge {{ $request->status }}" style="font-size: 16px; padding: 8px 16px;">
-                    {{ ucfirst($request->status) }}
-                </span>
+        @if($request->isRejected())
+            <div class="section-card" style="margin-top: 20px;">
+                <h3>Reason for Rejection</h3>
+                <p>{{ $request->rejection_reason }}</p>
             </div>
-            
-            @if($request->isRejected())
-                <div style="margin-top: 15px;">
-                    <strong>Reason for Rejection:</strong>
-                    <p>{{ $request->rejection_reason }}</p>
-                </div>
-            @endif
-            
-            @if($request->isApproved() && $request->approvedBy)
-                <div style="margin-top: 15px;">
-                    <strong>Approved by:</strong>
-                    <p>{{ $request->approvedBy->first_name }} {{ $request->approvedBy->last_name }}</p>
-                    <p>{{ $request->approved_at->format('M d, Y h:i A') }}</p>
-                </div>
-            @endif
-            
-            @if($request->notes)
-                <div style="margin-top: 15px;">
-                    <strong>Staff Notes:</strong>
-                    <p>{{ $request->notes }}</p>
-                </div>
-            @endif
-        </div>
+        @endif
+        
+        @if($request->isApproved() && $request->approvedBy)
+            <div class="section-card" style="margin-top: 20px;">
+                <h3>Approved by</h3>
+                <p>{{ $request->approvedBy->first_name }} {{ $request->approvedBy->last_name }}</p>
+                <p>{{ $request->approved_at->format('M d, Y h:i A') }}</p>
+            </div>
+        @endif
+        
+        @if($request->notes)
+            <div class="section-card" style="margin-top: 20px;">
+                <h3>Staff Notes</h3>
+                <p>{{ $request->notes }}</p>
+            </div>
+        @endif
     </div>
 
     <div class="yearly-col">
