@@ -73,10 +73,8 @@ class DashboardController extends Controller
         */
         $totalBeneficiaries = Beneficiary::count();
 
-        // Count verified beneficiaries from beneficiary_verifications
-        $verifiedBeneficiaries = DB::table('beneficiary_verifications')
-            ->distinct('beneficiary_id')
-            ->count('beneficiary_id');
+        // Count verified beneficiaries
+        $verifiedBeneficiaries = Beneficiary::where('is_verified', true)->count();
 
         $beneficiariesThisYear = Beneficiary::whereYear(
             'created_at',
@@ -251,12 +249,13 @@ class DashboardController extends Controller
             'municipalityCount' => Municipality::count(),
             'regionCount' => Municipality::distinct('province')->count('province'),
             'totalDistributions' => ReliefEvent::count(),
-            'verifiedBeneficiaries' => Beneficiary::where('status', 'verified')->count(),
+            'verifiedBeneficiaries' => Beneficiary::where('is_verified', true)->count(),
             'totalInventoryItems' => Item::count(),
             'lowStockItems' => Inventory::where('quantity', '<=', DB::raw('reorder_level'))->count(),
             'expiringItems' => Item::where('expiration_date', '<=', now()->addDays(30))->count(),
             'activeStaff' => User::whereHas('role', function($q) { $q->where('name', 'Staff'); })->count(),
             'pendingLocations' => \App\Models\Municipality::pending()->count(),
+            'activePartners' => User::whereHas('role', function($q) { $q->where('name', 'Barangay Partner'); })->where('status', 'active')->count(),
             'lastUpdated' => now()->format('M d, Y H:i:s')
         ];
 

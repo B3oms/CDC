@@ -78,76 +78,55 @@
             <i class="fas fa-users"></i> Active Staff
         </div>
     </div>
+    <div class="stat-card">
+        <div class="stat-num" style="color:#1a6b2a;" id="activePartners">{{ \App\Models\User::whereHas('role', function($q) { $q->where('name', 'Barangay Partner'); })->where('status', 'active')->count() }}</div>
+        <div class="stat-label">
+            <i class="fas fa-handshake"></i> Active Barangay Partners
+        </div>
+    </div>
 </div>
 
-<div class="dash-grid">
-    {{-- LEFT: Charts --}}
-    <div class="yearly-col">
-        <div class="chart-card">
-            <div class="chart-title">MONTHLY TREND</div>
-            <canvas id="chart-monthly" height="100" style="height: 100px; width: 100%;"></canvas>
-            <button onclick="exportChartToPDF('chart-monthly', 'monthly-trend')" class="pdf-export-btn">
+{{-- Charts Row: Monthly and Yearly side by side --}}
+<div class="charts-row">
+    <div class="chart-card">
+        <div class="chart-title">MONTHLY TREND</div>
+        <canvas id="chart-monthly" style="width: 100%; max-height: 220px;"></canvas>
+        <button onclick="exportChartToPDF('chart-monthly', 'monthly-trend')" class="pdf-export-btn">
+            <i class="fas fa-file-pdf"></i> Export PDF
+        </button>
+    </div>
+
+    @forelse($yearlyData as $year => $months)
+    <div class="chart-card">
+        <div class="chart-title">YEARLY TREND</div>
+        <canvas id="chart-yearly-trend"
+            data-labels="{{ json_encode($yearlyTrendLabels) }}"
+            data-values="{{ json_encode($yearlyTrendValues) }}"
+            style="width: 100%; max-height: 220px;">
+        </canvas>
+        <div class="chart-actions">
+            <button onclick="exportChartToPDF('chart-yearly-trend', 'yearly-trend')" class="pdf-export-btn">
                 <i class="fas fa-file-pdf"></i> Export PDF
             </button>
         </div>
-
-        {{-- Debug: Show yearly data structure --}}
-{{-- {{ dump($yearlyData) }} --}}
-
-@forelse($yearlyData as $year => $months)
-{{-- Yearly Trend Chart --}}
-        <div class="chart-card">
-            <div class="chart-title">YEARLY TREND</div>
-            <canvas id="chart-yearly-trend"
-                data-labels="{{ json_encode($yearlyTrendLabels) }}"
-                data-values="{{ json_encode($yearlyTrendValues) }}"
-                height="80" style="height: 80px; width: 100%;">
-            </canvas>
-            <div class="chart-actions">
-                <button onclick="exportChartToPDF('chart-yearly-trend', 'yearly-trend')" class="pdf-export-btn">
-                    <i class="fas fa-file-pdf"></i> Export PDF
-                </button>
-                <a href="{{ route('admin.relief.index') }}" class="view-link">View →</a>
-            </div>
-        </div>
-        @empty
-        <div class="chart-card">
-            <div class="chart-title">No relief data yet</div>
-            <p style="font-size:12px;color:#888;margin-top:8px;">
-                Create relief events to see charts.
-            </p>
-        </div>
-        @endforelse
     </div>
+    @empty
+    <div class="chart-card">
+        <div class="chart-title">No relief data yet</div>
+        <p style="font-size:12px;color:#888;margin-top:8px;">
+            Create relief events to see charts.
+        </p>
+    </div>
+    @endforelse
+</div>
 
-    {{-- RIGHT --}}
-    <div class="right-col">
-
-        {{-- Staff --}}
-        <div class="section-card">
-            <h3>Staff</h3>
-            <div class="staff-row">
-                @forelse($staff as $s)
-                <div class="staff-item">
-                    <div class="avatar">
-                        {{ strtoupper(substr($s->first_name,0,1).substr($s->last_name,0,1)) }}
-                    </div>
-                    <div>
-                        <div class="staff-name">{{ $s->first_name }} {{ $s->last_name }}</div>
-                        <div class="staff-role">{{ $s->role->name }}</div>
-                    </div>
-                </div>
-                @empty
-                <p style="font-size:12px;color:#888;">No staff found.</p>
-                @endforelse
-            </div>
-            <a href="{{ route('admin.staff.index') }}" class="see-all">See all →</a>
-        </div>
-
-        {{-- Upcoming & Ongoing Distributions --}}
-        @if($upcomingEvents->count())
-        <div class="section-card">
-            <h3>Upcoming & Ongoing Relief Events</h3>
+{{-- Bottom Section: Events --}}
+<div class="bottom-grid">
+    {{-- Upcoming & Ongoing --}}
+    @if(isset($upcomingEvents) && $upcomingEvents->count())
+    <div class="section-card">
+        <h3>Upcoming & Ongoing Relief Events</h3>
+        <div class="scrollable-table">
             <table class="dist-table">
                 <thead>
                     <tr>
@@ -181,14 +160,15 @@
                     @endforeach
                 </tbody>
             </table>
-            <a href="{{ route('admin.relief.index') }}" class="see-all">See all →</a>
         </div>
-        @endif
+    </div>
+    @endif
 
-        {{-- Completed Distributions --}}
-        @if($completedEvents->count())
-        <div class="section-card">
-            <h3>Completed Relief Events</h3>
+    {{-- Completed Relief Events --}}
+    @if(isset($completedEvents) && $completedEvents->count())
+    <div class="section-card">
+        <h3>Completed Relief Events</h3>
+        <div class="scrollable-table">
             <table class="dist-table">
                 <thead>
                     <tr>
@@ -216,17 +196,17 @@
                     @endforeach
                 </tbody>
             </table>
-            <a href="{{ route('admin.relief.index') }}" class="see-all">See all →</a>
         </div>
-        @endif
-
     </div>
+    @endif
 </div>
 @endsection
 
 @push('styles')
 <style>
-/* Dashboard Specific Responsive Styles */
+/* Dashboard Responsive Styles */
+
+/* Tablet and below - stack everything */
 @media (max-width: 1024px) {
     .dash-header {
         flex-direction: column;
@@ -245,32 +225,29 @@
     }
     
     .stats-row {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.75rem;
+    }
+    
+    .charts-row {
+        grid-template-columns: 1fr;
         gap: 1rem;
     }
     
-    .dash-grid {
+    .bottom-grid {
         grid-template-columns: 1fr;
-        gap: 1.5rem;
+        gap: 1rem;
     }
     
-    .chart-card {
-        margin-bottom: 1rem;
-    }
-    
-    .chart-title {
-        font-size: 0.9rem;
-    }
-    
-    .pdf-export-btn {
-        font-size: 0.8rem;
-        padding: 6px 12px;
+    .section-card {
+        overflow-x: auto;
     }
 }
 
+/* Mobile */
 @media (max-width: 768px) {
     .dash-header {
-        padding: 1rem;
+        padding: 0.75rem;
     }
     
     .dash-header h1 {
@@ -281,92 +258,8 @@
         max-width: 100%;
     }
     
-    .cal-label {
-        font-size: 0.9rem;
-    }
-    
-    .cal-name {
-        font-size: 0.8rem;
-    }
-    
     .stats-row {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 0.75rem;
-    }
-    
-    .stat-card {
-        padding: 1rem;
-    }
-    
-    .stat-num {
-        font-size: 1.5rem;
-    }
-    
-    .stat-label {
-        font-size: 0.8rem;
-    }
-    
-    .stat-label i {
-        font-size: 1rem;
-    }
-    
-    .dash-grid {
-        gap: 1rem;
-    }
-    
-    .chart-card {
-        padding: 1rem;
-    }
-    
-    .chart-title {
-        font-size: 0.8rem;
-    }
-    
-    .pdf-export-btn {
-        font-size: 0.75rem;
-        padding: 8px 12px;
-        width: 100%;
-    }
-    
-    .alert {
-        padding: 0.75rem;
-        font-size: 0.9rem;
-    }
-    
-    .badge-intensity {
-        font-size: 0.7rem;
-        padding: 2px 6px;
-    }
-}
-
-@media (max-width: 480px) {
-    .dash-header {
-        padding: 0.75rem;
-    }
-    
-    .dash-header h1 {
-        font-size: 1.1rem;
-    }
-    
-    .calamity-meter {
-        padding: 0.75rem;
-    }
-    
-    .cal-label {
-        font-size: 0.8rem;
-    }
-    
-    .cal-name {
-        font-size: 0.75rem;
-    }
-    
-    .cal-badge {
-        font-size: 0.7rem;
-        padding: 2px 6px;
-    }
-    
-    .stats-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
         gap: 0.5rem;
     }
     
@@ -375,19 +268,11 @@
     }
     
     .stat-num {
-        font-size: 1.25rem;
+        font-size: 1.3rem;
     }
     
     .stat-label {
         font-size: 0.75rem;
-    }
-    
-    .stat-label i {
-        font-size: 0.9rem;
-    }
-    
-    .dash-grid {
-        gap: 0.75rem;
     }
     
     .chart-card {
@@ -395,27 +280,82 @@
     }
     
     .chart-title {
-        font-size: 0.75rem;
-        margin-bottom: 0.5rem;
+        font-size: 0.8rem;
     }
     
     .pdf-export-btn {
         font-size: 0.7rem;
-        padding: 6px 10px;
+        padding: 5px 10px;
+    }
+    
+    .section-card {
+        padding: 0.75rem;
+    }
+    
+    .scrollable-table {
+        max-height: 250px;
+    }
+    
+    .dist-table th,
+    .dist-table td {
+        padding: 0.5rem;
+        font-size: 0.75rem;
     }
     
     .alert {
-        padding: 0.5rem;
-        font-size: 0.8rem;
+        padding: 0.75rem;
+        font-size: 0.85rem;
     }
     
     .badge-intensity {
-        font-size: 0.6rem;
-        padding: 1px 4px;
+        font-size: 0.65rem;
+        padding: 2px 5px;
     }
 }
 
-/* Landscape Mobile for Dashboard */
+/* Small mobile */
+@media (max-width: 480px) {
+    .dash-header h1 {
+        font-size: 1.1rem;
+    }
+    
+    .stats-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.4rem;
+    }
+    
+    .stat-card {
+        padding: 0.5rem;
+    }
+    
+    .stat-num {
+        font-size: 1.1rem;
+    }
+    
+    .stat-label {
+        font-size: 0.65rem;
+    }
+    
+    .chart-card {
+        padding: 0.5rem;
+    }
+    
+    .chart-title {
+        font-size: 0.7rem;
+    }
+    
+    .section-card h3 {
+        font-size: 0.9rem;
+    }
+    
+    .staff-item {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+}
+
+/* Landscape Mobile */
 @media (max-width: 768px) and (orientation: landscape) {
     .dash-header {
         flex-direction: row;
@@ -433,35 +373,16 @@
     }
     
     .stats-row {
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        grid-template-columns: repeat(4, 1fr);
         gap: 0.5rem;
     }
     
-    .stat-card {
-        padding: 0.5rem;
-    }
-    
     .stat-num {
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
     
     .stat-label {
-        font-size: 0.7rem;
-    }
-}
-
-/* Tablet Portrait for Dashboard */
-@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
-    .stats-row {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    
-    .dash-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .yearly-col {
-        max-width: 100%;
+        font-size: 0.65rem;
     }
 }
 </style>
@@ -643,11 +564,31 @@ function exportChartToPDF(chartId, filename) {
 
 @push('styles')
 <style>
-/* Chart Grid */
-.dash-grid {
+/* Charts Row - Monthly & Yearly side by side */
+.charts-row {
     display: grid;
-    grid-template-columns: 1fr 300px;
+    grid-template-columns: 1fr;
     gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .charts-row {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Bottom Grid - Events */
+.bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .bottom-grid {
+        grid-template-columns: 1fr 1fr;
+    }
 }
 
 /* PDF Export Buttons */
@@ -689,18 +630,18 @@ function exportChartToPDF(chartId, filename) {
     text-decoration: underline;
 }
 
-.yearly-col {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
 .chart-card {
     background: white;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     padding: 1rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    min-width: 0;
+}
+
+.bottom-grid .section-card {
+    min-width: 0;
+    overflow: hidden;
 }
 
 .chart-title {
@@ -723,196 +664,14 @@ function exportChartToPDF(chartId, filename) {
     text-decoration: underline;
 }
 
-.chart-wrapper {
-    background: white;
-    border-radius: 1rem;
-    padding: 1rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e5e7eb;
-    transition: all 0.3s ease;
-    height: 280px;
-    display: flex;
-    flex-direction: column;
-}
-
-.chart-wrapper:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
-}
-
-.chart-header {
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #f3f4f6;
-    flex-shrink: 0;
-}
-
-.chart-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin: 0 0 0.25rem 0;
-    letter-spacing: -0.025em;
-}
-
-.chart-subtitle {
-    font-size: 0.875rem;
-    color: #6b7280;
-    font-weight: 400;
-    margin: 0;
-}
-
-.chart-body {
-    position: relative;
-    flex: 1;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #fafafa;
-    border-radius: 0.5rem;
-    overflow: hidden;
-}
-
-.chart-body canvas {
-    max-width: 100%;
-    max-height: 100%;
-    position: relative;
-    z-index: 2;
-}
-
-.chart-loading {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    color: #9ca3af;
-    z-index: 1;
-}
-
-.chart-loading i {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.charts-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-}
-
-.chart-wrapper.half .chart-body {
-    height: 250px;
-}
-
-.year-chart {
-    margin-bottom: 2rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid #f3f4f6;
-}
-
-.year-chart:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
-}
-
-.year-chart h4 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #374151;
-    margin: 0 0 1rem 0;
-}
-
-.year-chart canvas {
-    height: 120px !important;
-}
-
-.no-data {
-    text-align: center;
-    padding: 3rem 1rem;
-    color: #9ca3af;
-}
-
-.no-data i {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    display: block;
-}
-
-.no-data p {
-    font-size: 1.125rem;
-    font-weight: 500;
-    margin: 0 0 0.5rem 0;
-    color: #6b7280;
-}
-
-.no-data small {
-    font-size: 0.875rem;
-    color: #9ca3af;
-}
-
-.more-data {
-    text-align: center;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #f3f4f6;
-}
-
-.view-more-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background: #f3f4f6;
-    color: #374151;
-    text-decoration: none;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-.view-more-btn:hover {
-    background: #e5e7eb;
-    color: #1f2937;
-    transform: translateY(-1px);
-}
-
-.view-more-btn i {
-    font-size: 1rem;
-}
-
 /* Chart.js Custom Styling */
 canvas {
-    max-height: 100%;
+    max-width: 100% !important;
+    height: auto !important;
 }
 
-/* Responsive Design */
-@media (max-width: 1023px) {
-    .charts-container {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-    }
-    
-    .chart-wrapper {
-        height: 250px;
-    }
-}
-
-@media (max-width: 768px) {
-    .chart-wrapper {
-        height: 220px;
-        padding: 0.75rem;
-    }
+.chart-card canvas {
+    max-height: 200px;
 }
 
 /* Pulse Animation */
@@ -952,6 +711,7 @@ function updateDashboardStats() {
             updateStatWithAnimation('expiringItems', data.expiringItems);
             updateStatWithAnimation('activeStaff', data.activeStaff);
             updateStatWithAnimation('pendingLocations', data.pendingLocations);
+            updateStatWithAnimation('activePartners', data.activePartners);
             
             // Update last updated time
             document.getElementById('lastUpdated').textContent = data.lastUpdated;

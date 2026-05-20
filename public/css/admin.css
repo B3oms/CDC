@@ -615,13 +615,7 @@ nav a.active {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1.5rem;
-}
-
-@media (min-width: 1024px) {
-    .dash-grid {
-        grid-template-columns: 350px 1fr;
-        gap: 2rem;
-    }
+    margin-bottom: 2rem;
 }
 
 /* Chart cards */
@@ -632,19 +626,25 @@ nav a.active {
 }
 
 .chart-card {
-    background: #fff;
-    border: 1px solid #d3d1c7;
-    border-radius: 10px;
-    padding: 12px;
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chart-card:hover {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
 .chart-card .chart-title {
-    font-size: 11px;
+    font-size: 0.85rem;
     font-weight: 600;
     color: #5f5e5a;
-    margin-bottom: 8px;
+    margin-bottom: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    text-align: center;
 }
 
 .chart-card a {
@@ -660,7 +660,25 @@ nav a.active {
 .right-col {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.25rem;
+}
+
+@media (min-width: 768px) {
+    .right-col {
+        gap: 1.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .right-col {
+        gap: 1.75rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    .right-col {
+        gap: 2rem;
+    }
 }
 
 .section-card {
@@ -1113,6 +1131,21 @@ margin-bottom: 1rem;
 }
 
 /* Buttons */
+.pdf-export-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-top: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
 .btn-primary {
     padding: 8px 20px;
     background: #1a6b2a;
@@ -1788,9 +1821,37 @@ margin-bottom: 1rem;
 /* Stats row */
 .stats-row {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+    .stats-row {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1.25rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .stats-row {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    .stats-row {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.75rem;
+    }
+}
+
+@media (min-width: 1400px) {
+    .stats-row {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+    }
 }
 
 .stat-card {
@@ -1965,6 +2026,69 @@ margin-bottom: 1rem;
         display: block;
     }
     
+    /* Dashboard specific mobile styles */
+    .dash-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .dash-header h1 {
+        font-size: 1.25rem;
+        text-align: center;
+    }
+    
+    .calamity-meter {
+        align-self: center;
+        max-width: 280px;
+        padding: 0.75rem;
+    }
+    
+    .stats-row {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+    }
+    
+    .dash-grid {
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .chart-card {
+        padding: 1rem;
+    }
+    
+    .chart-title {
+        font-size: 0.8rem;
+        margin-bottom: 0.4rem;
+    }
+    
+    .right-col {
+        gap: 1rem;
+    }
+    
+    .section-card {
+        padding: 1rem;
+    }
+    
+    .section-card h3 {
+        font-size: 1rem;
+    }
+    
     .top-header {
         padding: 0.75rem 1rem;
     }
@@ -1983,7 +2107,6 @@ margin-bottom: 1rem;
     }
     
     .dash-grid {
-        grid-template-columns: 1fr;
         gap: 1.5rem;
     }
     
@@ -2012,6 +2135,91 @@ margin-bottom: 1rem;
 @media (max-width: 480px) {
     .stats-row {
         grid-template-columns: 1fr;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-card {
+        padding: 0.75rem;
+    }
+    
+    .stat-value {
+        font-size: 1.25rem;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+    }
+    
+    .dash-header {
+        padding: 0.75rem;
+    }
+    
+    .dash-header h1 {
+        font-size: 1.1rem;
+    }
+    
+    .calamity-meter {
+        max-width: 240px;
+        padding: 0.5rem;
+    }
+    
+    .cal-label {
+        font-size: 0.8rem;
+    }
+    
+    .cal-name {
+        font-size: 0.75rem;
+    }
+    
+    .cal-badge {
+        font-size: 0.7rem;
+        padding: 2px 6px;
+    }
+    
+    .dash-grid {
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .chart-card {
+        padding: 0.5rem;
+    }
+    
+    .chart-title {
+        font-size: 0.7rem;
+        margin-bottom: 0.3rem;
+    }
+    
+    .yearly-col {
+        gap: 0.5rem;
+    }
+    
+    .pdf-export-btn {
+        font-size: 0.65rem;
+        padding: 4px 8px;
+    }
+    
+    .chart-card canvas {
+        height: 80px !important;
+    }
+    
+    .right-col {
+        gap: 0.75rem;
+    }
+    
+    .section-card {
+        padding: 0.75rem;
+    }
+    
+    .section-card h3 {
+        font-size: 0.9rem;
+    }
+    
+    .pdf-export-btn {
+        font-size: 0.7rem;
+        padding: 6px 10px;
+        width: 100%;
     }
     
     .search-input {
@@ -2710,6 +2918,70 @@ margin-bottom: 1rem;
     .section-card {
         padding: 2rem;
     }
+    
+    /* Dashboard large desktop styles */
+    .dash-header {
+        padding: 1.5rem 2rem;
+    }
+    
+    .dash-header h1 {
+        font-size: 1.75rem;
+    }
+    
+    .calamity-meter {
+        max-width: 320px;
+        padding: 1rem;
+    }
+    
+    .stats-row {
+        margin-bottom: 2.5rem;
+    }
+    
+    .stat-card {
+        padding: 1.5rem;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+    }
+    
+    .stat-label {
+        font-size: 0.95rem;
+    }
+    
+    .chart-card {
+        padding: 1rem;
+    }
+    
+    .chart-title {
+        font-size: 0.85rem;
+        margin-bottom: 0.6rem;
+    }
+    
+    .yearly-col {
+        gap: 1rem;
+    }
+    
+    .pdf-export-btn {
+        font-size: 0.75rem;
+        padding: 6px 12px;
+    }
+    
+    .chart-card canvas {
+        height: 140px !important;
+    }
+    
+    .right-col {
+        gap: 2rem;
+    }
+    
+    .section-card {
+        padding: 1.75rem;
+    }
+    
+    .section-card h3 {
+        font-size: 1.25rem;
+    }
 }
 
 /* Extra Large Desktop Styles (min 1400px) */
@@ -2741,6 +3013,70 @@ margin-bottom: 1rem;
     .main-content {
         max-width: 1400px;
         margin: 0 auto;
+    }
+    
+    /* Dashboard extra large desktop styles */
+    .dash-header {
+        padding: 2rem 2.5rem;
+    }
+    
+    .dash-header h1 {
+        font-size: 2rem;
+    }
+    
+    .calamity-meter {
+        max-width: 360px;
+        padding: 1.25rem;
+    }
+    
+    .stats-row {
+        margin-bottom: 3rem;
+    }
+    
+    .stat-card {
+        padding: 2rem;
+    }
+    
+    .stat-value {
+        font-size: 2.25rem;
+    }
+    
+    .stat-label {
+        font-size: 1rem;
+    }
+    
+    .chart-card {
+        padding: 1.25rem;
+    }
+    
+    .chart-title {
+        font-size: 0.9rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .yearly-col {
+        gap: 1.25rem;
+    }
+    
+    .pdf-export-btn {
+        font-size: 0.8rem;
+        padding: 8px 16px;
+    }
+    
+    .chart-card canvas {
+        height: 160px !important;
+    }
+    
+    .right-col {
+        gap: 2.5rem;
+    }
+    
+    .section-card {
+        padding: 2rem;
+    }
+    
+    .section-card h3 {
+        font-size: 1.5rem;
     }
 }
 
@@ -3584,4 +3920,482 @@ margin-bottom: 1rem;
     .main-wrapper {
         margin-left: 0 !important;
     }
+}
+
+/* ========================================
+   SCROLLABLE TABLES (Staff Dashboard Style)
+   ======================================== */
+
+.scrollable-table {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 300px;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.scrollable-table::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.scrollable-table::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.scrollable-table::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.scrollable-table::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Distribution Table Styles */
+.dist-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    min-width: 500px;
+}
+
+.dist-table th,
+.dist-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e5e5;
+    white-space: nowrap;
+}
+
+.dist-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #2c2c2a;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-bottom: 2px solid #d3d1c7;
+}
+
+.dist-table tr:hover {
+    background: #f8f9fa;
+}
+
+.dist-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Relief Status Badges */
+.relief-status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.relief-status-badge.upcoming {
+    background: #e3f2fd;
+    color: #1976d2;
+    border: 1px solid #bbdefb;
+}
+
+.relief-status-badge.ongoing {
+    background: #fff3e0;
+    color: #f57c00;
+    border: 1px solid #ffcc02;
+}
+
+.relief-status-badge.done {
+    background: #e8f5e8;
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
+
+.relief-status-badge.cancelled {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #ef9a9a;
+}
+
+/* Responsive Scrollable Tables */
+@media (max-width: 1024px) {
+    .scrollable-table {
+        max-height: 250px;
+        border-radius: 6px;
+    }
+    
+    .dist-table {
+        font-size: 0.8rem;
+        min-width: 450px;
+    }
+    
+    .dist-table th,
+    .dist-table td {
+        padding: 0.6rem 0.5rem;
+    }
+    
+    .dist-table th {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .scrollable-table {
+        max-height: 200px;
+        margin: 0 -1rem;
+        padding: 0 1rem;
+        border-radius: 4px;
+    }
+    
+    .dist-table {
+        font-size: 0.75rem;
+        min-width: 400px;
+    }
+    
+    .dist-table th,
+    .dist-table td {
+        padding: 0.5rem 0.4rem;
+        font-size: 0.7rem;
+    }
+    
+    .dist-table th {
+        font-size: 0.65rem;
+        padding: 0.5rem 0.4rem;
+    }
+    
+    .relief-status-badge {
+        padding: 3px 6px;
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .scrollable-table {
+        max-height: 180px;
+        margin: 0 -0.75rem;
+        padding: 0 0.75rem;
+    }
+    
+    .dist-table {
+        font-size: 0.7rem;
+        min-width: 320px;
+    }
+    
+    .dist-table th,
+    .dist-table td {
+        padding: 0.4rem 0.3rem;
+        font-size: 0.65rem;
+    }
+    
+    .dist-table th {
+        font-size: 0.6rem;
+        padding: 0.4rem 0.3rem;
+    }
+    
+    .relief-status-badge {
+        padding: 2px 4px;
+        font-size: 0.6rem;
+    }
+}
+
+/* Landscape Mobile Scrollable Tables */
+@media (max-width: 768px) and (orientation: landscape) {
+    .scrollable-table {
+        max-height: 150px;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .dist-table {
+        min-width: 350px;
+    }
+    
+    .dist-table th {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+    }
+}
+
+/* High DPI Scrollable Tables */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .dist-table th,
+    .dist-table td {
+        border-width: 0.5px;
+    }
+    
+    .scrollable-table {
+        border-width: 0.5px;
+    }
+    
+    .relief-status-badge {
+        border-width: 0.5px;
+    }
+}
+
+/* Print Scrollable Tables */
+@media print {
+    .scrollable-table {
+        overflow: visible;
+        max-height: none;
+        border: 1px solid #000;
+        border-radius: 0;
+    }
+    
+    .dist-table {
+        font-size: 8pt;
+        min-width: auto;
+    }
+    
+    .dist-table th,
+    .dist-table td {
+        padding: 4pt;
+        border: 0.5px solid #000;
+    }
+    
+    .dist-table th {
+        background: #f0f0f0;
+        position: static;
+    }
+    
+    .relief-status-badge {
+        background: #f0f0f0 !important;
+        color: #000 !important;
+        border: 0.5px solid #000 !important;
+    }
+}
+
+/* ========================================
+   ENHANCED RESPONSIVE SCROLLABLE TABLES
+   ======================================== */
+
+/* Tablet Portrait Enhancements */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+    .scrollable-table {
+        max-height: 280px;
+    }
+    
+    .dist-table {
+        min-width: 420px;
+    }
+    
+    .section-card {
+        padding: 1rem;
+    }
+    
+    .section-card h3 {
+        font-size: 1rem;
+    }
+}
+
+/* Large Desktop Enhancements */
+@media (min-width: 1200px) {
+    .scrollable-table {
+        max-height: 350px;
+        border-radius: 10px;
+    }
+    
+    .dist-table {
+        font-size: 0.9rem;
+        min-width: 550px;
+    }
+    
+    .dist-table th,
+    .dist-table td {
+        padding: 0.8rem 1rem;
+    }
+    
+    .dist-table th {
+        font-size: 0.85rem;
+    }
+    
+    .relief-status-badge {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Extra Large Desktop Enhancements */
+@media (min-width: 1400px) {
+    .scrollable-table {
+        max-height: 400px;
+    }
+    
+    .dist-table {
+        font-size: 0.95rem;
+        min-width: 600px;
+    }
+    
+    .dist-table th,
+    .dist-table td {
+        padding: 1rem 1.2rem;
+    }
+    
+    .dist-table th {
+        font-size: 0.9rem;
+    }
+    
+    .relief-status-badge {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .scrollable-table {
+        scrollbar-width: thin;
+    }
+    
+    .dist-table tr:hover {
+        background: transparent;
+    }
+    
+    .dist-table tr:active {
+        background: #f0f0f0;
+    }
+    
+    .dist-table th,
+    .dist-table td {
+        padding: 1rem;
+    }
+    
+    .relief-status-badge {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Dark Mode Support for Scrollable Tables */
+@media (prefers-color-scheme: dark) {
+    .scrollable-table {
+        background: #2d2d2d;
+        border-color: #444;
+    }
+    
+    .scrollable-table::-webkit-scrollbar-track {
+        background: #3d3d3d;
+    }
+    
+    .scrollable-table::-webkit-scrollbar-thumb {
+        background: #666;
+    }
+    
+    .scrollable-table::-webkit-scrollbar-thumb:hover {
+        background: #888;
+    }
+    
+    .dist-table th {
+        background: #3d3d3d;
+        color: #fff;
+        border-bottom-color: #555;
+    }
+    
+    .dist-table td {
+        border-bottom-color: #444;
+    }
+    
+    .dist-table tr:hover {
+        background: #3d3d3d;
+    }
+    
+    .relief-status-badge.upcoming {
+        background: #1e3a5f;
+        color: #64b5f6;
+        border-color: #2c5282;
+    }
+    
+    .relief-status-badge.ongoing {
+        background: #5d4037;
+        color: #ffb74d;
+        border-color: #795548;
+    }
+    
+    .relief-status-badge.done {
+        background: #2e4a2e;
+        color: #81c784;
+        border-color: #388e3c;
+    }
+    
+    .relief-status-badge.cancelled {
+        background: #5d2d2d;
+        color: #e57373;
+        border-color: #c62828;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    .scrollable-table::-webkit-scrollbar {
+        animation: none;
+    }
+    
+    .dist-table tr {
+        transition: none;
+    }
+    
+    .relief-status-badge {
+        transition: none;
+    }
+}
+
+/* High Contrast Support */
+@media (prefers-contrast: high) {
+    .scrollable-table {
+        border: 2px solid #000;
+    }
+    
+    .dist-table th {
+        border-bottom: 2px solid #000;
+    }
+    
+    .dist-table td {
+        border-bottom: 1px solid #000;
+    }
+    
+    .relief-status-badge {
+        border: 2px solid #000;
+        font-weight: 700;
+    }
+}
+
+/* Focus Management for Accessibility */
+.scrollable-table:focus-within {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+.dist-table a:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 1px;
+    border-radius: 2px;
+}
+
+/* Loading States for Scrollable Tables */
+.scrollable-table.loading::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 100;
+}
+
+.scrollable-table.loading::after {
+    content: 'Loading...';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.9rem;
+    color: #666;
+    z-index: 101;
 }
