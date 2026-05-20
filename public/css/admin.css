@@ -3596,7 +3596,9 @@ margin-bottom: 1rem;
     }
     
     .user-details {
-        margin-left: 12px;
+        margin-left: 0;
+        text-align: center;
+        width: 100%;
     }
     
     .user-name {
@@ -3611,6 +3613,7 @@ margin-bottom: 1rem;
         padding: 12px 16px;
         font-size: 0.9rem;
         margin-top: 12px;
+        text-align: center;
     }
     
     .sidebar-toggle {
@@ -3672,7 +3675,9 @@ margin-bottom: 1rem;
     }
     
     .user-details {
-        margin-left: 10px;
+        margin-left: 0;
+        text-align: center;
+        width: 100%;
     }
     
     .user-name {
@@ -3687,6 +3692,7 @@ margin-bottom: 1rem;
         padding: 14px 16px;
         font-size: 0.85rem;
         margin-top: 8px;
+        text-align: center;
     }
 }
 
