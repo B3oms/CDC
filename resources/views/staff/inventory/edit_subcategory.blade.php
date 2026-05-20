@@ -63,7 +63,7 @@
     padding: 2rem;
     border: 1px solid #e5e7eb;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    max-width: 600px;
+    width: 100%;
     margin: 0 auto;
 }
 

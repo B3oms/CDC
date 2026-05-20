@@ -5,7 +5,7 @@
 @section('content')
 
 <style>
-.cr-wrap{max-width:860px;margin:0 auto;padding:0 0 3rem;font-family:'Segoe UI', sans-serif}
+.cr-wrap{width:100%;margin:0 auto;padding:0 0 3rem;font-family:'Segoe UI', sans-serif}
 .cr-wrap *,.cr-wrap *::before,.cr-wrap *::after{box-sizing:border-box}
 
 

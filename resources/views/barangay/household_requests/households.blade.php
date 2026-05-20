@@ -106,7 +106,7 @@
 <style>
 /* Page Container and Layout */
 .page-container {
-    max-width: 100%;
+    width: 100%;
     margin: 0 auto;
     padding: 0 1rem;
     min-height: 100vh;
