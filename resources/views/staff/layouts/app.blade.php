@@ -94,6 +94,10 @@
                 <i class="fas fa-arrow-left"></i> Back
             </a>
             
+            <a href="{{ route('staff.dashboard') }}"
+                class="{{ request()->routeIs('staff.dashboard') ? 'active' : '' }}">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
             <a href="{{ route('staff.beneficiaries.index') }}"
                 class="{{ request()->routeIs('staff.beneficiaries.*') ? 'active' : '' }}">
                 <i class="fas fa-users"></i> Beneficiaries
@@ -106,10 +110,6 @@
                 class="{{ request()->routeIs('staff.relief.*') ? 'active' : '' }}"
                 style="display: block !important; visibility: visible !important;">
                 <i class="fas fa-hands-helping"></i> Relief Monitor
-            </a>
-            <a href="{{ route('staff.dashboard') }}"
-                class="{{ request()->routeIs('staff.dashboard') ? 'active' : '' }}">
-                <i class="fas fa-tachometer-alt"></i> Dashboard
             </a>
             <a href="{{ route('staff.locations.index') }}"
                 class="{{ request()->routeIs('staff.locations.*') ? 'active' : '' }}">
