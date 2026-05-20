@@ -91,6 +91,10 @@
                     class="{{ request()->routeIs('admin.staff.*') ? 'active' : '' }}">
                     <i class="fas fa-user-tie"></i> Staff
                 </a>
+                <a href="{{ route('admin.calamity.index') }}"
+                    class="{{ request()->routeIs('admin.calamity.*') ? 'active' : '' }}">
+                    <i class="fas fa-cloud-sun-rain"></i> Calamities
+                </a>
 
                 <a href="{{ route('admin.relief.index') }}"
                     class="{{ request()->routeIs('admin.relief.*') ? 'active' : '' }}">
