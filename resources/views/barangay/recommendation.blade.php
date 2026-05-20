@@ -58,7 +58,7 @@
                 </div>
                 <div class="form-group" style="margin-bottom:10px;">
                     <label>Age</label>
-                    <input type="number" name="age" value="{{ old('age') }}" min="0" max="120" required>
+                    <input type="number" name="age" value="{{ old('age') }}" min="16" max="110" required>
                 </div>
                 <div class="form-group" style="margin-bottom:10px;">
                     <label>Contact Number</label>
