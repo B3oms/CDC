@@ -186,45 +186,38 @@
         gap: 1rem !important;
     }
     
+    .section-card {
+        max-height: 400px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
     .dist-table {
         font-size: 0.75rem;
+        width: 100%;
     }
     
     .dist-table th,
     .dist-table td {
         padding: 0.5rem 0.25rem;
     }
-    
-    .dist-table th:nth-child(3),
-    .dist-table th:nth-child(4),
-    .dist-table td:nth-child(3),
-    .dist-table td:nth-child(4) {
-        display: none;
-    }
-    
-    /* For beneficiaries table on mobile */
-    .dist-table th:nth-child(5),
-    .dist-table td:nth-child(5) {
-        display: none;
-    }
 }
 
 @media (max-width: 480px) {
+    .section-card {
+        max-height: 300px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
     .dist-table {
         font-size: 0.7rem;
+        width: 100%;
     }
     
     .dist-table th,
     .dist-table td {
         padding: 0.4rem 0.2rem;
-    }
-    
-    .dist-table th:nth-child(2),
-    .dist-table td:nth-child(2) {
-        max-width: 120px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
     }
     
     select {
