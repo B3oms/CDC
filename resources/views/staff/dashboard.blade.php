@@ -57,18 +57,18 @@
                 <button onclick="toggleChartPdfDropdown(event, 'monthly')" class="pdf-export-btn">
                     <i class="fas fa-file-pdf"></i> Export PDF
                 </button>
-                <div id="pdfOptions-monthly" class="pdf-options" style="display:none;position:absolute;top:100%;right:0;background:white;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:12px;min-width:200px;z-index:1001;">
+                <div id="pdfOptions-monthly" class="pdf-options" style="display:none;position:absolute;top:100%;right:0;background:white;border:1px solid #000000;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:12px;min-width:200px;z-index:1001;">
                     <div style="margin-bottom:12px;">
-                        <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Paper Size</label>
-                        <select id="paperSize-monthly" style="width:100%;padding:6px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;color:#374151;">
+                        <label style="display:block;font-size:12px;font-weight:600;color:#000000;margin-bottom:6px;">Paper Size</label>
+                        <select id="paperSize-monthly" style="width:100%;padding:6px 8px;border:1px solid #000000;border-radius:4px;font-size:13px;color:#000000;">
                             <option value="A4">A4</option>
                             <option value="Letter">Letter</option>
                             <option value="Legal">Legal</option>
                         </select>
                     </div>
                     <div style="margin-bottom:12px;">
-                        <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Orientation</label>
-                        <select id="orientation-monthly" style="width:100%;padding:6px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;color:#374151;">
+                        <label style="display:block;font-size:12px;font-weight:600;color:#000000;margin-bottom:6px;">Orientation</label>
+                        <select id="orientation-monthly" style="width:100%;padding:6px 8px;border:1px solid #000000;border-radius:4px;font-size:13px;color:#000000;">
                             <option value="portrait" selected>Portrait</option>
                             <option value="landscape">Landscape</option>
                         </select>
@@ -96,18 +96,18 @@
                 <button onclick="toggleChartPdfDropdown(event, 'yearly')" class="pdf-export-btn">
                     <i class="fas fa-file-pdf"></i> Export PDF
                 </button>
-                <div id="pdfOptions-yearly" class="pdf-options" style="display:none;position:absolute;top:100%;right:0;background:white;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:12px;min-width:200px;z-index:1001;">
+                <div id="pdfOptions-yearly" class="pdf-options" style="display:none;position:absolute;top:100%;right:0;background:white;border:1px solid #000000;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:12px;min-width:200px;z-index:1001;">
                     <div style="margin-bottom:12px;">
-                        <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Paper Size</label>
-                        <select id="paperSize-yearly" style="width:100%;padding:6px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;color:#374151;">
+                        <label style="display:block;font-size:12px;font-weight:600;color:#000000;margin-bottom:6px;">Paper Size</label>
+                        <select id="paperSize-yearly" style="width:100%;padding:6px 8px;border:1px solid #000000;border-radius:4px;font-size:13px;color:#000000;">
                             <option value="A4">A4</option>
                             <option value="Letter">Letter</option>
                             <option value="Legal">Legal</option>
                         </select>
                     </div>
                     <div style="margin-bottom:12px;">
-                        <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Orientation</label>
-                        <select id="orientation-yearly" style="width:100%;padding:6px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;color:#374151;">
+                        <label style="display:block;font-size:12px;font-weight:600;color:#000000;margin-bottom:6px;">Orientation</label>
+                        <select id="orientation-yearly" style="width:100%;padding:6px 8px;border:1px solid #000000;border-radius:4px;font-size:13px;color:#000000;">
                             <option value="portrait" selected>Portrait</option>
                             <option value="landscape">Landscape</option>
                         </select>
@@ -373,11 +373,11 @@ document.addEventListener('click', function(event) {
 :root {
     --primary:       #1a3d1f;
     --primary-light: #2d6a35;
-    --bg:            #f2f0eb;
+    --bg:            #ffffff;
     --white:         #ffffff;
-    --border:        #d3d1c7;
+    --border:        #000000;
     --text:          #2c2c2a;
-    --muted:         #888780;
+    --muted:         #2c2c2a;
     --blue:          #185fa5;
     --green:         #3b6d11;
     --amber:         #ef9f27;
@@ -626,7 +626,7 @@ document.addEventListener('click', function(event) {
     overflow-y: auto;
     max-height: 280px;
     border-radius: var(--radius-sm);
-    border: 1px solid #e9ecef;
+    border: 1px solid #000000;
     -webkit-overflow-scrolling: touch;
 }
 
