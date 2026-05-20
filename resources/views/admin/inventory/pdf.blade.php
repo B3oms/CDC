@@ -8,21 +8,24 @@
             font-size: 12px;
             margin: 20px;
             color: #333;
+            line-height: 1.4;
         }
         .header {
             text-align: center;
             margin-bottom: 30px;
-            border-bottom: 2px solid #333;
+            border-bottom: 2px solid #1a3d1f;
             padding-bottom: 20px;
         }
         .header h1 {
             font-size: 20px;
             margin: 0;
-            color: #2c3e50;
+            color: #1a3d1f;
+            font-weight: 700;
         }
         .header p {
             margin: 5px 0;
             color: #666;
+            font-size: 11px;
         }
         .category-section {
             margin-bottom: 30px;
@@ -31,7 +34,7 @@
         .category-title {
             font-size: 16px;
             font-weight: bold;
-            color: #2c3e50;
+            color: #1a3d1f;
             margin-bottom: 15px;
             border-bottom: 1px solid #ddd;
             padding-bottom: 5px;
@@ -50,29 +53,48 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 15px;
+            background: white;
         }
         .items-table th,
         .items-table td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
+            vertical-align: top;
         }
         .items-table th {
-            background-color: #f8f9fa;
+            background-color: #1a3d1f;
+            color: white;
             font-weight: bold;
+            font-size: 11px;
+            text-transform: uppercase;
         }
         .items-table tr:nth-child(even) {
             background-color: #f8f9fa;
         }
         .status-low {
-            color: #dc3545;
+            background-color: #fee2e2;
+            color: #dc2626;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
             font-weight: bold;
         }
         .status-normal {
-            color: #28a745;
+            background-color: #d1fae5;
+            color: #059669;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
         }
         .status-expired {
-            color: #6c757d;
+            background-color: #f3f4f6;
+            color: #6b7280;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
             font-style: italic;
         }
         .summary-section {
@@ -80,6 +102,7 @@
             padding: 15px;
             background-color: #f8f9fa;
             border-radius: 8px;
+            border-left: 4px solid #1a3d1f;
         }
         .summary-grid {
             display: grid;
@@ -96,7 +119,7 @@
         .summary-number {
             font-size: 18px;
             font-weight: bold;
-            color: #2c3e50;
+            color: #1a3d1f;
         }
         .summary-label {
             font-size: 11px;
@@ -108,6 +131,15 @@
             text-align: center;
             color: #666;
             font-size: 10px;
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+        .no-data {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            padding: 20px;
+            background-color: #f8f9fa;
         }
     </style>
 </head>

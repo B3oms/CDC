@@ -131,9 +131,18 @@
 
 /* Mobile responsive styles for relief monitor */
 @media (max-width: 768px) {
+    .relief-section {
+        margin-bottom: 2rem;
+    }
+    
     .relief-grid {
         grid-template-columns: 1fr;
-        gap: 1rem;
+        gap: 1.5rem;
+    }
+    
+    .relief-card-wrapper {
+        position: relative;
+        width: 100%;
     }
     
     .relief-card {
@@ -142,11 +151,16 @@
         border-radius: 10px;
         padding: 1rem;
         transition: border-color 0.2s, transform 0.15s;
+        display: block;
+        width: 100%;
+        position: relative;
+        z-index: 1;
     }
     
     .relief-card:hover {
         border-color: #1a3d1f;
         transform: translateY(-2px);
+        z-index: 2;
     }
     
     .relief-card-header {
@@ -155,6 +169,7 @@
         align-items: flex-start;
         gap: 8px;
         margin-bottom: 0.75rem;
+        padding-right: 40px;
     }
     
     .relief-card-name {
@@ -198,6 +213,14 @@
 }
 
 @media (max-width: 480px) {
+    .relief-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    .relief-grid {
+        gap: 1rem;
+    }
+    
     .relief-card {
         padding: 0.75rem;
     }

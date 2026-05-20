@@ -9,17 +9,19 @@
             font-size: 12px;
             margin: 20px;
             color: #333;
+            line-height: 1.4;
         }
         .header {
             text-align: center;
-            border-bottom: 2px solid #185fa5;
+            border-bottom: 2px solid #1a3d1f;
             padding-bottom: 20px;
             margin-bottom: 30px;
         }
         .header h1 {
-            color: #185fa5;
+            color: #1a3d1f;
             margin: 0;
-            font-size: 24px;
+            font-size: 20px;
+            font-weight: 700;
         }
         .header .subtitle {
             color: #666;
@@ -32,23 +34,25 @@
         .info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 15px;
             margin-bottom: 20px;
         }
         .info-item {
-            padding: 10px;
+            padding: 12px;
             background: #f8f9fa;
-            border-left: 4px solid #185fa5;
+            border-left: 4px solid #1a3d1f;
+            border-radius: 4px;
         }
         .info-item strong {
-            color: #185fa5;
+            color: #1a3d1f;
             display: block;
             margin-bottom: 5px;
+            font-weight: 600;
         }
         .section-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
-            color: #185fa5;
+            color: #1a3d1f;
             margin-bottom: 15px;
             border-bottom: 1px solid #ddd;
             padding-bottom: 5px;
@@ -57,14 +61,16 @@
             margin-bottom: 30px;
         }
         .barangay-item {
-            padding: 8px;
-            margin-bottom: 5px;
+            padding: 10px;
+            margin-bottom: 8px;
             background: #f8f9fa;
             border-radius: 4px;
+            border-left: 3px solid #1a3d1f;
         }
         .barangay-name {
             font-weight: bold;
-            color: #333;
+            color: #1a3d1f;
+            font-size: 13px;
         }
         .venue-info {
             font-size: 11px;
@@ -75,16 +81,23 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
+            background: white;
         }
         th, td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
+            vertical-align: top;
         }
         th {
-            background-color: #185fa5;
+            background-color: #1a3d1f;
             color: white;
             font-weight: bold;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
         }
         .top-rank {
             background-color: #fff3cd;
@@ -96,12 +109,12 @@
             font-weight: bold;
         }
         .status-open {
-            background-color: #d4edda;
-            color: #155724;
+            background-color: #d1fae5;
+            color: #059669;
         }
         .status-closed {
-            background-color: #f8d7da;
-            color: #721c24;
+            background-color: #fee2e2;
+            color: #dc2626;
         }
         .footer {
             margin-top: 40px;
@@ -109,13 +122,14 @@
             border-top: 1px solid #ddd;
             text-align: center;
             color: #666;
-            font-size: 11px;
+            font-size: 10px;
         }
         .no-data {
             text-align: center;
             color: #888;
             font-style: italic;
             padding: 20px;
+            background-color: #f8f9fa;
         }
     </style>
 </head>

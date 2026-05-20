@@ -10,6 +10,7 @@ use App\Models\Inventory;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use PDF;
 
 class InventoryController extends Controller
 {
@@ -258,5 +259,73 @@ class InventoryController extends Controller
 
         return redirect()->route('admin.inventory.subcategory', $subcategoryId)
             ->with('success', 'Item deleted.');
+    }
+
+    // PDF Generation - Inventory by Category
+    public function pdf()
+    {
+        try {
+            // Get all categories with their subcategories and items
+            $categories = Category::with(['subcategories.items.inventory'])
+                ->orderBy('name')
+                ->get();
+
+            // Calculate summary statistics
+            $totalCategories = $categories->count();
+            $totalSubcategories = $categories->sum(function($category) {
+                return $category->subcategories->count();
+            });
+            $totalItems = 0;
+            $totalQuantity = 0;
+            $lowStockItems = 0;
+            $expiringItems = 0;
+
+            foreach ($categories as $category) {
+                foreach ($category->subcategories as $subcategory) {
+                    $totalItems += $subcategory->items->count();
+                    foreach ($subcategory->items as $item) {
+                        if ($item->inventory) {
+                            $totalQuantity += $item->inventory->quantity;
+                            
+                            // Check low stock (10 or less)
+                            if ($item->inventory->quantity <= 10) {
+                                $lowStockItems++;
+                            }
+                            
+                            // Check expiring items (within 30 days)
+                            if ($item->inventory->expiration_date) {
+                                $expirationDate = \Carbon\Carbon::parse($item->inventory->expiration_date);
+                                if ($expirationDate->isPast()) {
+                                    $expiringItems++;
+                                } elseif ($expirationDate->diffInDays(now()) <= 30) {
+                                    $expiringItems++;
+                                }
+                            }
+                        } else {
+                            $lowStockItems++; // No stock counts as low stock
+                        }
+                    }
+                }
+            }
+
+            $pdfData = [
+                'categories' => $categories,
+                'totalCategories' => $totalCategories,
+                'totalSubcategories' => $totalSubcategories,
+                'totalItems' => $totalItems,
+                'totalQuantity' => $totalQuantity,
+                'lowStockItems' => $lowStockItems,
+                'expiringItems' => $expiringItems,
+                'generated_date' => now()->format('F d, Y - h:i A')
+            ];
+
+            $pdf = PDF::loadView('admin.inventory.pdf', $pdfData);
+            $pdf->setPaper('A4', 'landscape');
+            return $pdf->download('inventory-by-category-' . now()->format('Y-m-d') . '.pdf');
+            
+        } catch (\Exception $e) {
+            return redirect()->route('admin.inventory.index')
+                ->with('error', 'Failed to generate PDF: ' . $e->getMessage());
+        }
     }
 }

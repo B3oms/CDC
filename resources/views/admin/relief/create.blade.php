@@ -8,7 +8,6 @@
 .cr-wrap{max-width:860px;margin:0 auto;padding:0 0 3rem;font-family:'Segoe UI', sans-serif}
 .cr-wrap *,.cr-wrap *::before,.cr-wrap *::after{box-sizing:border-box}
 
-
 /* Form Styles */
 .cr-error{display:flex;gap:12px;align-items:flex-start;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:1rem 1.25rem;margin-bottom:1.5rem;color:#991b1b;font-size:14px}
 .cr-error ul{margin:4px 0 0;padding-left:1.25rem}
@@ -105,13 +104,51 @@
 .cr-header-left{flex:1}
 .cr-header-right{display:flex;align-items:center;gap:1rem}
 
+/* ── Mobile ─────────────────────────────────────── */
 @media(max-width:640px){
+  /* Stack multi-col rows */
   .cr-row-3,.cr-row-half{grid-template-columns:1fr}
+
+  /* Stack header */
   .cr-top-header{flex-direction:column;align-items:flex-start;gap:12px}
   .cr-header-right{width:100%;justify-content:space-between}
+
+  /* Municipality grid: 2 columns */
   .cr-muni-grid{grid-template-columns:repeat(2,1fr)}
-  .cr-inv-row{grid-template-columns:1fr auto}
-  .cr-inv-res{display:none}
+
+  /* Inventory row: stack item info above qty + calc */
+  .cr-inv-row{
+    grid-template-columns:1fr;
+    gap:8px;
+    padding:12px 14px;
+  }
+
+  /* Always show qty input and calculation — never hide */
+  .cr-inv-res{
+    display:flex !important;
+    flex-direction:row;
+    align-items:center;
+    justify-content:flex-start;
+    gap:8px;
+    flex-wrap:wrap;
+    text-align:left;
+  }
+
+  /* Bigger tap target for qty field */
+  .cr-qty-input{
+    width:80px;
+    padding:8px;
+    font-size:13px;
+  }
+
+  /* Calc text wraps onto its own line */
+  .cr-calc-display{
+    font-size:11px;
+    margin-left:0;
+    flex-basis:100%;
+    white-space:normal;
+    line-height:1.4;
+  }
 }
 </style>
 
@@ -175,8 +212,7 @@
     {{-- Facilitators --}}
     <div class="cr-card">
       <div class="cr-sec-label">Facilitators</div>
-      
-      
+
       {{-- Staff --}}
       <div class="cr-acc-group">
         <button type="button" class="cr-acc-toggle" onclick="crToggleAcc('cr-staff')">
@@ -186,17 +222,12 @@
         </button>
         <div class="cr-acc-body open" id="cr-staff">
           <div class="cr-chip-grid">
-            @php 
-            // Make role filtering more flexible - try different possible role names
+            @php
             $staffUsers = $facilitators->filter(function($user) {
                 $roleName = strtolower($user->role->name ?? '');
                 return $roleName === 'staff' || $roleName === 'staff member' || strpos($roleName, 'staff') !== false;
-            }); 
-            // Debug: Check staff count
-            $staffCount = $staffUsers->count();
+            });
             @endphp
-            
-                        
             @forelse($staffUsers as $f)
               <div class="cr-chip {{ in_array($f->id, old('facilitators_staff',[])) ? 'cr-chip-on' : '' }}"
                 onclick="crToggleChip(this,'f-staff-{{ $f->id }}')">
@@ -224,30 +255,25 @@
         </button>
         <div class="cr-acc-body" id="cr-vol">
           <div class="cr-chip-grid">
-            @php 
-            // Make role filtering more flexible - try different possible role names
+            @php
             $volunteerUsers = $facilitators->filter(function($user) {
                 $roleName = strtolower($user->role->name ?? '');
                 return $roleName === 'volunteer' || $roleName === 'volunteers' || strpos($roleName, 'volunteer') !== false;
-            }); 
-            // Debug: Check volunteer count
-            $volunteerCount = $volunteerUsers->count();
+            });
             @endphp
-            
-                        
             @forelse($volunteerUsers as $f)
               <div class="cr-chip {{ in_array($f->id, old('facilitators_volunteers',[])) ? 'cr-chip-on' : '' }}"
                 onclick="crToggleChip(this,'f-vol-{{ $f->id }}')">
-              <input type="checkbox" name="facilitators_volunteers[]" value="{{ $f->id }}"
-                id="f-vol-{{ $f->id }}" {{ in_array($f->id, old('facilitators_volunteers',[])) ? 'checked' : '' }}>
-              <div class="cr-av">{{ strtoupper(substr($f->first_name,0,1).substr($f->last_name,0,1)) }}</div>
-              <div>
-                <div class="cr-chip-name">{{ $f->first_name }} {{ $f->last_name }}</div>
-                <div class="cr-chip-sub">Volunteer</div>
+                <input type="checkbox" name="facilitators_volunteers[]" value="{{ $f->id }}"
+                  id="f-vol-{{ $f->id }}" {{ in_array($f->id, old('facilitators_volunteers',[])) ? 'checked' : '' }}>
+                <div class="cr-av">{{ strtoupper(substr($f->first_name,0,1).substr($f->last_name,0,1)) }}</div>
+                <div>
+                  <div class="cr-chip-name">{{ $f->first_name }} {{ $f->last_name }}</div>
+                  <div class="cr-chip-sub">Volunteer</div>
+                </div>
               </div>
-            </div>
             @empty
-            <p class="cr-empty">No volunteers assigned yet.</p>
+              <p class="cr-empty">No volunteers assigned yet.</p>
             @endforelse
           </div>
         </div>
@@ -262,18 +288,12 @@
         </button>
         <div class="cr-acc-body" id="cr-bgy-fac">
           <div class="cr-chip-grid">
-            @php 
-            // Make role filtering more flexible - try different possible role names
+            @php
             $barangayUsers = $facilitators->filter(function($user) {
                 $roleName = strtolower($user->role->name ?? '');
                 return $roleName === 'barangay partner' || $roleName === 'barangay' || strpos($roleName, 'barangay') !== false;
-            }); 
-            // Debug: Check what roles are available
-            $availableRoles = $facilitators->pluck('role.name')->unique()->implode(', ');
-            $barangayCount = $barangayUsers->count();
+            });
             @endphp
-            
-                        
             @forelse($barangayUsers as $f)
               <div class="cr-chip {{ in_array($f->id, old('facilitators_barangay',[])) ? 'cr-chip-on' : '' }}"
                 onclick="crToggleChip(this,'f-bar-{{ $f->id }}')">
@@ -282,7 +302,6 @@
                 <div class="cr-av">{{ strtoupper(substr($f->first_name,0,1).substr($f->last_name,0,1)) }}</div>
                 <div>
                   <div class="cr-chip-name">{{ $f->first_name }} {{ $f->last_name }}</div>
-                  {{-- barangay may be a relation object or a plain string --}}
                   <div class="cr-chip-sub">
                     @if(is_object($f->barangay))
                       {{ $f->barangay->name ?? 'Barangay Partner' }}
@@ -293,7 +312,7 @@
                 </div>
               </div>
             @empty
-            <p class="cr-empty">No barangay partners assigned yet.</p>
+              <p class="cr-empty">No barangay partners assigned yet.</p>
             @endforelse
           </div>
         </div>
@@ -358,9 +377,9 @@
                   </div>
                 </label>
                 <div class="cr-inv-res" id="cr-res-{{ $item->id }}">
-                  <input type="number" name="item_quantities[{{ $item->id }}]" 
+                  <input type="number" name="item_quantities[{{ $item->id }}]"
                     min="0" max="{{ $item->inventory?->quantity ?? 0 }}"
-                    placeholder="Qty" 
+                    placeholder="Qty"
                     class="cr-qty-input"
                     data-max="{{ $item->inventory?->quantity ?? 0 }}"
                     data-unit="{{ $item->unit }}"
@@ -480,19 +499,17 @@ function crUpdateBenef() {
 /* ── Inventory calc ──────────────────────────────── */
 function crCalcDist() {
   var hh = parseInt(document.getElementById('cr-total-hh').value) || 0;
-  
-  // Update all item calculations
+
   document.querySelectorAll('input[name="distribute_items[]"]').forEach(function(cb) {
-    var id = cb.value;
-    var maxQty = parseInt(cb.dataset.qty) || 0;
-    var unit = cb.dataset.unit;
-    var qtyInput = document.querySelector('input[name="item_quantities[' + id + ']"]');
+    var id         = cb.value;
+    var unit       = cb.dataset.unit;
+    var qtyInput   = document.querySelector('input[name="item_quantities[' + id + ']"]');
     var calcDisplay = document.getElementById('cr-calc-' + id);
-    
+
     if (!calcDisplay) return;
-    
+
     var qty = qtyInput ? parseInt(qtyInput.value) || 0 : 0;
-    
+
     if (cb.checked && hh > 0 && qty > 0) {
       var per = Math.floor(qty / hh);
       calcDisplay.textContent = per + ' ' + unit + ' each (' + qty + ' ÷ ' + hh + ' = ' + per + ' per beneficiary)';
@@ -510,47 +527,39 @@ function crCalcDist() {
   });
 }
 
-// Combine facilitator arrays before form submission
+/* ── Form submit: merge facilitator arrays ───────── */
 document.addEventListener('DOMContentLoaded', function() {
-  const form = document.querySelector('form.cr-form');
-  if (form) {
-    form.addEventListener('submit', function(e) {
-      // Prevent default to ensure we can modify the form
-      e.preventDefault();
-      
-      // Combine all facilitator arrays
-      const staffFacilitators = Array.from(document.querySelectorAll('input[name="facilitators_staff[]"]:checked'))
-        .map(input => input.value);
-      const volunteerFacilitators = Array.from(document.querySelectorAll('input[name="facilitators_volunteers[]"]:checked'))
-        .map(input => input.value);
-      const barangayFacilitators = Array.from(document.querySelectorAll('input[name="facilitators_barangay[]"]:checked'))
-        .map(input => input.value);
-      
-      // Combine all facilitator IDs
-      const allFacilitators = [...staffFacilitators, ...volunteerFacilitators, ...barangayFacilitators];
-      
-      // Remove any existing facilitator_ids inputs
-      document.querySelectorAll('input[name="facilitator_ids[]"]').forEach(input => input.remove());
-      
-      // Create hidden inputs for each facilitator ID (array format)
-      allFacilitators.forEach(function(userId) {
-        const hiddenInput = document.createElement('input');
-        hiddenInput.type = 'hidden';
-        hiddenInput.name = 'facilitator_ids[]';
-        hiddenInput.value = userId;
-        form.appendChild(hiddenInput);
-      });
-      
-      // Remove the individual arrays to avoid confusion
-      document.querySelectorAll('input[name="facilitators_staff[]"], input[name="facilitators_volunteers[]"], input[name="facilitators_barangay[]"]')
-        .forEach(input => input.remove());
-      
-      // Submit the form programmatically
-      form.submit();
-    });
-  }
-});
+  var form = document.querySelector('form.cr-form');
+  if (!form) return;
 
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    var staff     = Array.from(document.querySelectorAll('input[name="facilitators_staff[]"]:checked')).map(function(i){ return i.value; });
+    var volunteers = Array.from(document.querySelectorAll('input[name="facilitators_volunteers[]"]:checked')).map(function(i){ return i.value; });
+    var barangay  = Array.from(document.querySelectorAll('input[name="facilitators_barangay[]"]:checked')).map(function(i){ return i.value; });
+
+    var all = staff.concat(volunteers).concat(barangay);
+
+    // Remove old hidden inputs
+    document.querySelectorAll('input[name="facilitator_ids[]"]').forEach(function(i){ i.remove(); });
+
+    // Add combined hidden inputs
+    all.forEach(function(userId) {
+      var hidden = document.createElement('input');
+      hidden.type  = 'hidden';
+      hidden.name  = 'facilitator_ids[]';
+      hidden.value = userId;
+      form.appendChild(hidden);
+    });
+
+    // Remove the split arrays to avoid confusion
+    document.querySelectorAll('input[name="facilitators_staff[]"], input[name="facilitators_volunteers[]"], input[name="facilitators_barangay[]"]')
+      .forEach(function(i){ i.remove(); });
+
+    form.submit();
+  });
+});
 </script>
 
 @endsection

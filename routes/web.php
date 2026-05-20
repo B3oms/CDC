@@ -118,6 +118,7 @@ Route::middleware(['isAdminOrStaff'])->group(function () {
 
     // Inventory
     Route::get('admin/inventory',                                  [InventoryController::class, 'index'])->name('admin.inventory.index');
+    Route::get('admin/inventory/pdf',                              [InventoryController::class, 'pdf'])->name('admin.inventory.pdf');
     Route::get('admin/inventory/category/create',                  [InventoryController::class, 'createCategory'])->name('admin.inventory.category.create');
     Route::post('admin/inventory/category',                        [InventoryController::class, 'storeCategory'])->name('admin.inventory.category.store');
     Route::get('admin/inventory/category/{id}',                    [InventoryController::class, 'showCategory'])->name('admin.inventory.category.show');

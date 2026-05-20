@@ -2,76 +2,62 @@
 @section('title', 'Location Management')
 
 @section('content')
-<div class="locations-header">
-    <div class="locations-title">
-        <h1>Location Management</h1>
-        <p class="locations-subtitle">Manage and monitor location requests</p>
-    </div>
-    <div class="locations-actions">
-        <a href="{{ route('admin.locations.create') }}" class="btn-add-location">
+
+<div class="dash-header">
+    <h1>Location Management</h1>
+    <div class="dash-header-actions">
+        <a href="{{ route('admin.locations.create') }}" class="btn-primary">
             <i class="fas fa-plus"></i> Add Location
         </a>
     </div>
 </div>
 
+{{-- ===================== ALERTS ===================== --}}
 @if(session('success'))
-    <div class="alert alert-success">
+    <div class="alert alert-success" style="margin-bottom:1.5rem;">
         <i class="fas fa-check-circle"></i>
         {{ session('success') }}
     </div>
 @endif
 
 @if(session('error'))
-    <div class="alert alert-error">
+    <div class="alert alert-error" style="margin-bottom:1.5rem;">
         <i class="fas fa-exclamation-circle"></i>
         {{ session('error') }}
     </div>
 @endif
 
-{{-- Enhanced Statistics Row --}}
 <div class="stats-row" style="margin-bottom:1.5rem;">
     <div class="stat-card">
         <div class="stat-num">{{ $pendingRequests ?? 0 }}</div>
-        <div class="stat-label">
-            <i class="fas fa-clock"></i> Pending Requests
-        </div>
+        <div class="stat-label"><i class="fas fa-clock"></i> Pending Requests</div>
     </div>
     <div class="stat-card">
         <div class="stat-num">{{ $approvedRequests ?? 0 }}</div>
-        <div class="stat-label">
-            <i class="fas fa-check-circle"></i> Approved Requests
-        </div>
+        <div class="stat-label"><i class="fas fa-check-circle"></i> Approved Requests</div>
     </div>
     <div class="stat-card">
         <div class="stat-num">{{ $rejectedRequests ?? 0 }}</div>
-        <div class="stat-label">
-            <i class="fas fa-times-circle"></i> Rejected Requests
-        </div>
+        <div class="stat-label"><i class="fas fa-times-circle"></i> Rejected Requests</div>
     </div>
     <div class="stat-card">
         <div class="stat-num">{{ $totalLocations ?? 0 }}</div>
-        <div class="stat-label">
-            <i class="fas fa-map-marker-alt"></i> Total Locations
-        </div>
+        <div class="stat-label"><i class="fas fa-map-marker-alt"></i> Total Locations</div>
     </div>
 </div>
 
 @if($locationRequests->isEmpty())
-
     <div class="empty-state">
-        <div class="empty-icon">
-            <i class="fas fa-map-marked-alt"></i>
-        </div>
+        <div class="empty-icon"><i class="fas fa-map-marked-alt"></i></div>
         <h3>No location requests yet</h3>
         <p>Start by adding your first location request</p>
-        <a href="{{ route('admin.locations.create') }}" class="btn-primary">
+        <a href="{{ route('admin.locations.create') }}" class="btn-add-location">
             <i class="fas fa-plus"></i> Add First Location
         </a>
     </div>
-
 @else
 
-    {{-- Pending Requests Table --}}
+    {{-- ===================== PENDING REQUESTS ===================== --}}
     @php $pendingCount = $locationRequests->where('status', 'pending')->count(); @endphp
 
     @if($pendingCount > 0)
@@ -83,6 +69,9 @@
                 <span class="badge-count">{{ $pendingCount }}</span>
             </h2>
         </div>
+
+        {{-- Desktop table --}}
+        <div class="table-wrapper">
         <div class="locations-table">
             <div class="table-header">
                 <div class="table-cell">Location Name</div>
@@ -94,76 +83,67 @@
             </div>
             @foreach($locationRequests->where('status', 'pending') as $request)
             <div class="table-row">
-                <div class="table-cell">
-                    <div class="location-name">{{ $request->name }}</div>
+                <div class="table-cell" data-label="Location">
+                    <span class="location-name">{{ $request->name }}</span>
                 </div>
-                <div class="table-cell">
+                <div class="table-cell" data-label="Type">
                     <span class="location-type">{{ ucfirst($request->type) }}</span>
                 </div>
-                <div class="table-cell">
-                    <div class="submitter-info">
-                        {{ $request->requested_by_firstname }} {{ $request->requested_by_lastname }}
-                    </div>
+                <div class="table-cell" data-label="Submitted By">
+                    <span class="submitter-info">{{ $request->requested_by_firstname }} {{ $request->requested_by_lastname }}</span>
                 </div>
-                <div class="table-cell">
-                    <div class="date-info">{{ date('M d, Y', strtotime($request->created_at)) }}</div>
+                <div class="table-cell" data-label="Date">
+                    <span class="date-info">{{ date('M d, Y', strtotime($request->created_at)) }}</span>
                 </div>
-                <div class="table-cell">
+                <div class="table-cell" data-label="Status">
                     <span class="status-badge pending">
                         <i class="fas fa-clock"></i> Pending
                     </span>
                 </div>
-                <div class="table-cell">
+                <div class="table-cell" data-label="Actions">
                     <div class="action-buttons">
-                        <form method="POST" action="{{ route('admin.locations.approve', $request->id) }}" class="action-form">
+                        <form method="POST" action="{{ route('admin.locations.approve', $request->id) }}" style="display:contents">
                             @csrf
-                            <button type="submit" class="btn-approve">
+                            <button type="submit" class="btn-action btn-approve" title="Approve">
                                 <i class="fas fa-check"></i>
                             </button>
                         </form>
-                        <form method="POST" action="{{ route('admin.locations.reject', $request->id) }}" class="action-form">
+                        <form method="POST" action="{{ route('admin.locations.reject', $request->id) }}" style="display:contents">
                             @csrf
                             <input type="hidden" name="rejection_reason" value="Rejected by admin">
-                            <button type="submit" class="btn-reject">
+                            <button type="submit" class="btn-action btn-reject" title="Reject">
                                 <i class="fas fa-times"></i>
                             </button>
                         </form>
-                        <a href="{{ route('admin.locations.show', $request->id) }}" class="btn-view">
+                        <a href="{{ route('admin.locations.show', $request->id) }}" class="btn-action btn-view" title="View">
                             <i class="fas fa-eye"></i>
                         </a>
                     </div>
                 </div>
             </div>
             @endforeach
-        </div>
-    </div>
+        </div>{{-- /.locations-table --}}
+        </div>{{-- /.table-wrapper --}}
+    </div>{{-- /.locations-section --}}
     @endif
 
-    {{-- All System Locations --}}
+    {{-- ===================== ALL SYSTEM LOCATIONS ===================== --}}
     @if($totalLocations > 0)
         @php
-            $municipalities = $allLocations->where('type', 'municipality')->sortBy('name');
-            $barangays      = $allLocations->where('type', 'barangay');
-
-            $barangayGroups = [];
-            foreach ($barangays as $barangay) {
-                $municipalityName = $barangay->municipality_name ?? 'Uncategorized';
-                $barangayGroups[$municipalityName][] = $barangay;
-            }
-            ksort($barangayGroups);
-
-            $orphanedBarangays = $barangays->filter(function ($barangay) use ($municipalities) {
-                return !$municipalities->contains('name', $barangay->municipality_name);
-            });
+            $municipalities    = $allLocations->where('type', 'municipality')->sortBy('name');
+            $barangays         = $allLocations->where('type', 'barangay');
+            $orphanedBarangays = $barangays->filter(fn($b) => !$municipalities->contains('name', $b->municipality_name));
         @endphp
 
         <div class="locations-organized">
             <div class="locations-tabs">
                 <button class="tab-btn active" onclick="showLocationTab('municipalities', event)">
-                    <i class="fas fa-city"></i> Municipalities ({{ $municipalities->count() }})
+                    <i class="fas fa-city"></i>
+                    <span>Municipalities ({{ $municipalities->count() }})</span>
                 </button>
                 <button class="tab-btn" onclick="showLocationTab('hierarchy', event)">
-                    <i class="fas fa-sitemap"></i> Hierarchy View
+                    <i class="fas fa-sitemap"></i>
+                    <span>Hierarchy View</span>
                 </button>
             </div>
 
@@ -174,33 +154,26 @@
                     <div class="location-card municipality-card">
                         <div class="location-card-header">
                             <div class="location-info">
-                                <h3 class="location-name">{{ $municipality->name }}</h3>
+                                <h3 class="location-card-name">{{ $municipality->name }}</h3>
                                 <div class="location-meta">
                                     <span class="location-type-badge municipality">Municipality</span>
                                     <span class="location-province">{{ $municipality->province }}</span>
                                 </div>
                             </div>
-                            <div class="location-stats">
-                                <span class="stat-badge">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    {{ $barangays->where('municipality_name', $municipality->name)->count() }} barangays
-                                </span>
-                            </div>
+                            <span class="stat-badge">
+                                <i class="fas fa-map-marker-alt"></i>
+                                {{ $barangays->where('municipality_name', $municipality->name)->count() }}
+                            </span>
                         </div>
                         <div class="location-card-body">
-                            <div class="location-details">
-                                <div class="detail-item">
-                                    <i class="fas fa-globe"></i>
-                                    <span>{{ $municipality->province }}</span>
-                                </div>
-                                <div class="detail-item">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    <span>{{ $barangays->where('municipality_name', $municipality->name)->count() }} barangays</span>
-                                </div>
+                            <div class="detail-item"><i class="fas fa-globe"></i><span>{{ $municipality->province }}</span></div>
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>{{ $barangays->where('municipality_name', $municipality->name)->count() }} barangays</span>
                             </div>
                         </div>
                         <div class="location-card-actions">
-                            <form method="POST" action="{{ route('admin.locations.destroy', $municipality->id) }}" class="action-form">
+                            <form method="POST" action="{{ route('admin.locations.destroy', $municipality->id) }}" style="display:contents">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn-delete" onclick="return confirm('Delete this municipality?')">
@@ -216,7 +189,6 @@
             {{-- Hierarchy Tab --}}
             <div id="hierarchy-tab" class="tab-content">
                 <div class="hierarchy-container">
-
                     @foreach($municipalities as $municipality)
                     <div class="hierarchy-item municipality-hierarchy">
                         <div class="hierarchy-header" onclick="toggleHierarchy('muni-{{ $municipality->id }}')">
@@ -226,9 +198,7 @@
                                 <span class="hierarchy-name">{{ $municipality->name }}</span>
                                 <span class="hierarchy-type">Municipality</span>
                             </div>
-                            <span class="hierarchy-count">
-                                {{ $barangays->where('municipality_name', $municipality->name)->count() }} barangays
-                            </span>
+                            <span class="hierarchy-count">{{ $barangays->where('municipality_name', $municipality->name)->count() }} barangays</span>
                         </div>
                         <div id="muni-{{ $municipality->id }}" class="hierarchy-children">
                             @foreach($barangays->where('municipality_name', $municipality->name)->sortBy('name') as $barangay)
@@ -239,14 +209,13 @@
                                         <span class="hierarchy-name">{{ $barangay->name }}</span>
                                         <span class="hierarchy-type">Barangay</span>
                                     </div>
-                                                                    </div>
+                                </div>
                             </div>
                             @endforeach
                         </div>
                     </div>
                     @endforeach
 
-                    {{-- Orphaned barangays --}}
                     @if($orphanedBarangays->count() > 0)
                     <div class="hierarchy-item orphaned-hierarchy">
                         <div class="hierarchy-header" onclick="toggleHierarchy('orphaned')">
@@ -267,22 +236,18 @@
                                         <span class="hierarchy-name">{{ $barangay->name }}</span>
                                         <span class="hierarchy-type">Barangay</span>
                                     </div>
-                                                                    </div>
+                                </div>
                             </div>
                             @endforeach
                         </div>
                     </div>
                     @endif
-
                 </div>
             </div>
         </div>
-
     @else
         <div class="empty-state">
-            <div class="empty-icon">
-                <i class="fas fa-map-marked-alt"></i>
-            </div>
+            <div class="empty-icon"><i class="fas fa-map-marked-alt"></i></div>
             <h3>No locations in the system yet</h3>
             <p>Approve pending requests to add locations to the system.</p>
         </div>
@@ -292,233 +257,265 @@
 
 @push('styles')
 <style>
-.locations-header {
+/* =============================================
+   CSS VARIABLES
+   ============================================= */
+:root {
+    --clr-primary:      #1a3d1f;
+    --clr-primary-hover:#2d6a35;
+    --clr-white:        #ffffff;
+    --clr-gray-50:      #f9fafb;
+    --clr-gray-100:     #f3f4f6;
+    --clr-gray-200:     #e5e7eb;
+    --clr-gray-400:     #9ca3af;
+    --clr-gray-500:     #6b7280;
+    --clr-gray-700:     #374151;
+    --clr-gray-900:     #111827;
+    --clr-green-bg:     #d1fae5;
+    --clr-green-text:   #059669;
+    --clr-red-bg:       #fee2e2;
+    --clr-red-text:     #dc2626;
+    --clr-yellow-bg:    #fef3c7;
+    --clr-yellow-text:  #d97706;
+
+    --radius-sm:  6px;
+    --radius-md:  8px;
+    --radius-lg:  12px;
+
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
+    --shadow-md: 0 4px 12px rgba(0,0,0,.12);
+}
+
+/* =============================================
+   PAGE HEADER  — the main fix
+   ============================================= */
+.page-header {
+    background: var(--clr-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--clr-gray-200);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1.5rem;
+    padding: 1.25rem 1.5rem;
+}
+
+.page-header-inner {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 2rem;
-    padding: 1.5rem 0;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 
-.locations-title h1 {
-    font-size: 1.875rem;
+.page-header-title {
+    font-size: clamp(1.25rem, 3.5vw, 1.875rem);
     font-weight: 700;
-    color: #1a3d1f;
-    margin: 0 0 0.5rem 0;
+    color: var(--clr-primary);
+    margin: 0 0 0.25rem;
+    line-height: 1.2;
 }
 
-.locations-subtitle {
-    color: #6b7280;
+.page-header-subtitle {
+    color: var(--clr-gray-500);
     font-size: 0.875rem;
     margin: 0;
 }
 
-.locations-actions {
-    display: flex;
-    gap: 0.75rem;
+.page-header-actions {
+    flex-shrink: 0;
 }
 
-.btn-filter {
-    display: inline-flex;
+/* =============================================
+   ALERTS
+   ============================================= */
+.alert {
+    display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.625rem 1.25rem;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    background: white;
-    color: #374151;
+    gap: 0.75rem;
+    padding: 0.875rem 1.25rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 1.25rem;
     font-size: 0.875rem;
     font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
 }
 
-.btn-filter:hover {
-    background: #f9fafb;
-    border-color: #9ca3af;
+.alert-success { background: var(--clr-green-bg); color: var(--clr-green-text); border: 1px solid #bbf7d0; }
+.alert-error   { background: var(--clr-red-bg);   color: var(--clr-red-text);   border: 1px solid #fecaca; }
+
+/* =============================================
+   STATS ROW
+   ============================================= */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
 }
 
+.stat-card {
+    background: var(--clr-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--clr-gray-200);
+    box-shadow: var(--shadow-sm);
+    padding: 1.25rem 1.5rem;
+    transition: box-shadow .2s;
+}
+
+.stat-card:hover { box-shadow: var(--shadow-md); }
+
+.stat-num {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 700;
+    color: var(--clr-primary);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--clr-gray-500);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+/* =============================================
+   BUTTONS
+   ============================================= */
 .btn-add-location {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.625rem 1.25rem;
-    border: none;
-    border-radius: 8px;
-    background: #1a3d1f;
-    color: white;
+    border-radius: var(--radius-md);
+    background: var(--clr-primary);
+    color: var(--clr-white);
     font-size: 0.875rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all 0.2s ease;
-}
-
-.btn-add-location:hover {
-    background: #2d4f33;
-}
-
-.stats-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.stat-card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 1.25rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e5e7eb;
-}
-
-.stat-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.stat-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-    color: white;
-}
-
-.stat-icon.pending  { background: linear-gradient(135deg, #f59e0b, #d97706); }
-.stat-icon.approved { background: linear-gradient(135deg, #10b981, #059669); }
-.stat-icon.rejected { background: linear-gradient(135deg, #ef4444, #dc2626); }
-.stat-icon.total    { background: linear-gradient(135deg, #3b82f6, #2563eb); }
-
-.stat-number {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: #1f2937;
-    line-height: 1;
-    margin-bottom: 0.25rem;
-}
-
-.stat-label {
-    font-size: 0.75rem;
-    color: #6b7280;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.alert {
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.alert-success {
-    background: #f0fdf4;
-    color: #166534;
-    border: 1px solid #bbf7d0;
-}
-
-.alert-error {
-    background: #fef2f2;
-    color: #991b1b;
-    border: 1px solid #fecaca;
-}
-
-.empty-state {
-    text-align: center;
-    padding: 4rem 2rem;
-    background: white;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-}
-
-.empty-icon {
-    width: 64px;
-    height: 64px;
-    margin: 0 auto 1.5rem;
-    background: #f3f4f6;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    color: #6b7280;
-}
-
-.empty-state h3 {
-    font-size: 1.25rem;
     font-weight: 600;
-    color: #374151;
-    margin: 0 0 0.5rem 0;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background .2s, transform .15s;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.empty-state p {
-    color: #6b7280;
-    margin: 0 0 2rem 0;
+.btn-add-location:hover  { background: var(--clr-primary-hover); }
+.btn-add-location:active { transform: scale(.97); }
+
+.btn-action {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-sm);
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition: opacity .2s, transform .15s;
+    -webkit-tap-highlight-color: transparent;
+    flex-shrink: 0;
 }
 
-/* Pending table */
+.btn-action:active { transform: scale(.93); }
+.btn-approve { background: #10b981; color: var(--clr-white); }
+.btn-approve:hover { opacity: .85; }
+.btn-reject  { background: #ef4444; color: var(--clr-white); }
+.btn-reject:hover  { opacity: .85; }
+.btn-view    { background: var(--clr-gray-100); color: var(--clr-gray-500); }
+.btn-view:hover    { background: var(--clr-gray-200); }
+
+.btn-delete {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #ef4444;
+    color: var(--clr-white);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: opacity .2s;
+}
+
+.btn-delete:hover { opacity: .85; }
+
+/* =============================================
+   SECTION HEADER
+   ============================================= */
 .locations-section { margin-bottom: 2rem; }
 
+.section-header { margin-bottom: 1rem; }
+
 .section-title {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 600;
-    color: #1f2937;
-    margin: 0 0 1.5rem;
+    color: var(--clr-gray-900);
+    margin: 0;
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-.section-title i { color: #1a3d1f; }
+.section-title i { color: var(--clr-primary); }
 
 .badge-count {
-    background: #1a3d1f;
-    color: white;
-    font-size: 0.75rem;
-    font-weight: 500;
-    padding: 0.25rem 0.5rem;
+    background: var(--clr-primary);
+    color: var(--clr-white);
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.2rem 0.5rem;
     border-radius: 12px;
-    margin-left: 0.5rem;
+}
+
+/* =============================================
+   TABLE  — horizontally scrollable on all screens
+   ============================================= */
+.table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--clr-gray-200);
 }
 
 .locations-table {
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e5e7eb;
+    background: var(--clr-white);
+    min-width: 640px; /* prevents columns from squishing */
+    width: 100%;
 }
 
+/* Desktop header */
 .table-header {
     display: grid;
-    grid-template-columns: 2fr 1fr 1.5fr 1fr 1fr 1.5fr;
-    background: #f9fafb;
-    border-bottom: 1px solid #e5e7eb;
-    padding: 1rem 1.5rem;
+    grid-template-columns: 2fr 1fr 1.5fr 1fr 1fr 1.2fr;
+    background: var(--clr-gray-50);
+    border-bottom: 1px solid var(--clr-gray-200);
+    padding: 0.75rem 1.25rem;
     font-weight: 600;
-    font-size: 0.875rem;
-    color: #374151;
+    font-size: 0.8rem;
+    color: var(--clr-gray-700);
+    text-transform: uppercase;
+    letter-spacing: .4px;
 }
 
+/* Desktop row */
 .table-row {
     display: grid;
-    grid-template-columns: 2fr 1fr 1.5fr 1fr 1fr 1.5fr;
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid #f3f4f6;
-    transition: background-color 0.2s ease;
+    grid-template-columns: 2fr 1fr 1.5fr 1fr 1fr 1.2fr;
+    padding: 0.875rem 1.25rem;
+    border-bottom: 1px solid var(--clr-gray-100);
+    align-items: center;
+    transition: background .15s;
 }
 
 .table-row:last-child { border-bottom: none; }
-.table-row:hover { background: #f9fafb; }
+.table-row:hover { background: var(--clr-gray-50); }
 
 .table-cell {
     display: flex;
@@ -526,216 +523,180 @@
     font-size: 0.875rem;
 }
 
-.location-name { font-weight: 500; color: #1f2937; }
+.location-name  { font-weight: 500; color: var(--clr-gray-900); }
+.submitter-info,
+.date-info      { color: var(--clr-gray-500); }
 
 .location-type {
-    background: #f3f4f6;
-    color: #374151;
-    padding: 0.25rem 0.75rem;
-    border-radius: 6px;
+    background: var(--clr-gray-100);
+    color: var(--clr-gray-700);
+    padding: 0.2rem 0.6rem;
+    border-radius: 5px;
     font-size: 0.75rem;
     font-weight: 500;
 }
-
-.submitter-info, .date-info { color: #6b7280; }
 
 .status-badge {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
-    padding: 0.25rem 0.75rem;
+    gap: 0.3rem;
+    padding: 0.25rem 0.65rem;
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 500;
+    white-space: nowrap;
 }
 
-.status-badge.pending  { background: #fbbf24 !important; color: #92400e !important; }
-.status-badge.approved { background: #34d399 !important; color: #064e3b !important; }
-.status-badge.rejected { background: #fee2e2 !important; color: #dc2626 !important; }
+.status-badge.pending  { background: #fbbf24; color: #92400e; }
+.status-badge.approved { background: #34d399; color: #064e3b; }
+.status-badge.rejected { background: var(--clr-red-bg); color: var(--clr-red-text); }
 
-.action-buttons { display: flex; gap: 0.5rem; }
-.action-form { display: inline; }
-
-.btn-approve,
-.btn-reject,
-.btn-view {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    border: none;
+.action-buttons {
     display: flex;
+    gap: 0.4rem;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    font-size: 0.875rem;
 }
 
-.btn-approve { background: #10b981; color: white; }
-.btn-approve:hover { background: #059669; }
-.btn-reject  { background: #ef4444; color: white; }
-.btn-reject:hover  { background: #dc2626; }
-.btn-view    { background: #f3f4f6; color: #6b7280; }
-.btn-view:hover    { background: #e5e7eb; }
-
-.btn-delete {
-    background: #ef4444;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.875rem;
+/* =============================================
+   EMPTY STATE
+   ============================================= */
+.empty-state {
+    text-align: center;
+    padding: 3.5rem 1.5rem;
+    background: var(--clr-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--clr-gray-200);
 }
 
-.btn-delete:hover { background: #dc2626; }
-
-.btn-view-small {
-    width: 28px;
-    height: 28px;
-    border-radius: 4px;
-    background: #f3f4f6;
-    color: #6b7280;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    font-size: 0.75rem;
-    transition: all 0.2s ease;
+.empty-icon {
+    width: 60px; height: 60px;
+    margin: 0 auto 1.25rem;
+    background: var(--clr-gray-100);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    color: var(--clr-gray-400);
 }
 
-.btn-view-small:hover { background: #e5e7eb; }
+.empty-state h3 { font-size: 1.125rem; font-weight: 600; color: var(--clr-gray-700); margin: 0 0 .5rem; }
+.empty-state p  { color: var(--clr-gray-500); margin: 0 0 1.5rem; }
 
-/* Organized locations */
+/* =============================================
+   LOCATIONS ORGANIZED (tabs + cards)
+   ============================================= */
 .locations-organized {
-    background: white;
-    border-radius: 12px;
+    background: var(--clr-white);
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e5e7eb;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--clr-gray-200);
 }
 
 .locations-tabs {
     display: flex;
-    background: #f9fafb;
-    border-bottom: 1px solid #e5e7eb;
+    background: var(--clr-gray-50);
+    border-bottom: 1px solid var(--clr-gray-200);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .tab-btn {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 1rem 1.5rem;
+    padding: 0.875rem 1.25rem;
     border: none;
     background: transparent;
-    color: #6b7280;
+    color: var(--clr-gray-500);
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    white-space: nowrap;
     border-bottom: 2px solid transparent;
+    transition: color .2s, background .2s;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.tab-btn:hover { color: #1f2937; background: rgba(26, 61, 31, 0.05); }
-.tab-btn.active { color: #1a3d1f; background: white; border-bottom-color: #1a3d1f; }
+.tab-btn:hover  { color: var(--clr-gray-900); background: rgba(26,61,31,.04); }
+.tab-btn.active { color: var(--clr-primary); background: var(--clr-white); border-bottom-color: var(--clr-primary); }
 
-.tab-content { display: none; padding: 1.5rem; }
+.tab-content        { display: none; padding: 1.25rem; }
 .tab-content.active { display: block; }
 
 .locations-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    gap: 1rem;
 }
 
 .location-card {
-    background: white;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
+    background: var(--clr-white);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--clr-gray-200);
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: transform .2s, box-shadow .2s;
 }
 
-.location-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
+.location-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 
 .location-card-header {
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid #f3f4f6;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--clr-gray-100);
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    gap: 0.75rem;
 }
 
-.location-card-header .location-name {
-    font-size: 1.125rem;
+.location-card-name {
+    font-size: 1rem;
     font-weight: 600;
-    color: #1f2937;
-    margin: 0 0 0.5rem 0;
+    color: var(--clr-gray-900);
+    margin: 0 0 0.4rem;
 }
 
-.location-meta {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    flex-wrap: wrap;
-}
+.location-meta { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
 
 .location-type-badge {
-    padding: 0.25rem 0.5rem;
+    padding: 0.2rem 0.5rem;
     border-radius: 4px;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 500;
 }
 
 .location-type-badge.municipality { background: #dbeafe; color: #1e40af; }
 
-.location-province { color: #6b7280; font-size: 0.875rem; }
+.location-province { color: var(--clr-gray-500); font-size: 0.8rem; }
 
 .stat-badge {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.25rem;
     padding: 0.25rem 0.5rem;
-    background: #f3f4f6;
-    color: #6b7280;
+    background: var(--clr-gray-100);
+    color: var(--clr-gray-500);
     border-radius: 4px;
     font-size: 0.75rem;
     font-weight: 500;
+    flex-shrink: 0;
 }
 
-.location-card-body { padding: 1rem 1.5rem; }
+.location-card-body { padding: 0.875rem 1.25rem; display: flex; flex-direction: column; gap: 0.4rem; }
 
-.location-details { display: flex; flex-direction: column; gap: 0.5rem; }
+.detail-item { display: flex; align-items: center; gap: 0.5rem; color: var(--clr-gray-500); font-size: 0.85rem; }
+.detail-item i { color: var(--clr-primary); width: 14px; flex-shrink: 0; }
 
-.detail-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #6b7280;
-    font-size: 0.875rem;
-}
+.location-card-actions { padding: 0.875rem 1.25rem; border-top: 1px solid var(--clr-gray-100); }
 
-.detail-item i { color: #1a3d1f; width: 16px; }
-
-.location-card-actions {
-    padding: 1rem 1.5rem;
-    border-top: 1px solid #f3f4f6;
-    display: flex;
-    gap: 0.75rem;
-}
-
-/* Hierarchy */
+/* =============================================
+   HIERARCHY
+   ============================================= */
 .hierarchy-container { display: flex; flex-direction: column; gap: 0.5rem; }
 
 .hierarchy-item {
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    background: var(--clr-white);
+    border: 1px solid var(--clr-gray-200);
+    border-radius: var(--radius-md);
     overflow: hidden;
 }
 
@@ -743,99 +704,70 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 1.5rem;
+    padding: 0.875rem 1.25rem;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background .15s;
+    gap: 0.5rem;
 }
 
-.hierarchy-header:hover { background: #f9fafb; }
+.hierarchy-header:hover { background: var(--clr-gray-50); }
 
-.hierarchy-info {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
+.hierarchy-info { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
 
-.hierarchy-toggle {
-    color: #9ca3af;
-    transition: transform 0.2s ease;
-}
-
+.hierarchy-toggle { color: var(--clr-gray-400); transition: transform .2s; flex-shrink: 0; }
 .hierarchy-toggle.expanded { transform: rotate(90deg); }
 
-.hierarchy-name { font-weight: 500; color: #1f2937; }
-.hierarchy-type { color: #6b7280; font-size: 0.875rem; }
-.hierarchy-count { color: #6b7280; font-size: 0.875rem; }
+.hierarchy-name  { font-weight: 500; color: var(--clr-gray-900); }
+.hierarchy-type  { color: var(--clr-gray-400); font-size: 0.8rem; }
+.hierarchy-count { color: var(--clr-gray-500); font-size: 0.8rem; white-space: nowrap; }
 
-.hierarchy-children {
-    background: #f9fafb;
-    border-top: 1px solid #e5e7eb;
-    display: none;
-}
-
+.hierarchy-children { background: var(--clr-gray-50); border-top: 1px solid var(--clr-gray-200); display: none; }
 .hierarchy-children.expanded { display: block; }
 
-.barangay-hierarchy {
-    border: none;
-    border-radius: 0;
-    margin: 0;
-}
+.barangay-hierarchy { border: none; border-radius: 0; }
+.barangay-hierarchy .hierarchy-header { padding-left: 2.5rem; }
+.barangay-hierarchy .hierarchy-header:hover { background: rgba(26,61,31,.05); }
 
-.barangay-hierarchy .hierarchy-header {
-    padding: 0.75rem 1.5rem 0.75rem 3rem;
-    background: transparent;
-}
+.orphaned-hierarchy { border-color: #f59e0b; background: #fffbeb; }
 
-.barangay-hierarchy .hierarchy-header:hover {
-    background: rgba(26, 61, 31, 0.05);
-}
+/* =============================================
+   RESPONSIVE
+   ============================================= */
 
-.hierarchy-actions { display: flex; gap: 0.5rem; }
-
-.orphaned-hierarchy {
-    border-color: #f59e0b;
-    background: #fffbeb;
-}
-
+/* Tablet — keep 2-col stats */
 @media (max-width: 768px) {
-    .locations-header {
+    /* Header stacks */
+    .page-header-inner {
         flex-direction: column;
-        gap: 1rem;
-        align-items: stretch;
+        align-items: flex-start;
+        gap: 0.875rem;
     }
 
-    .stats-container {
-        grid-template-columns: repeat(2, 1fr);
-    }
+    .btn-add-location { width: 100%; justify-content: center; }
 
-    .table-header { display: none; }
+    /* Stats: 2 per row */
+    .stats-row { grid-template-columns: 1fr 1fr; }
 
-    .table-row {
-        grid-template-columns: 1fr;
-        padding: 1rem;
-        border-bottom: 1px solid #e5e7eb;
-    }
+    /* Table stays as-is; wrapper handles scroll */
+}
 
-    .table-cell {
-        padding: 0.25rem 0;
-        border-bottom: 1px solid #f3f4f6;
-    }
+/* Phone — 1-col stats */
+@media (max-width: 480px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .stat-card { padding: 1rem; }
 
-    .table-cell:last-child { border-bottom: none; }
+    .locations-table { border-radius: var(--radius-md); }
 
-    .table-cell::before {
-        content: attr(data-label);
-        font-weight: 600;
-        color: #374151;
-        margin-right: 0.5rem;
-        min-width: 100px;
-        display: inline-block;
-    }
+    .hierarchy-header { padding: 0.75rem 1rem; }
+    .barangay-hierarchy .hierarchy-header { padding-left: 1.75rem; }
 
-    .action-buttons {
-        justify-content: flex-start;
-        padding-top: 0.5rem;
-    }
+    .tab-btn { padding: 0.75rem 1rem; font-size: 0.8rem; }
+    .tab-content { padding: 1rem; }
+}
+
+/* Very small phones */
+@media (max-width: 360px) {
+    .stats-row { grid-template-columns: 1fr; }
 }
 </style>
 @endpush
@@ -852,15 +784,9 @@ function showLocationTab(tabName, event) {
 function toggleHierarchy(id) {
     const el     = document.getElementById(id);
     const toggle = event.currentTarget.querySelector('.hierarchy-toggle');
+    if (!el) return;
     el.classList.toggle('expanded');
-    toggle.classList.toggle('expanded');
-}
-
-const filterBtn = document.querySelector('.btn-filter');
-if (filterBtn) {
-    filterBtn.addEventListener('click', function () {
-        alert('Filter functionality coming soon!');
-    });
+    if (toggle) toggle.classList.toggle('expanded');
 }
 </script>
 @endpush

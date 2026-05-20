@@ -5,7 +5,15 @@
 @section('content')
 <div class="dash-header">
     <h1>Inventory</h1>
-    <a href="{{ route('admin.inventory.category.create') }}" class="btn-primary">+ Add Category</a>
+    <div class="dash-header-actions">
+        <a href="{{ route('admin.inventory.pdf') }}" class="btn-export-pdf" target="_blank"
+           style="display: inline-flex !important; align-items: center !important; gap: 6px !important; padding: 8px 16px !important; background: #10b981 !important; color: white !important; text-decoration: none !important; border-radius: 6px !important; font-size: 13px !important; font-weight: 500 !important; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3) !important; letter-spacing: 0.5px !important;"
+           onmouseover="this.style.background='#059669'"
+           onmouseout="this.style.background='#10b981'">
+            <i class="fas fa-file-pdf"></i> Export PDF
+        </a>
+        <a href="{{ route('admin.inventory.category.create') }}" class="btn-primary">+ Add Category</a>
+    </div>
 </div>
 
 @if(session('success'))

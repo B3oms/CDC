@@ -8,77 +8,126 @@
             font-size: 12px;
             margin: 20px;
             color: #333;
+            line-height: 1.4;
         }
         .header {
             text-align: center;
             margin-bottom: 30px;
-            border-bottom: 2px solid #333;
+            border-bottom: 2px solid #1a3d1f;
             padding-bottom: 20px;
         }
         .header h1 {
             font-size: 20px;
             margin: 0;
-            color: #2c3e50;
+            color: #1a3d1f;
+            font-weight: 700;
         }
         .header p {
             margin: 5px 0;
             color: #666;
+            font-size: 11px;
         }
         .event-info {
             background-color: #f8f9fa;
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
+            border-left: 4px solid #1a3d1f;
         }
         .event-info h3 {
-            margin: 0 0 10px 0;
-            color: #2c3e50;
+            margin: 0 0 15px 0;
+            color: #1a3d1f;
+            font-size: 16px;
+            font-weight: 600;
         }
         .event-details {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 15px;
         }
         .event-detail {
             display: flex;
             justify-content: space-between;
+            padding: 4px 0;
         }
         .event-detail strong {
-            color: #2c3e50;
+            color: #1a3d1f;
+            font-weight: 600;
         }
         .barangay-section {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         .barangay-section h3 {
-            color: #2c3e50;
+            color: #1a3d1f;
             border-bottom: 1px solid #ddd;
             padding-bottom: 5px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: 600;
         }
         .barangay-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
+            background: white;
         }
         .barangay-table th,
         .barangay-table td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
+            vertical-align: top;
         }
         .barangay-table th {
-            background-color: #f8f9fa;
+            background-color: #1a3d1f;
+            color: white;
             font-weight: bold;
+            font-size: 11px;
+            text-transform: uppercase;
         }
         .barangay-table tr:nth-child(even) {
             background-color: #f8f9fa;
+        }
+        .summary-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #1a3d1f;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        .summary-item {
+            text-align: center;
+        }
+        .summary-number {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1a3d1f;
+        }
+        .summary-label {
+            font-size: 11px;
+            color: #666;
+            margin-top: 3px;
         }
         .footer {
             margin-top: 30px;
             text-align: center;
             color: #666;
             font-size: 10px;
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+        .no-data {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            padding: 20px;
+            background-color: #f8f9fa;
         }
     </style>
 </head>

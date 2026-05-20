@@ -6,8 +6,11 @@
 <div class="dash-header">
     <h1>Inventory</h1>
     <div style="display: flex; gap: 10px; align-items: center;">
-        <a href="{{ route('staff.inventory.pdf') }}" class="btn-primary" target="_blank" style="text-decoration: none;">
-            <i class="fas fa-file-pdf"></i> Download PDF
+        <a href="{{ route('staff.inventory.pdf') }}" class="btn-export-pdf" target="_blank"
+           style="display: inline-flex !important; align-items: center !important; gap: 6px !important; padding: 8px 16px !important; background: #10b981 !important; color: white !important; text-decoration: none !important; border-radius: 6px !important; font-size: 13px !important; font-weight: 500 !important; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3) !important; letter-spacing: 0.5px !important;"
+           onmouseover="this.style.background='#059669'"
+           onmouseout="this.style.background='#10b981'">
+            <i class="fas fa-file-pdf"></i> Export PDF
         </a>
         <a href="{{ route('staff.inventory.category.create') }}" class="btn-primary" style="text-decoration: none;">+ Add Category</a>
     </div>
@@ -64,3 +67,31 @@
 </div>
 @endif
 @endsection
+
+@push('styles')
+<style>
+.btn-export-pdf {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 8px 16px !important;
+    background: #10b981 !important;
+    color: white !important;
+    text-decoration: none !important;
+    border-radius: 6px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3) !important;
+    letter-spacing: 0.5px !important;
+}
+
+.btn-export-pdf:hover {
+    background: #059669 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 12px -2px rgba(16, 185, 129, 0.4) !important;
+    text-decoration: none !important;
+    color: white !important;
+}
+</style>
+@endpush

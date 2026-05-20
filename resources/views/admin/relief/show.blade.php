@@ -4,24 +4,27 @@
 
 @section('content')
 <div class="dash-header">
-    <div style="text-align: left !important;">
-        <h1 style="text-align: left !important;">{{ $event->name }}</h1>
+    <div style="text-align: left;">
+        <h1 style="text-align: left;">{{ $event->name }}</h1>
         <p class="sub">
             {{ is_string($event->date) ? date('M d, Y', strtotime($event->date)) : \Carbon\Carbon::parse($event->date)->format('M d, Y') }} ·
             {{ $event->venue }} ·
             <span class="relief-status-badge {{ strtolower($event->status) }}">{{ $event->status }}</span>
         </p>
     </div>
-    <div style="display:flex;gap:10px;align-items:center;">
-        <button onclick="toggleEventStatus({{ $event->id }}, '{{ $event->status }}')" class="btn-status" style="@if($event->status === 'Ongoing') background: #10b981; @else background: #6b7280; @endif">
+    <div class="dash-header-actions">
+        <button onclick="toggleEventStatus({{ $event->id }}, '{{ $event->status }}')" class="btn-status {{ $event->status === 'Ongoing' ? 'btn-ongoing' : 'btn-default' }}">
             @if($event->status === 'Ongoing')
                 <i class="fas fa-check-circle"></i> Mark as Finished
             @else
                 <i class="fas fa-play-circle"></i> Mark as Ongoing
             @endif
         </button>
-        <a href="{{ route('admin.relief.event.pdf', $event->id) }}" class="btn-secondary" target="_blank">
-            <i class="fas fa-file-pdf"></i> Download PDF
+        <a href="{{ route('admin.relief.event.pdf', $event->id) }}" class="btn-export-pdf" target="_blank"
+           style="display: inline-flex !important; align-items: center !important; gap: 6px !important; padding: 8px 16px !important; background: #10b981 !important; color: white !important; text-decoration: none !important; border-radius: 6px !important; font-size: 13px !important; font-weight: 500 !important; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3) !important; letter-spacing: 0.5px !important;"
+           onmouseover="this.style.background='#059669'"
+           onmouseout="this.style.background='#10b981'">
+            <i class="fas fa-file-pdf"></i> Export PDF
         </a>
         <a href="{{ route('admin.relief.index') }}" class="btn-back">← Back</a>
     </div>
@@ -31,87 +34,90 @@
     <div class="alert-success">{{ session('success') }}</div>
 @endif
 
-<div class="dash-grid">
-    <div class="yearly-col">
+<div class="relief-event-container">
+
+    {{-- Left Column: Event Details, Facilitators, Barangays --}}
+    <div class="left-column">
 
         {{-- Event Info --}}
-        <div class="section-card">
+        <div class="event-card">
             <h3>Event Details</h3>
-            <table class="dist-table">
-                <tr><td class="meta-label">Name</td><td>{{ $event->name }}</td></tr>
-                <tr><td class="meta-label">Date</td><td>{{ is_string($event->date) ? date('M d, Y', strtotime($event->date)) : \Carbon\Carbon::parse($event->date)->format('M d, Y') }}</td></tr>
-                <tr><td class="meta-label">Venue</td><td>{{ $event->venue }}</td></tr>
-                <tr><td class="meta-label">Status</td><td><span class="relief-status-badge {{ strtolower($event->status) }}">{{ $event->status }}</span></td></tr>
+            <table class="info-table">
+                <tr><td class="label">Name</td><td>{{ $event->name }}</td></tr>
+                <tr><td class="label">Date</td><td>{{ is_string($event->date) ? date('M d, Y', strtotime($event->date)) : \Carbon\Carbon::parse($event->date)->format('M d, Y') }}</td></tr>
+                <tr><td class="label">Venue</td><td>{{ $event->venue }}</td></tr>
+                <tr><td class="label">Status</td><td><span class="relief-status-badge {{ strtolower($event->status) }}">{{ $event->status }}</span></td></tr>
                 @if($event->calamity)
-                <tr><td class="meta-label">Calamity</td><td>{{ $event->calamity->name }}</td></tr>
+                <tr><td class="label">Calamity</td><td>{{ $event->calamity->name }}</td></tr>
                 @endif
             </table>
         </div>
 
         {{-- Facilitators --}}
-        <div class="section-card">
+        <div class="event-card">
             <h3>Facilitators</h3>
             @forelse($event->facilitators as $f)
-            <div class="partner-item">
-                <span class="dot"></span>
-                {{ $f->first_name }} {{ $f->last_name }}
+            <div class="facilitator-item">
+                <span class="facilitator-name">{{ $f->first_name }} {{ $f->last_name }}</span>
                 <span class="role-tag">{{ $f->role->name }}</span>
             </div>
             @empty
-            <p style="font-size:12px;color:#888;">No facilitators assigned.</p>
+            <p class="empty-message">No facilitators assigned.</p>
             @endforelse
         </div>
 
         {{-- Barangays --}}
-        <div class="section-card">
+        <div class="event-card">
             <h3>Barangays</h3>
             @foreach($event->eventBarangays as $eb)
-            <div class="partner-item">
-                <span class="dot"></span>
-                {{ $eb->barangay->name }}
-                <span class="hint" style="margin:0;">{{ $eb->municipality->name }}</span>
+            <div class="barangay-item">
+                <div class="barangay-name">{{ $eb->barangay->name }}</div>
+                <div class="municipality-name">{{ $eb->municipality->name }}</div>
             </div>
             @endforeach
         </div>
 
+    </div>
+
+    {{-- Right Column: Distributed Items, Beneficiaries --}}
+    <div class="right-column">
+
         {{-- Distributed Items --}}
         @if($event->distributedItems->isNotEmpty())
-        <div class="section-card distributed-items-card">
+        <div class="event-card">
             <h3>Distributed Items</h3>
-            <table class="dist-table">
-                <thead>
-                    <tr>
-                        <th>Item</th>
-                        <th>Total Quantity</th>
-                        <th>Per Beneficiary</th>
-                        <th>Beneficiaries</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($event->distributedItems as $distributedItem)
-                    <tr>
-                        <td>{{ $distributedItem->item->name }}</td>
-                        <td>{{ $distributedItem->total_quantity }} {{ $distributedItem->unit }}</td>
-                        <td>{{ $distributedItem->per_beneficiary }} {{ $distributedItem->unit }}</td>
-                        <td>{{ $distributedItem->beneficiaries_count }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+            <div class="scroll-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Total Qty</th>
+                            <th>Per Beneficiary</th>
+                            <th>Beneficiaries</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($event->distributedItems as $distributedItem)
+                        <tr>
+                            <td>{{ $distributedItem->item->name }}</td>
+                            <td>{{ $distributedItem->total_quantity }} {{ $distributedItem->unit }}</td>
+                            <td>{{ $distributedItem->per_beneficiary }} {{ $distributedItem->unit }}</td>
+                            <td>{{ $distributedItem->beneficiaries_count }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
         @endif
 
-    </div>
-
-    <div class="right-col">
-        <div class="section-card beneficiaries-card">
+        {{-- Beneficiaries --}}
+        <div class="event-card">
             <h3>Beneficiaries</h3>
 
-            {{-- Barangay Filter --}}
-            <div style="margin-bottom:1rem;">
+            <div class="filter-section">
                 <form method="GET" action="{{ route('admin.relief.show', $event->id) }}">
-                    <select name="barangay_id" onchange="this.form.submit()"
-                        style="padding:6px 12px;border:1px solid #d3d1c7;border-radius:6px;font-size:13px;">
+                    <select name="barangay_id" onchange="this.form.submit()" class="filter-select">
                         <option value="">All Barangays</option>
                         @foreach($event->eventBarangays as $eb)
                         <option value="{{ $eb->barangay_id }}"
@@ -123,441 +129,413 @@
                 </form>
             </div>
 
-            <table class="dist-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Barangay</th>
-                        <th>Family Size</th>
-                        <th>Vulnerability</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($beneficiaries as $i => $beneficiary)
-                    <tr>
-                        <td>{{ $i + 1 }}</td>
-                        <td>{{ $beneficiary->beneficiary->first_name }} {{ $beneficiary->beneficiary->last_name }}</td>
-                        <td>{{ $beneficiary->beneficiary->barangay->name ?? 'N/A' }}</td>
-                        <td>{{ $beneficiary->beneficiary->family_size }}</td>
-                        <td>
-                            <span class="badge-intensity {{ strtolower($beneficiary->beneficiary->vulnerability_level ?? 'medium') }}">
-                                {{ $beneficiary->beneficiary->vulnerability_level ?? 'Medium' }}
-                            </span>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="5" style="text-align:center;color:#888;padding:16px;">
-                            No verified beneficiaries found.
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-
-            @if($beneficiaries->count())
-            <div style="margin-top:1rem;text-align:right;">
-                <a href="{{ route('admin.relief.show', $event->id) }}?{{ http_build_query(['barangay_id' => request('barangay_id'), 'pdf' => 1]) }}"
-                    class="btn-primary">
-                    Export PDF
-                </a>
+            <div class="scroll-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Barangay</th>
+                            <th>Family Size</th>
+                            <th>Vulnerability</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($beneficiaries as $i => $beneficiary)
+                        <tr>
+                            <td>{{ $i + 1 }}</td>
+                            <td>{{ $beneficiary->beneficiary->first_name }} {{ $beneficiary->beneficiary->last_name }}</td>
+                            <td>{{ $beneficiary->beneficiary->barangay->name ?? 'N/A' }}</td>
+                            <td>{{ $beneficiary->beneficiary->family_size }}</td>
+                            <td>
+                                <span class="badge-vulnerability {{ strtolower($beneficiary->beneficiary->vulnerability_level ?? 'medium') }}">
+                                    {{ $beneficiary->beneficiary->vulnerability_level ?? 'Medium' }}
+                                </span>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="5" class="empty-row">No verified beneficiaries found.</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
-            @endif
-        </div>
+
+                    </div>
+
     </div>
+
 </div>
 @endsection
 
 @push('styles')
 <style>
-.relief-status-badge {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 500;
+/* ─── Layout ─────────────────────────────────────────── */
+.relief-event-container {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 1.5rem;
+    padding: 0 1rem;
 }
 
-/* Mobile responsive styles */
-@media (max-width: 768px) {
-    .dash-grid {
-        grid-template-columns: 1fr !important;
-        gap: 1rem !important;
-    }
-    
-    .section-card {
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-    
-    .section-card h3 {
-        font-size: 1rem;
-        margin-bottom: 0.75rem;
-    }
-    
-    /* Event Details Table */
-    .dist-table {
-        font-size: 0.8rem;
-        width: 100%;
-        border-collapse: collapse;
-    }
-    
-    .dist-table td {
-        padding: 0.5rem;
-        border-bottom: 1px solid #f3f4f6;
-    }
-    
-    .dist-table td:first-child {
-        font-weight: 600;
-        color: #374151;
-        width: 120px;
-    }
-    
-    /* Partner items and facilitators */
-    .partner-item {
-        padding: 0.5rem 0;
-        font-size: 0.85rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-    }
-    
-    .dot {
-        width: 6px;
-        height: 6px;
-        flex-shrink: 0;
-    }
-    
-    .role-tag {
-        font-size: 0.7rem;
-        padding: 2px 6px;
-        margin-left: auto;
-    }
-    
-    .hint {
-        font-size: 0.75rem;
-        color: #6b7280;
-        margin-left: 0.5rem;
-    }
-    
-    /* Distributed Items and Beneficiaries Tables */
-    .distributed-items-card,
-    .beneficiaries-card {
-        max-height: 400px;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-    
-    .dist-table th {
-        padding: 0.5rem;
-        font-size: 0.75rem;
-        background: #f8faf8;
-        position: sticky;
-        top: 0;
-        z-index: 10;
-    }
-    
-    .dist-table td {
-        padding: 0.5rem;
-        font-size: 0.75rem;
-    }
-    
-    /* Fix beneficiaries table column widths */
-    .beneficiaries-card .dist-table th:first-child,
-    .beneficiaries-card .dist-table td:first-child {
-        width: 40px;
-        text-align: center;
-        padding: 0.5rem 0.25rem;
-    }
-    
-    .beneficiaries-card .dist-table th:nth-child(2),
-    .beneficiaries-card .dist-table td:nth-child(2) {
-        min-width: 120px;
-        max-width: 180px;
-        padding-left: 0.75rem;
-    }
-    
-    .beneficiaries-card .dist-table th:nth-child(3),
-    .beneficiaries-card .dist-table td:nth-child(3) {
-        min-width: 100px;
-        max-width: 120px;
-        padding-left: 0.5rem;
-    }
-    
-    /* Form controls */
-    select {
-        font-size: 0.8rem !important;
-        padding: 0.5rem !important;
-        width: 100%;
-        margin-bottom: 0.75rem;
-    }
-    
-    .btn-primary {
-        font-size: 0.8rem !important;
-        padding: 0.5rem 1rem !important;
-        width: 100%;
-        margin-top: 0.5rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .section-card {
-        padding: 0.75rem;
-    }
-    
-    .section-card h3 {
-        font-size: 0.9rem;
-    }
-    
-    .dist-table {
-        font-size: 0.75rem;
-    }
-    
-    .dist-table td {
-        padding: 0.4rem;
-    }
-    
-    .dist-table td:first-child {
-        width: 100px;
-        font-size: 0.7rem;
-    }
-    
-    .partner-item {
-        font-size: 0.8rem;
-        padding: 0.4rem 0;
-    }
-    
-    .role-tag {
-        font-size: 0.65rem;
-        padding: 1px 4px;
-    }
-    
-    .hint {
-        font-size: 0.7rem;
-        display: block;
-        margin-left: 1rem;
-        margin-top: 0.2rem;
-    }
-    
-    .dist-table th {
-        padding: 0.4rem;
-        font-size: 0.7rem;
-    }
-    
-    .dist-table td {
-        padding: 0.4rem;
-        font-size: 0.7rem;
-    }
-    
-    select {
-        font-size: 0.75rem !important;
-        padding: 0.4rem !important;
-    }
-    
-    .btn-primary {
-        font-size: 0.75rem !important;
-        padding: 0.4rem 0.8rem !important;
-    }
-    
-    /* Make tables scrollable on small screens */
-    .distributed-items-card,
-    .beneficiaries-card {
-        max-height: 300px;
-    }
-}
-
-.relief-status-badge {
-    text-transform: uppercase;
-}
-
-.relief-status-badge.ongoing {
-    background: #fef3c7;
-    color: #d97706;
-}
-
-.relief-status-badge.upcoming {
-    background: #dbeafe;
-    color: #1e40af;
-}
-
-.relief-status-badge.done {
-    background: #d1fae5;
-    color: #059669;
-}
-
-.partner-item {
+.left-column,
+.right-column {
     display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-width: 0; /* prevent grid blowout */
+}
+
+/* ─── Header ─────────────────────────────────────────── */
+.dash-header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* ─── Cards ──────────────────────────────────────────── */
+.event-card {
+    background: #fff;
+    border: 1px solid #d3d1c7;
+    border-radius: 10px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    min-width: 0;
+}
+
+.event-card h3 {
+    margin: 0 0 1rem 0;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #2c2c2a;
+}
+
+/* ─── Info Table ─────────────────────────────────────── */
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.info-table td {
+    padding: 6px 0;
+    font-size: 13px;
+    vertical-align: top;
+}
+
+.info-table .label {
+    font-weight: 600;
+    color: #666;
+    width: 110px;
+    white-space: nowrap;
+}
+
+/* ─── Facilitators ───────────────────────────────────── */
+.facilitator-item {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
     gap: 8px;
     padding: 8px 0;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid #f0f0f0;
 }
 
-.partner-item:last-child {
-    border-bottom: none;
-}
+.facilitator-item:last-child { border-bottom: none; }
 
-.dot {
-    width: 8px;
-    height: 8px;
-    background: #3b82f6;
-    border-radius: 50%;
-    flex-shrink: 0;
+.facilitator-name {
+    font-weight: 500;
+    font-size: 13px;
 }
 
 .role-tag {
-    background: #e5e7eb;
-    color: #374151;
-    padding: 2px 8px;
+    background: #e8f4fd;
+    color: #0066cc;
+    padding: 2px 10px;
     border-radius: 12px;
-    font-size: 11px;
-    font-weight: 500;
-    margin-left: auto;
-}
-
-.hint {
-    color: #6b7280;
     font-size: 12px;
-    margin-left: 8px;
+    white-space: nowrap;
 }
 
-.badge-intensity {
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
+/* ─── Barangays ──────────────────────────────────────── */
+.barangay-item {
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
 }
 
-.badge-intensity.low {
-    background: #d1fae5;
-    color: #059669;
+.barangay-item:last-child { border-bottom: none; }
+
+.barangay-name {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 2px;
 }
 
-.badge-intensity.medium {
-    background: #fef3c7;
-    color: #d97706;
+.municipality-name {
+    font-size: 12px;
+    color: #666;
 }
 
-.badge-intensity.high {
-    background: #fee2e2;
-    color: #dc2626;
-}
-
-.dash-grid {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 1.5rem;
-}
-
-.yearly-col {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.right-col {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.dist-table {
+/* ─── Scrollable table wrapper ───────────────────────── */
+.scroll-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     width: 100%;
+    border-radius: 6px;
+}
+
+/* ─── Data Tables ────────────────────────────────────── */
+.data-table {
+    width: 100%;
+    min-width: 480px; /* forces scroll on small screens */
     border-collapse: collapse;
     font-size: 13px;
 }
 
-.dist-table th {
-    background: #f9fafb;
-    padding: 10px;
+.data-table th {
+    background: #f8f9fa;
+    padding: 10px 12px;
     text-align: left;
+    font-size: 12px;
     font-weight: 600;
-    color: #374151;
-    border-bottom: 1px solid #e5e7eb;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
 }
 
-.dist-table td {
-    padding: 10px;
-    border-bottom: 1px solid #f3f4f6;
-    vertical-align: top;
+.data-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
 }
 
-.dist-table tr:last-child td {
-    border-bottom: none;
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover { background: #f8f9fa; }
+
+/* ─── Filter ─────────────────────────────────────────── */
+.filter-section { margin-bottom: 1rem; }
+
+.filter-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d3d1c7;
+    border-radius: 6px;
+    font-size: 13px;
+    background: #fff;
 }
 
-.meta-label {
+/* ─── Export ─────────────────────────────────────────── */
+.export-section {
+    margin-top: 1rem;
+    text-align: right;
+}
+
+.export-btn {
+    display: inline-block;
+    padding: 8px 18px;
+    background: #1a3d1f;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 13px;
+    transition: background 0.2s;
+}
+
+.export-btn:hover { background: #2a5d2f; }
+
+/* ─── Badges ─────────────────────────────────────────── */
+.relief-status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
     font-weight: 600;
-    color: #374151;
-    width: 120px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
 }
 
+.relief-status-badge.ongoing  { background: #fef3c7; color: #d97706; }
+.relief-status-badge.upcoming { background: #dbeafe; color: #1e40af; }
+.relief-status-badge.done     { background: #d1fae5; color: #059669; }
+
+.badge-vulnerability {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-vulnerability.low    { background: #d1fae5; color: #059669; }
+.badge-vulnerability.medium { background: #fef3c7; color: #d97706; }
+.badge-vulnerability.high   { background: #fee2e2; color: #dc2626; }
+
+/* ─── Status Button ──────────────────────────────────── */
 .btn-status {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 8px 16px;
     border: none;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
-    color: white;
+    color: #fff;
+    transition: opacity 0.2s;
 }
 
-.btn-status:hover {
-    transform: translateY(-1px);
+.btn-status:hover { opacity: 0.85; }
+.btn-ongoing  { background: #10b981; }
+.btn-default  { background: #6b7280; }
+
+.btn-export-pdf {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 8px 16px !important;
+    background: #10b981 !important;
+    color: white !important;
+    text-decoration: none !important;
+    border-radius: 6px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3) !important;
+    letter-spacing: 0.5px !important;
 }
 
-.btn-status i {
-    font-size: 16px;
+.btn-export-pdf:hover {
+    background: #059669 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 12px -2px rgba(16, 185, 129, 0.4) !important;
+    text-decoration: none !important;
+    color: white !important;
+}
+
+/* ─── Empty states ───────────────────────────────────── */
+.empty-message {
+    font-size: 13px;
+    color: #888;
+    margin: 0;
+}
+
+.empty-row {
+    text-align: center;
+    color: #888;
+    padding: 16px;
+    font-style: italic;
+}
+
+/* ─── Responsive ─────────────────────────────────────── */
+
+/* Tablet: single column */
+@media (max-width: 900px) {
+    .relief-event-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .left-column,
+    .right-column {
+        gap: 1rem;
+    }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .relief-event-container {
+        padding: 0 0.5rem;
+        gap: 0.75rem;
+    }
+
+    .left-column,
+    .right-column {
+        gap: 0.75rem;
+    }
+
+    .event-card {
+        padding: 1rem;
+    }
+
+    .event-card h3 {
+        font-size: 12px;
+    }
+
+    .info-table td {
+        font-size: 12px;
+    }
+
+    .info-table .label {
+        width: 90px;
+    }
+
+    .facilitator-item {
+        flex-wrap: wrap;
+    }
+
+    .data-table {
+        min-width: 420px;
+        font-size: 12px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 8px;
+    }
+
+    .dash-header-actions {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .export-btn {
+        width: 100%;
+        text-align: center;
+        padding: 10px;
+    }
 }
 </style>
+@endpush
 
 @push('scripts')
 <script>
 function toggleEventStatus(eventId, currentStatus) {
-    if (confirm('Are you sure you want to change the event status?')) {
-        // Show loading state
-        const btn = event.target;
-        const originalContent = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
-        btn.disabled = true;
-        
-        // Determine new status
-        const newStatus = currentStatus === 'Ongoing' ? 'Done' : 'Ongoing';
-        
-        // Send AJAX request to update status
-        fetch(`/admin/relief/${eventId}/status`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({ status: newStatus })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Reload page to show updated status
-                window.location.reload();
-            } else {
-                alert('Error updating status: ' + data.message);
-                btn.innerHTML = originalContent;
-                btn.disabled = false;
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error updating status');
+    if (!confirm('Are you sure you want to change the event status?')) return;
+
+    const btn = document.querySelector('.btn-status');
+    const originalContent = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+    btn.disabled = true;
+
+    const newStatus = currentStatus === 'Ongoing' ? 'Done' : 'Ongoing';
+
+    fetch(`/admin/relief/${eventId}/status`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({ status: newStatus })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert('Error updating status: ' + data.message);
             btn.innerHTML = originalContent;
             btn.disabled = false;
-        });
-    }
+        }
+    })
+    .catch(() => {
+        alert('Error updating status');
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+    });
 }
 </script>
 @endpush
