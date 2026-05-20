@@ -336,7 +336,6 @@
 }
 
 .data-table tr:last-child td { border-bottom: none; }
-.data-table tr:hover { background: #f8f9fa; }
 
 /* ─── Filter ─────────────────────────────────────────── */
 .filter-section { margin-bottom: 1rem; }

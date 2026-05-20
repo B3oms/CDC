@@ -412,11 +412,7 @@ canvas { max-width: 100% !important; height: auto !important; }
     border-bottom: none;
 }
 
-.db-table tbody tr:hover td {
-    background: #f8f9fa !important;
-}
-
-.db-link {
+.db-table tbody tr td {  
     color: #185fa5 !important;
     text-decoration: none;
 }
