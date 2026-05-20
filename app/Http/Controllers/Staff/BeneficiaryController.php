@@ -78,7 +78,7 @@ class BeneficiaryController extends Controller
             'gender'          => 'required|in:Male,Female,Other',
             'is_4ps_member'   => 'required|boolean',
             'birthdate'       => 'required|date',
-            'contact_number'  => 'nullable|string|digits:11',
+            'contact_number'  => 'nullable|string|regex:/^[0-9]{11}$/',
             'address'         => 'nullable|string',
             'family_size'     => 'required|integer|min:1',
             'monthly_income'  => 'required|numeric|min:0',

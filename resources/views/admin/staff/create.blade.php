@@ -51,7 +51,10 @@
             <div class="form-group">
                 <label>Contact Number</label>
                 <input type="text" name="contact_number" value="{{ old('contact_number') }}"
-                    placeholder="09XXXXXXXXX" required>
+                    placeholder="09XXXXXXXXX" required maxlength="11" pattern="[0-9]{11}"
+                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11)"
+                    onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                <small style="color: #666; font-size: 12px;">Must be exactly 11 digits (numbers only)</small>
             </div>
 
             <div class="form-group">
