@@ -306,24 +306,23 @@ class ReliefController extends Controller
     public function downloadPDF(Request $request, $id)
     {
         try {
-            // Test PDF with view rendering and mock data
-            $mockEvent = (object)[
-                'name' => 'Test Relief Event',
-                'date' => now(),
-                'venue' => 'Test Venue',
-                'status' => 'Ongoing'
-            ];
+            // Get the actual event data from the database
+            $event = ReliefEvent::with([
+                'eventBarangays.barangay',
+                'eventBarangays.municipality',
+                'beneficiaries',
+                'creator',
+                'calamity',
+                'facilitators.role'
+            ])->findOrFail($id);
 
             // Get paper size and orientation from request (default to A4 portrait)
             $paperSize = $request->input('paper_size', 'A4');
             $orientation = $request->input('orientation', 'portrait');
 
-            $html = view('staff.relief.pdf', ['event' => $mockEvent])->render();
-            $dompdf = new \Dompdf\Dompdf();
-            $dompdf->loadHtml($html);
-            $dompdf->setPaper($paperSize, $orientation);
-            $dompdf->render();
-            return $dompdf->stream('test-view.pdf');
+            $pdf = PDF::loadView('staff.relief.pdf', compact('event'));
+            $pdf->setPaper($paperSize, $orientation);
+            return $pdf->download('relief-event-' . $event->name . '-' . now()->format('Y-m-d') . '.pdf');
 
         } catch (\Exception $e) {
             // Log the error for debugging
