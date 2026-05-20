@@ -227,6 +227,14 @@
 @stack('scripts')
 
 <script>
+// Reset sidebar scroll to top on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+        sidebar.scrollTop = 0;
+    }
+});
+
 // Toggle Sidebar
 function toggleSidebar() {
     document.querySelector('.sidebar').classList.toggle('collapsed');
