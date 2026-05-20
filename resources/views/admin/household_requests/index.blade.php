@@ -111,5 +111,13 @@
 .dist-table tr:hover td {
     background: transparent !important;
 }
+
+.dist-table tbody tr:hover {
+    background: transparent !important;
+}
+
+.dist-table tr:hover {
+    background: transparent !important;
+}
 </style>
 @endsection
