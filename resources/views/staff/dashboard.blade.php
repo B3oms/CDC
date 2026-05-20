@@ -477,6 +477,7 @@ document.addEventListener('click', function(event) {
     padding: 1.25rem 1.5rem;
     box-shadow: var(--shadow);
     transition: box-shadow .2s;
+    text-align: center;
 }
 
 .stat-card:hover { box-shadow: var(--shadow-md); }
