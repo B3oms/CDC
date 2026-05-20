@@ -36,10 +36,12 @@ class StaffController extends Controller
     {
         $request->validate([
             'role_id'        => 'required|exists:roles,id',
-            'first_name'     => 'required|string|max:100',
-            'last_name'      => 'required|string|max:100',
+            'first_name'     => 'required|string|max:100|regex:/^[a-zA-Z\s]+$/',
+            'middle_name'    => 'nullable|string|max:100|regex:/^[a-zA-Z\s]*$/',
+            'last_name'      => 'required|string|max:100|regex:/^[a-zA-Z\s]+$/',
+            'suffix'         => 'nullable|string|max:20',
             'email'          => 'required|email|unique:users,email',
-            'contact_number' => 'required|string|max:13',
+            'contact_number' => 'required|string|digits:11',
             'address'        => 'nullable|string',
             'birthdate'      => 'nullable|date',
             'position'       => 'nullable|string|max:100',
@@ -52,7 +54,9 @@ class StaffController extends Controller
         User::create([
             'role_id'        => $request->role_id,
             'first_name'     => $request->first_name,
+            'middle_name'    => $request->middle_name,
             'last_name'      => $request->last_name,
+            'suffix'         => $request->suffix,
             'email'          => $request->email,
             'contact_number' => $request->contact_number,
             'address'        => $request->address,
@@ -83,10 +87,12 @@ class StaffController extends Controller
 
         $request->validate([
             'role_id'        => 'required|exists:roles,id',
-            'first_name'     => 'required|string|max:100',
-            'last_name'      => 'required|string|max:100',
+            'first_name'     => 'required|string|max:100|regex:/^[a-zA-Z\s]+$/',
+            'middle_name'    => 'nullable|string|max:100|regex:/^[a-zA-Z\s]*$/',
+            'last_name'      => 'required|string|max:100|regex:/^[a-zA-Z\s]+$/',
+            'suffix'         => 'nullable|string|max:20',
             'email'          => 'required|email|unique:users,email,' . $id,
-            'contact_number' => 'required|string|max:13',
+            'contact_number' => 'required|string|digits:11',
             'address'        => 'nullable|string',
             'birthdate'      => 'nullable|date',
             'position'       => 'nullable|string|max:100',
@@ -98,7 +104,9 @@ class StaffController extends Controller
         $user->update([
             'role_id'        => $request->role_id,
             'first_name'     => $request->first_name,
+            'middle_name'    => $request->middle_name,
             'last_name'      => $request->last_name,
+            'suffix'         => $request->suffix,
             'email'          => $request->email,
             'contact_number' => $request->contact_number,
             'address'        => $request->address,

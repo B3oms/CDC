@@ -29,8 +29,18 @@
             </div>
 
             <div class="form-group">
+                <label>Middle Name (Optional)</label>
+                <input type="text" name="middle_name" value="{{ old('middle_name') }}">
+            </div>
+
+            <div class="form-group">
                 <label>Last Name</label>
                 <input type="text" name="last_name" value="{{ old('last_name') }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Suffix (Optional)</label>
+                <input type="text" name="suffix" value="{{ old('suffix') }}" placeholder="e.g. Jr., Sr., III">
             </div>
 
             <div class="form-group">
