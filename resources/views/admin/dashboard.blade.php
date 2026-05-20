@@ -74,7 +74,7 @@
         <div class="chart-title">MONTHLY TREND</div>
         <canvas id="chart-monthly" style="width:100%; max-height:220px;"></canvas>
         <div class="chart-actions">
-            <button onclick="toggleChartPdfDropdown('monthly')" class="pdf-export-btn">
+            <button onclick="toggleChartPdfDropdown(event, 'monthly')" class="pdf-export-btn">
                 <i class="fas fa-file-pdf"></i> Export PDF
             </button>
             <div id="pdfOptions-monthly" class="pdf-options" style="display:none;position:absolute;top:100%;right:0;background:white;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:12px;min-width:200px;z-index:1001;">
@@ -111,7 +111,7 @@
             style="width:100%; max-height:220px;">
         </canvas>
         <div class="chart-actions">
-            <button onclick="toggleChartPdfDropdown('yearly')" class="pdf-export-btn">
+            <button onclick="toggleChartPdfDropdown(event, 'yearly')" class="pdf-export-btn">
                 <i class="fas fa-file-pdf"></i> Export PDF
             </button>
             <div id="pdfOptions-yearly" class="pdf-options" style="display:none;position:absolute;top:100%;right:0;background:white;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:12px;min-width:200px;z-index:1001;">
@@ -620,10 +620,16 @@ function exportChartToPDF(chartId, filename, chartType) {
     });
 }
 
-function toggleChartPdfDropdown(chartType) {
+let dropdownOpenTime = 0;
+
+function toggleChartPdfDropdown(event, chartType) {
+    if (event) {
+        event.stopPropagation();
+    }
     const dropdown = document.getElementById(`pdfOptions-${chartType}`);
     if (dropdown.style.display === 'none') {
         dropdown.style.display = 'block';
+        dropdownOpenTime = Date.now();
     } else {
         dropdown.style.display = 'none';
     }

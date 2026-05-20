@@ -7,7 +7,7 @@
     <h1>Inventory</h1>
     <div class="dash-header-actions">
         <div class="pdf-export-dropdown" style="position:relative;display:inline-block;">
-            <button onclick="togglePdfDropdown()" class="btn-export-pdf"
+            <button onclick="togglePdfDropdown(event)" class="btn-export-pdf"
                style="display: inline-flex !important; align-items: center !important; gap: 6px !important; padding: 8px 16px !important; background: #10b981 !important; color: white !important; text-decoration: none !important; border-radius: 6px !important; font-size: 13px !important; font-weight: 500 !important; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3) !important; letter-spacing: 0.5px !important; border:none !important; cursor:pointer !important;"
                onmouseover="this.style.background='#059669'"
                onmouseout="this.style.background='#10b981'">
@@ -186,10 +186,16 @@
 @push('scripts')
 <script>
 // PDF Export Functions
-function togglePdfDropdown() {
+let dropdownOpenTime = 0;
+
+function togglePdfDropdown(event) {
+    if (event) {
+        event.stopPropagation();
+    }
     const dropdown = document.getElementById('pdfOptions');
     if (dropdown.style.display === 'none') {
         dropdown.style.display = 'block';
+        dropdownOpenTime = Date.now();
     } else {
         dropdown.style.display = 'none';
     }

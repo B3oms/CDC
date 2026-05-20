@@ -65,7 +65,7 @@
 
             <div class="filter-actions">
                 <div class="pdf-export-dropdown" style="position:relative;display:inline-block;">
-                    <button onclick="togglePdfDropdown()" class="btn-filter-action"
+                    <button onclick="togglePdfDropdown(event)" class="btn-filter-action"
                        style="border:none !important;cursor:pointer !important;">
                         <i class="fas fa-file-pdf"></i> PDF
                     </button>
@@ -495,10 +495,16 @@
 @push('scripts')
 <script>
 // PDF Export Functions
-function togglePdfDropdown() {
+let dropdownOpenTime = 0;
+
+function togglePdfDropdown(event) {
+    if (event) {
+        event.stopPropagation();
+    }
     const dropdown = document.getElementById('pdfOptions');
     if (dropdown.style.display === 'none') {
         dropdown.style.display = 'block';
+        dropdownOpenTime = Date.now();
     } else {
         dropdown.style.display = 'none';
     }
