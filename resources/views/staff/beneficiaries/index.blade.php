@@ -560,7 +560,8 @@ function exportPdf() {
 document.addEventListener('click', function(event) {
     const dropdown = document.getElementById('pdfOptions');
     const button = event.target.closest('.pdf-export-dropdown');
-    if (!button && dropdown && dropdown.style.display === 'block') {
+    const insideDropdown = event.target.closest('#pdfOptions');
+    if (!button && !insideDropdown && dropdown && dropdown.style.display === 'block') {
         dropdown.style.display = 'none';
     }
 });

@@ -333,8 +333,9 @@ function toggleChartPdfDropdown(chartType) {
 document.addEventListener('click', function(event) {
     ['monthly', 'yearly'].forEach(chartType => {
         const dropdown = document.getElementById(`pdfOptions-${chartType}`);
-        const button = event.target.closest(`#pdfOptions-${chartType}`);
-        if (!button && dropdown && dropdown.style.display === 'block' && !event.target.closest('.pdf-export-btn')) {
+        const button = event.target.closest('.pdf-export-btn');
+        const insideDropdown = event.target.closest(`#pdfOptions-${chartType}`);
+        if (!button && !insideDropdown && dropdown && dropdown.style.display === 'block') {
             dropdown.style.display = 'none';
         }
     });
