@@ -420,7 +420,7 @@ document.addEventListener('click', function(event) {
    CALAMITY METER
    ============================================ */
 .calamity-meter {
-    background: #faeeda;
+    background: transparent;
     border: 1px solid var(--amber);
     border-radius: var(--radius-md);
     padding: 8px 14px;
@@ -456,7 +456,7 @@ document.addEventListener('click', function(event) {
     margin-top: 3px;
 }
 
-.calamity-meter.none { background: #eaf3de; border-color: #639922; }
+.calamity-meter.none { background: transparent; border-color: #639922; }
 .calamity-meter.none .cal-label { color: #3b6d11; }
 .calamity-meter.none .cal-name  { color: #27500a; }
 
@@ -644,7 +644,7 @@ document.addEventListener('click', function(event) {
 }
 
 .dist-table th {
-    background: #f8f9fa;
+    background: transparent;
     color: var(--text);
     font-weight: 600;
     text-align: left;
@@ -684,9 +684,9 @@ document.addEventListener('click', function(event) {
     white-space: nowrap;
 }
 
-.relief-status-badge.upcoming  { background: #fffbeb; color: var(--amber); }
-.relief-status-badge.ongoing   { background: #e3f2fd; color: var(--blue);  }
-.relief-status-badge.completed { background: #f0f9f0; color: var(--green); }
+.relief-status-badge.upcoming  { background: transparent; color: var(--amber); border: 1px solid var(--amber); }
+.relief-status-badge.ongoing   { background: transparent; color: var(--blue); border: 1px solid var(--blue); }
+.relief-status-badge.completed { background: transparent; color: var(--green); border: 1px solid var(--green); }
 
 /* ============================================
    RESPONSIVE — Tablet (≤ 1024px)
