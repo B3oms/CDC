@@ -372,7 +372,7 @@ canvas { max-width: 100% !important; height: auto !important; }
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
     width: 100%;
-    max-height: 150px;
+    max-height: 250px;
     border-radius: 6px;
     border: 1px solid #e5e7eb;
 }
