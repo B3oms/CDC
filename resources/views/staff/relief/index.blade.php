@@ -24,6 +24,14 @@
         width: 100%;
     }
 }
+
+.stat-card {
+    text-align: center;
+}
+
+.stat-label {
+    text-align: center;
+}
 </style>
 
 {{-- Stats Row --}}
