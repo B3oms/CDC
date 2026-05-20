@@ -46,7 +46,7 @@
 
             <div class="form-group">
                 <label>Suffix (Optional)</label>
-                <select name="suffix">
+                <select name="suffix" id="suffix-select" onchange="toggleCustomSuffix()">
                     <option value="">-- None --</option>
                     <option value="Jr." {{ old('suffix') == 'Jr.' ? 'selected' : '' }}>Jr.</option>
                     <option value="Sr." {{ old('suffix') == 'Sr.' ? 'selected' : '' }}>Sr.</option>
@@ -55,7 +55,12 @@
                     <option value="III" {{ old('suffix') == 'III' ? 'selected' : '' }}>III</option>
                     <option value="IV" {{ old('suffix') == 'IV' ? 'selected' : '' }}>IV</option>
                     <option value="V" {{ old('suffix') == 'V' ? 'selected' : '' }}>V</option>
+                    <option value="Other" {{ old('suffix') == 'Other' || (old('suffix') && !in_array(old('suffix'), ['Jr.', 'Sr.', 'I', 'II', 'III', 'IV', 'V'])) ? 'selected' : '' }}>Other</option>
                 </select>
+            </div>
+            <div class="form-group" id="custom-suffix-group" style="display: {{ (old('suffix') == 'Other' || (old('suffix') && !in_array(old('suffix'), ['Jr.', 'Sr.', 'I', 'II', 'III', 'IV', 'V']))) ? 'flex' : 'none' }};">
+                <label>Custom Suffix</label>
+                <input type="text" name="custom_suffix" id="custom-suffix-input" value="{{ old('custom_suffix') ?? (old('suffix') && !in_array(old('suffix'), ['Jr.', 'Sr.', 'I', 'II', 'III', 'IV', 'V']) ? old('suffix') : '') }}" placeholder="Enter custom suffix">
             </div>
 
             <div class="form-group">
@@ -161,7 +166,23 @@ function toggleFields() {
     org.style.display      = (roleName === 'Volunteer' || roleName === 'Barangay Partner') ? 'flex' : 'none';
 }
 
+function toggleCustomSuffix() {
+    const select = document.getElementById('suffix-select');
+    const customGroup = document.getElementById('custom-suffix-group');
+    const customInput = document.getElementById('custom-suffix-input');
+
+    if (select.value === 'Other') {
+        customGroup.style.display = 'flex';
+        customInput.required = true;
+    } else {
+        customGroup.style.display = 'none';
+        customInput.required = false;
+        customInput.value = '';
+    }
+}
+
 // Run on page load to restore old() selections
 toggleFields();
+toggleCustomSuffix();
 </script>
 @endpush
