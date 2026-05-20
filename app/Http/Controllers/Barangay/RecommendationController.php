@@ -24,7 +24,7 @@ class RecommendationController extends Controller
             'middle_name'    => 'nullable|string|max:100|regex:/^[a-zA-Z\s]*$/',
             'last_name'      => 'required|string|max:100|regex:/^[a-zA-Z\s]+$/',
             'suffix'         => 'nullable|string|max:20',
-            'age'            => 'required|integer|min:16|max:110',
+            'age'            => 'required|integer|min:18|max:110',
             'contact_number' => 'nullable|string|max:11|regex:/^[0-9]{11}$/',
             'address'        => 'nullable|string',
         ]);
