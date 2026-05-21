@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('beneficiary.layouts.app')
 
 @section('title', 'Relief History')
 @section('breadcrumb', 'Relief History')
@@ -9,6 +9,7 @@
 /* Relief History Styles */
 .relief-history-page {
     max-width: 100%;
+    text-align: center;
 }
 
 .page-header {
@@ -43,11 +44,13 @@
     border-radius: 12px;
     padding: 1.5rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    text-align: center;
 }
 
 .event-card {
     background: #fff;
     border: 1px solid #f3f4f6;
+    text-align: center;
     border-radius: 12px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
@@ -135,6 +138,7 @@
     margin-top: 1rem;
     padding-top: 1rem;
     border-top: 1px solid #f3f4f6;
+    text-align: center;
 }
 
 .items-title {
@@ -151,6 +155,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 0.75rem;
+    justify-content: center;
 }
 
 .item-card {
@@ -158,6 +163,7 @@
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     padding: 0.75rem;
+    text-align: center;
 }
 
 .item-name {

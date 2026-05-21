@@ -4,7 +4,7 @@
 @section('content')
 <div class="dash-header">
     <h1>Add Staff / Partner</h1>
-    <a href="{{ route('admin.staff.index') }}" class="btn-back">← Back</a>
+    <x-back-button href="{{ route('admin.staff.index') }}" label="Back" />
 </div>
 
 <div class="form-card">

@@ -7,7 +7,7 @@
     <div>
         <h1>Edit Household #{{ $id }}</h1>
     </div>
-    <a href="{{ route('staff.households.show', $id) }}" class="btn-back">← Back</a>
+    <x-back-button href="{{ route('staff.households.show', $id) }}" label="Back" />
 </div>
 
 <div class="form-card">

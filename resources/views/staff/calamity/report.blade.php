@@ -9,7 +9,7 @@
             <span class="badge-intensity {{ strtolower($calamity->intensity) }}">{{ $calamity->intensity }}</span>
         </p>
     </div>
-    <a href="{{ route('admin.dashboard') }}" class="btn-back">← Back to Dashboard</a>
+    <x-back-button href="{{ route('admin.dashboard') }}" label="Back to Dashboard" />
 </div>
 
 @if(session('success'))
@@ -76,26 +76,6 @@
     color: #6b7280;
     margin: 0.25rem 0 0 0;
     font-size: 0.9rem;
-}
-
-.btn-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border: 1px solid #d1d5db;
-    background: white;
-    color: #6b7280;
-    border-radius: 6px;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all 0.2s ease;
-}
-
-.btn-back:hover {
-    background: #f9fafb;
-    border-color: #9ca3af;
-    color: #374151;
 }
 
 .alert-success {

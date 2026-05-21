@@ -84,34 +84,7 @@
             </div>
 
             <div class="filter-actions">
-                <div class="pdf-export-dropdown" style="position:relative;display:inline-block;">
-                    <button onclick="togglePdfDropdown(event)" class="btn-filter-action"
-                       style="border:none !important;cursor:pointer !important;">
-                        <i class="fas fa-file-pdf"></i> PDF
-                    </button>
-                    <div id="pdfOptions" class="pdf-options" style="display:none;position:absolute;top:100%;left:0;background:white;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:12px;min-width:200px;z-index:1001;">
-                        <div style="margin-bottom:12px;">
-                            <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Paper Size</label>
-                            <select id="paperSize" style="width:100%;padding:6px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;color:#374151;">
-                                <option value="A4">A4</option>
-                                <option value="Letter">Letter</option>
-                                <option value="Legal">Legal</option>
-                            </select>
-                        </div>
-                        <div style="margin-bottom:12px;">
-                            <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Orientation</label>
-                            <select id="orientation" style="width:100%;padding:6px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;color:#374151;">
-                                <option value="portrait" selected>Portrait</option>
-                                <option value="landscape">Landscape</option>
-                            </select>
-                        </div>
-                        <button onclick="exportPdf()" style="width:100%;padding:8px;background:#10b981;color:white;border:none;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s;"
-                           onmouseover="this.style.background='#059669'"
-                           onmouseout="this.style.background='#10b981'">
-                            Export PDF
-                        </button>
-                    </div>
-                </div>
+                <x-pdf-export-dropdown align="left" export-onclick="exportPdf()" />
                 <a href="{{ route('staff.beneficiaries.index') }}" class="btn-filter-reset">
                     <i class="fas fa-redo"></i> Reset
                 </a>
@@ -427,6 +400,59 @@ document.getElementById('municipality').addEventListener('change', function () {
     font-weight: 500;
 }
 
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.btn-view, .btn-edit, .btn-delete {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.4rem 0.7rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-view {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-view:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+.btn-edit {
+    background: #f59e0b;
+    color: white;
+}
+
+.btn-edit:hover {
+    background: #d97706;
+    transform: translateY(-1px);
+}
+
+.btn-delete {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
 /* Badges */
 .badge-yes {
     color: #059669;
@@ -553,45 +579,6 @@ document.getElementById('municipality').addEventListener('change', function () {
 </style>
 @push('scripts')
 <script>
-// PDF Export Functions
-let dropdownOpenTime = 0;
-
-function togglePdfDropdown(event) {
-    if (event) {
-        event.stopPropagation();
-        event.preventDefault();
-    }
-    const dropdown = document.getElementById('pdfOptions');
-    if (dropdown.style.display === 'none') {
-        dropdown.style.display = 'block';
-        dropdownOpenTime = Date.now();
-    } else {
-        dropdown.style.display = 'none';
-    }
-}
-
-// Prevent dropdown from closing when clicking inside
-document.getElementById('pdfOptions').addEventListener('click', function(event) {
-    event.stopPropagation();
-    event.preventDefault();
-});
-
-// Close dropdown when clicking outside (with delay to prevent immediate closing)
-document.addEventListener('click', function(event) {
-    const dropdown = document.getElementById('pdfOptions');
-    const button = event.target.closest('.pdf-export-dropdown');
-    const insideDropdown = event.target.closest('#pdfOptions');
-    
-    // Don't close if just opened (within 200ms)
-    if (Date.now() - dropdownOpenTime < 200) {
-        return;
-    }
-    
-    if (!button && !insideDropdown && dropdown && dropdown.style.display === 'block') {
-        dropdown.style.display = 'none';
-    }
-});
-
 function exportPdf() {
     const paperSize = document.getElementById('paperSize').value;
     const orientation = document.getElementById('orientation').value;
@@ -664,9 +651,7 @@ function exportPdf() {
     document.body.removeChild(form);
     
     // Close dropdown after submission
-    document.getElementById('pdfOptions').style.display = 'none';
+    closePdfDropdown('pdfOptions');
 }
-
-// Removed click-outside listener to prevent dropdown from closing unexpectedly
 </script>
 @endpush

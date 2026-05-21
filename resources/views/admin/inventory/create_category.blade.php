@@ -4,7 +4,7 @@
 @section('content')
 <div class="dash-header">
     <h1>Add Category</h1>
-    <a href="{{ route('admin.inventory.index') }}" class="btn-back">← Back</a>
+    <x-back-button href="{{ route('admin.inventory.index') }}" label="Back" />
 </div>
 
 <div class="form-card">

@@ -184,17 +184,22 @@ class DashboardController extends Controller
         */
         $totalInventoryItems = Item::count();
 
-        // inventory.quantity
-        $lowStockItems = Inventory::where('quantity', '<=', 10)->count();
+        // inventory.quantity - Get both count and specific items
+        $lowStockItems = Inventory::where('quantity', '<=', 100)
+            ->with('item.subcategory.category')
+            ->get();
+        $lowStockCount = $lowStockItems->count();
 
-        // inventory.expiration_date
+        // inventory.expiration_date - Get both count and specific items
         $expiringItems = Inventory::whereNotNull('expiration_date')
             ->whereDate(
                 'expiration_date',
                 '<=',
                 now()->addDays(30)
             )
-            ->count();
+            ->with('item.subcategory.category')
+            ->get();
+        $expiringCount = $expiringItems->count();
 
         /*
         |--------------------------------------------------------------------------
@@ -235,7 +240,9 @@ class DashboardController extends Controller
 
             'totalInventoryItems',
             'lowStockItems',
+            'lowStockCount',
             'expiringItems',
+            'expiringCount',
 
             'activeCalamity'
         ));
@@ -251,7 +258,7 @@ class DashboardController extends Controller
             'totalDistributions' => ReliefEvent::count(),
             'verifiedBeneficiaries' => Beneficiary::where('is_verified', true)->count(),
             'totalInventoryItems' => Item::count(),
-            'lowStockItems' => Inventory::where('quantity', '<=', DB::raw('reorder_level'))->count(),
+            'lowStockItems' => Inventory::where('quantity', '<=', 100)->count(),
             'expiringItems' => Item::where('expiration_date', '<=', now()->addDays(30))->count(),
             'activeStaff' => User::whereHas('role', function($q) { $q->where('name', 'Staff'); })->count(),
             'pendingLocations' => \App\Models\Municipality::pending()->count(),

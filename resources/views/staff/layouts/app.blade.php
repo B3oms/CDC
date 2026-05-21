@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>SPUP-CDC | @yield('title', 'Dashboard')</title>
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/design-system.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin/location-management.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -32,45 +33,6 @@
     margin: 0 auto;
 }
 
-/* Back Button for Small Screens */
-.back-button {
-    display: none;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    margin-bottom: 1rem;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.back-button:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-1px);
-}
-
-.back-button i {
-    margin-right: 0.5rem;
-}
-
-/* Show back button on smaller screens */
-@media (max-width: 768px) {
-    .back-button {
-        display: flex;
-    }
-}
-
-@media (max-width: 480px) {
-    .back-button {
-        padding: 0.625rem 0.875rem;
-        font-size: 13px;
-    }
-}
 </style>
 @stack('styles')
 </head>
@@ -89,10 +51,7 @@
         </div>
         
         <nav>
-            <!-- Back Button for Small Screens -->
-            <a href="javascript:history.back()" class="back-button" onclick="goBack()">
-                <i class="fas fa-arrow-left"></i> Back
-            </a>
+            <x-back-button :history="true" class="btn-back--sidebar" />
             
             <a href="{{ route('staff.dashboard') }}"
                 class="{{ request()->routeIs('staff.dashboard') ? 'active' : '' }}">
@@ -117,7 +76,7 @@
             </a>
             <a href="{{ route('staff.locations.index') }}"
                 class="{{ request()->routeIs('staff.locations.*') ? 'active' : '' }}">
-                <i class="fas fa-map-marker-alt"></i> Locations
+                <i class="fas fa-map-marker-alt"></i> Barangay Partners
             </a>
             <a href="{{ route('staff.recommended.index') }}"
                 class="{{ request()->routeIs('staff.recommended.*') ? 'active' : '' }}">
@@ -228,6 +187,7 @@
     </div>
 </div>
 
+@include('partials.pdf-export-scripts')
 @stack('scripts')
 
 <script>

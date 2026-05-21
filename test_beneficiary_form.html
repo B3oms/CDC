@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Beneficiary Login</title>
+    <style>
+        .form-section { display: none; }
+        .form-section.visible { display: block; }
+        .role-box { cursor: pointer; padding: 10px; border: 1px solid #ccc; margin: 5px; }
+        .role-box.selected { background-color: #e6f3ff; }
+    </style>
+</head>
+<body>
+    <h1>Test Beneficiary Login Form</h1>
+    
+    <form method="POST" action="/login" id="loginForm">
+        <input type="hidden" name="user_role" id="user_role" required>
+        
+        <div class="section-label">Select your role</div>
+        <div class="role-options">
+            <div class="role-box" data-role="beneficiary" onclick="selectRole('beneficiary')">
+                <h4>Beneficiary</h4>
+                <p>Relief recipient</p>
+            </div>
+        </div>
+        
+        <div id="emailForm" class="form-section">
+            <h3>Email/Password Form</h3>
+            <label>Email:</label>
+            <input type="email" id="email" name="email">
+            <label>Password:</label>
+            <input type="password" id="password" name="password">
+        </div>
+        
+        <div id="idForm" class="form-section">
+            <h3>Unique ID Form</h3>
+            <label for="unique_id">Unique ID:</label>
+            <input type="text" id="unique_id" name="unique_id" placeholder="e.g. BE-URAN-Y67W" style="text-transform:uppercase">
+        </div>
+        
+        <button type="submit">Log in</button>
+    </form>
+    
+    <div id="debug"></div>
+    
+    <script>
+        function selectRole(role) {
+            document.getElementById('user_role').value = role;
+            document.querySelectorAll('.role-box').forEach(b => b.classList.remove('selected'));
+            document.querySelector('[data-role="' + role + '"]').classList.add('selected');
+            
+            document.getElementById('emailForm').classList.remove('visible');
+            document.getElementById('idForm').classList.remove('visible');
+            
+            ['email', 'password', 'unique_id'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.removeAttribute('required'); el.value = ''; }
+            });
+            
+            if (role === 'beneficiary') {
+                document.getElementById('idForm').classList.add('visible');
+                document.getElementById('unique_id').setAttribute('required', 'required');
+            } else {
+                document.getElementById('emailForm').classList.add('visible');
+                document.getElementById('email').setAttribute('required', 'required');
+                document.getElementById('password').setAttribute('required', 'required');
+            }
+            
+            // Debug info
+            document.getElementById('debug').innerHTML = 
+                'Selected role: ' + role + '<br>' +
+                'User role value: ' + document.getElementById('user_role').value + '<br>' +
+                'ID Form visible: ' + document.getElementById('idForm').classList.contains('visible') + '<br>' +
+                'Email Form visible: ' + document.getElementById('emailForm').classList.contains('visible');
+        }
+        
+        // Auto-select beneficiary for testing
+        document.addEventListener('DOMContentLoaded', function() {
+            selectRole('beneficiary');
+        });
+    </script>
+</body>
+</html>

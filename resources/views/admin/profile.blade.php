@@ -109,9 +109,7 @@
 
             {{-- Actions --}}
             <div class="profile-actions">
-                <a href="{{ route('admin.dashboard') }}" class="btn btn-ghost">
-                    <i class="fas fa-arrow-left"></i> Dashboard
-                </a>
+                <x-back-button href="{{ route('admin.dashboard') }}" label="Dashboard" />
                 <button type="button" onclick="showEditMode()" class="btn btn-primary">
                     <i class="fas fa-edit"></i> Edit Profile
                 </button>

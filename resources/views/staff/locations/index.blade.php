@@ -8,9 +8,7 @@
         <p style="color:#666;font-size:0.9rem;margin-top:0.5rem;">Submit requests for new municipalities and barangays to be added to the system</p>
     </div>
     <div class="dash-header-actions">
-        <a href="{{ route('staff.dashboard') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Dashboard
-        </a>
+        <x-back-button href="{{ route('staff.dashboard') }}" label="Back to Dashboard" />
     </div>
 </div>
 

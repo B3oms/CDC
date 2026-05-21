@@ -87,10 +87,13 @@ Route::prefix('admin')->name('admin.')->middleware(['isAdmin'])->group(function 
     Route::post('beneficiaries/count', [EventController::class, 'getBeneficiaryCounts'])->name('beneficiaries.count');
 
     // Beneficiaries
-    Route::get('beneficiaries',      [BeneficiaryController::class, 'index'])->name('beneficiaries.index');
-    Route::get('beneficiaries/create', [BeneficiaryController::class, 'create'])->name('beneficiaries.create');
-    Route::post('beneficiaries',     [BeneficiaryController::class, 'store'])->name('beneficiaries.store');
-    Route::get('beneficiaries/{id}', [BeneficiaryController::class, 'show'])->name('beneficiaries.show');
+    Route::get('beneficiaries',           [BeneficiaryController::class, 'index'])->name('beneficiaries.index');
+    Route::get('beneficiaries/create',    [BeneficiaryController::class, 'create'])->name('beneficiaries.create');
+    Route::post('beneficiaries',          [BeneficiaryController::class, 'store'])->name('beneficiaries.store');
+    Route::get('beneficiaries/{id}',      [BeneficiaryController::class, 'show'])->name('beneficiaries.show');
+    Route::get('beneficiaries/{id}/edit', [BeneficiaryController::class, 'edit'])->name('beneficiaries.edit');
+    Route::put('beneficiaries/{id}',      [BeneficiaryController::class, 'update'])->name('beneficiaries.update');
+    Route::delete('beneficiaries/{id}',   [BeneficiaryController::class, 'destroy'])->name('beneficiaries.destroy');
 
     // Staff management
     Route::get('staff',                      [StaffController::class, 'index'])->name('staff.index');
@@ -184,6 +187,9 @@ Route::prefix('staff')->name('staff.')->middleware(['isStaff'])->group(function 
     Route::post('beneficiaries',          [StaffBeneficiaryController::class, 'store'])->name('beneficiaries.store');
     Route::get('beneficiaries/pdf',       [StaffBeneficiaryController::class, 'pdf'])->name('beneficiaries.pdf');
     Route::get('beneficiaries/{id}',      [StaffBeneficiaryController::class, 'show'])->name('beneficiaries.show');
+    Route::get('beneficiaries/{id}/edit', [StaffBeneficiaryController::class, 'edit'])->name('beneficiaries.edit');
+    Route::put('beneficiaries/{id}',      [StaffBeneficiaryController::class, 'update'])->name('beneficiaries.update');
+    Route::delete('beneficiaries/{id}',   [StaffBeneficiaryController::class, 'destroy'])->name('beneficiaries.destroy');
 
     Route::get('locations', [\App\Http\Controllers\Staff\LocationController::class, 'index'])->name('staff.locations.index');
     Route::get('locations/create', [\App\Http\Controllers\Staff\LocationController::class, 'create'])->name('staff.locations.create');

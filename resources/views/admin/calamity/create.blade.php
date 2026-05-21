@@ -145,7 +145,7 @@
 
     {{-- Form Actions --}}
     <div class="cr-footer">
-      <a href="{{ route('admin.calamity.index') }}" class="cr-btn-cancel">← Back</a>
+      <x-back-button href="{{ route('admin.calamity.index') }}" label="Back" />
       <button type="submit" class="cr-btn-submit">
         <i class="fas fa-plus"></i>
         Create

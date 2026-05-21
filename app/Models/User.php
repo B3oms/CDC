@@ -46,4 +46,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Barangay::class);
     }
+
+    public function beneficiary()
+    {
+        return $this->hasOne(Beneficiary::class);
+    }
 }

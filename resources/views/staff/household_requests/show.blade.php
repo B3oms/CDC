@@ -9,7 +9,7 @@
         <p class="sub">Review and approve/reject household assistance request</p>
     </div>
     <div>
-        <a href="{{ route('staff.household_requests.index') }}" class="btn-back">← Back</a>
+        <x-back-button href="{{ route('staff.household_requests.index') }}" label="Back" />
     </div>
 </div>
 

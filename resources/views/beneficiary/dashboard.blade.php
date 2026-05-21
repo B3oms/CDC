@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('beneficiary.layouts.app')
 
 @section('title', 'Beneficiary Dashboard')
 @section('breadcrumb', 'Dashboard')
@@ -272,14 +272,6 @@
             </div>
             <div class="stat-value">{{ $totalItemsReceived }}</div>
             <div class="stat-label">Items Received</div>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-peso-sign"></i>
-            </div>
-            <div class="stat-value">₱{{ number_format($totalValue, 2) }}</div>
-            <div class="stat-label">Total Estimated Value</div>
         </div>
     </div>
 

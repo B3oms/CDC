@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>SPUP-CDC | @yield('title', 'Dashboard')</title>
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/design-system.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -101,7 +102,7 @@
                 </a>
                 <a href="{{ route('admin.locations.index') }}"
                     class="{{ request()->routeIs('admin.locations.*') ? 'active' : '' }}">
-                    <i class="fas fa-map-marker-alt"></i> Locations
+                    <i class="fas fa-map-marker-alt"></i> Barangay Partners
                 </a>
             @endif
         </nav>
@@ -174,7 +175,7 @@
                         @endif
                         @if(Route::has('admin.locations.create'))
                         <a href="{{ route('admin.locations.create') }}" class="quick-action-item">
-                            <i class="fas fa-map-marker-alt"></i> Location
+                            <i class="fas fa-map-marker-alt"></i> Barangay Partner
                         </a>
                         @endif
                         @if(Route::has('admin.inventory.category.create'))
@@ -195,6 +196,7 @@
     </div>
 </div>
 
+@include('partials.pdf-export-scripts')
 @stack('scripts')
 
 <script>
@@ -429,14 +431,14 @@ function updateNotificationBadge() {
     font-size: 0.875rem;
 }
 
-/* Notification Unread State */
+/* Notification unread — uses design-system brand colors */
 .notification-item.unread {
-    background: #f0f9ff;
-    border-left: 3px solid #3b82f6;
+    background: var(--color-accent-soft, #eaf3de);
+    border-left: 3px solid var(--color-primary, #1a3d1f);
 }
 
 .notification-item.unread:hover {
-    background: #e0f2fe;
+    background: #dcefc8;
 }
 
 /* Profile Circle Styling */

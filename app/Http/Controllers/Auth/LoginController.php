@@ -16,6 +16,7 @@ class LoginController extends Controller
             'Admin'            => redirect()->route('admin.dashboard'),
             'Staff'            => redirect()->route('staff.dashboard'),
             'Barangay Partner' => redirect()->route('barangay.dashboard'),
+            'Beneficiary'       => redirect()->route('beneficiary.dashboard'),
             default            => redirect('/'),
         };
     }
@@ -30,19 +31,37 @@ class LoginController extends Controller
         if ($userRole === 'beneficiary') {
             $credentials = $request->validate([
                 'user_role' => 'required|in:beneficiary',
-                'unique_id' => 'required|string|between:8,12|regex:/^[A-Z0-9]+$/',
+                'unique_id' => [
+                    'required',
+                    'string',
+                    function ($attribute, $value, $fail) {
+                        // Check old format: BAL-SPUP-2026-069 (17 chars)
+                        if (preg_match('/^[A-Z]{3}-[A-Z]{4}-[0-9]{4}-[0-9]{3}$/', $value)) {
+                            return;
+                        }
+                        // Check new format: BE-URAN-Y67W (12 chars)
+                        if (preg_match('/^[A-Z]{2}-[A-Z]{4}-[A-Z0-9]{4}$/', $value)) {
+                            return;
+                        }
+                        $fail('Unique ID must be in format: BAL-SPUP-2026-069 or BE-URAN-Y67W');
+                    },
+                ],
             ], [
                 'unique_id.required' => 'Unique ID is required for beneficiaries',
-                'unique_id.between' => 'Unique ID must be between 8 and 12 characters',
-                'unique_id.regex' => 'Unique ID must contain only uppercase letters and numbers',
             ]);
             
             // Find beneficiary by unique_id
-            $user = \App\Models\User::where('unique_id', $request->unique_id)
-                ->whereHas('role', function($query) {
-                    $query->where('name', 'Beneficiary');
-                })
+            $beneficiary = \App\Models\Beneficiary::where('unique_id', $request->unique_id)
                 ->first();
+            
+            if (!$beneficiary || !$beneficiary->user_id) {
+                return back()->withErrors([
+                    'unique_id' => 'Invalid Unique ID. Please check your ID and try again.',
+                ])->onlyInput('unique_id', 'user_role');
+            }
+            
+            // Get the user account
+            $user = $beneficiary->user;
                 
             if (!$user) {
                 return back()->withErrors([

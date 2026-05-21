@@ -66,8 +66,112 @@ class BeneficiaryController extends Controller
         return view('staff.beneficiaries.create', compact('municipalities', 'barangays'));
     }
 
+    public function edit($id)
+    {
+        $beneficiary = Beneficiary::findOrFail($id);
+        $municipalities = Municipality::with('barangays')->get();
+        $barangays = Barangay::all();
+        
+        return view('staff.beneficiaries.edit', compact('beneficiary', 'municipalities', 'barangays'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $beneficiary = Beneficiary::findOrFail($id);
+        
+        $request->validate([
+            'municipality_id'  => 'required|exists:municipalities,id',
+            'barangay_id'     => 'required|exists:barangays,id',
+            'first_name'      => 'required|string|max:100|regex:/^[a-zA-Z\s]+$/',
+            'middle_name'     => 'nullable|string|max:100|regex:/^[a-zA-Z\s]*$/',
+            'last_name'       => 'required|string|max:100|regex:/^[a-zA-Z\s]+$/',
+            'suffix'          => 'nullable|string|max:20',
+            'gender'          => 'required|in:Male,Female,Other',
+            'is_4ps_member'   => 'required|boolean',
+            'birthdate'       => 'required|date',
+            'contact_number'  => 'nullable|string|regex:/^[0-9]{11}$/',
+            'address'         => 'nullable|string',
+            'family_size'     => 'required|integer|min:1',
+            'monthly_income'  => 'required|numeric|min:0',
+            'children_count'  => 'required|integer|min:0',
+            'has_senior'      => 'required|boolean',
+            'interview_notes'  => 'nullable|string',
+        ]);
+
+        // Auto-verification
+        $criteriaMet = Beneficiary::checkCriteria(
+            $request->family_size,
+            $request->monthly_income,
+            $request->has_senior ?? false,
+            $request->children_count,
+            $request->is_4ps_member ?? false
+        );
+
+        $isVerified       = $criteriaMet >= 3 ? 1 : 0;
+        $vulnerabilityLevel = match(true) {
+            $criteriaMet >= 4 => 'High',
+            $criteriaMet == 3 => 'Medium',
+            default           => 'Low',
+        };
+
+        $beneficiary->update([
+            'barangay_id'        => $request->barangay_id,
+            'first_name'         => $request->first_name,
+            'middle_name'        => $request->middle_name,
+            'last_name'          => $request->last_name,
+            'suffix'             => $request->suffix,
+            'gender'             => $request->gender,
+            'is_4ps_member'      => $request->is_4ps_member,
+            'birthdate'          => $request->birthdate,
+            'contact_number'     => $request->contact_number,
+            'address'            => $request->address,
+            'family_size'        => $request->family_size,
+            'monthly_income'     => $request->monthly_income,
+            'vulnerability_level'=> $vulnerabilityLevel,
+            'has_senior'         => $request->has_senior ?? false,
+            'children_count'     => $request->children_count,
+            'criteria_met'       => $criteriaMet,
+            'interview_notes'    => $request->interview_notes,
+            'is_verified'        => $isVerified,
+        ]);
+
+        return redirect()->route('staff.beneficiaries.index')
+            ->with('success', 'Beneficiary updated successfully.');
+    }
+
+    public function destroy($id)
+    {
+        $beneficiary = Beneficiary::findOrFail($id);
+        
+        // Delete associated user account if exists
+        if ($beneficiary->user_id) {
+            $user = $beneficiary->user;
+            if ($user) {
+                $user->delete();
+            }
+        }
+        
+        // Delete beneficiary
+        $beneficiary->delete();
+        
+        return redirect()->route('staff.beneficiaries.index')
+            ->with('success', 'Beneficiary deleted successfully.');
+    }
+
     public function store(Request $request)
     {
+        // Check for duplicate beneficiary before validation
+        $existingBeneficiary = Beneficiary::where('first_name', $request->first_name)
+            ->where('last_name', $request->last_name)
+            ->where('birthdate', $request->birthdate)
+            ->first();
+
+        if ($existingBeneficiary) {
+            return back()
+                ->withInput()
+                ->withErrors(['duplicate' => 'This person is already registered as a beneficiary.']);
+        }
+
         $request->validate([
             'municipality_id'  => 'required|exists:municipalities,id',
             'barangay_id'     => 'required|exists:barangays,id',
@@ -86,6 +190,10 @@ class BeneficiaryController extends Controller
             'children_count'  => 'required|integer|min:0',
             'has_senior'      => 'required|boolean',
             'interview_notes'  => 'nullable|string',
+        ], [
+            'first_name.required' => 'First name is required.',
+            'last_name.required' => 'Last name is required.',
+            'birthdate.required' => 'Birthdate is required.',
         ]);
 
         // Check 250 slot limit
@@ -114,43 +222,60 @@ class BeneficiaryController extends Controller
             default           => 'Low',
         };
 
-        $beneficiary = Beneficiary::create([
-            'barangay_id'        => $request->barangay_id,
-            'first_name'         => $request->first_name,
-            'middle_name'        => $request->middle_name,
-            'last_name'          => $request->last_name,
-            'suffix'             => $request->suffix,
-            'gender'             => $request->gender,
-            'is_4ps_member'      => $request->is_4ps_member,
-            'birthdate'          => $request->birthdate,
-            'contact_number'     => $request->contact_number,
-            'address'            => $request->address,
-            'family_size'        => $request->family_size,
-            'monthly_income'     => $request->monthly_income,
-            'vulnerability_level'=> $vulnerabilityLevel,
-            'has_senior'         => $request->has_senior ?? false,
-            'children_count'     => $request->children_count,
-            'criteria_met'       => $criteriaMet,
-            'interview_notes'    => $request->interview_notes,
-            'interviewed_by'     => auth()->id(),
-            'interviewed_at'     => now(),
-            'is_verified'        => $isVerified,
-        ]);
+        // Generate unique ID
+        $uniqueId = $this->generateUniqueId($request->barangay_id);
 
-        // Create beneficiary account if verified
-        if ($isVerified) {
-            $this->createBeneficiaryAccount($beneficiary);
+        try {
+            $beneficiary = Beneficiary::create([
+                'barangay_id'        => $request->barangay_id,
+                'unique_id'          => $uniqueId,
+                'first_name'         => $request->first_name,
+                'middle_name'        => $request->middle_name,
+                'last_name'          => $request->last_name,
+                'suffix'             => $request->suffix,
+                'gender'             => $request->gender,
+                'is_4ps_member'      => $request->is_4ps_member,
+                'birthdate'          => $request->birthdate,
+                'contact_number'     => $request->contact_number,
+                'address'            => $request->address,
+                'family_size'        => $request->family_size,
+                'monthly_income'     => $request->monthly_income,
+                'vulnerability_level'=> $vulnerabilityLevel,
+                'has_senior'         => $request->has_senior ?? false,
+                'children_count'     => $request->children_count,
+                'criteria_met'       => $criteriaMet,
+                'interview_notes'    => $request->interview_notes,
+                'interviewed_by'     => auth()->id(),
+                'interviewed_at'     => now(),
+                'is_verified'        => $isVerified,
+            ]);
+
+            // Create beneficiary account if verified
+            if ($isVerified) {
+                $this->createBeneficiaryAccount($beneficiary);
+            }
+
+            // Trigger notification for beneficiary addition
+            NotificationService::beneficiaryAdded($beneficiary->id, auth()->id());
+
+            $message = $isVerified
+                ? 'Beneficiary verified and added successfully.'
+                : 'Beneficiary recorded but did not meet verification criteria.';
+
+            return redirect()->route('staff.beneficiaries.index')
+                ->with('success', $message);
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Handle duplicate entry error (error code 1062)
+            if ($e->getCode() == 1062 || $e->errorInfo[1] == 1062) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['duplicate' => 'This person is already registered as a beneficiary.']);
+            }
+
+            // Re-throw other database errors
+            throw $e;
         }
-
-        // Trigger notification for beneficiary addition
-        NotificationService::beneficiaryAdded($beneficiary->id, auth()->id());
-
-        $message = $isVerified
-            ? 'Beneficiary verified and added successfully.'
-            : 'Beneficiary recorded but did not meet verification criteria.';
-
-        return redirect()->route('staff.beneficiaries.index')
-            ->with('success', $message);
     }
 
     public function show($id)
@@ -234,5 +359,28 @@ class BeneficiaryController extends Controller
         ]);
 
         $beneficiary->update(['user_id' => $user->id]);
+    }
+
+    /**
+     * Generate a unique ID for beneficiary
+     */
+    private function generateUniqueId($barangayId)
+    {
+        // Get barangay code
+        $barangay = Barangay::find($barangayId);
+        $barangayCode = $barangay ? strtoupper(substr($barangay->name, 0, 3)) : 'BRG';
+        
+        // Get current year
+        $year = date('Y');
+        
+        // Get sequential number for this barangay
+        $lastBeneficiary = Beneficiary::where('barangay_id', $barangayId)
+            ->orderBy('id', 'desc')
+            ->first();
+        
+        $sequence = $lastBeneficiary ? ((int) substr($lastBeneficiary->unique_id ?? '000', -3) + 1) : 1;
+        
+        // Format: BRG-CODE-YEAR-NNN (e.g., BRG-MNL-2026-001)
+        return sprintf('%s-%s-%s-%03d', $barangayCode, 'SPUP', $year, $sequence);
     }
 }

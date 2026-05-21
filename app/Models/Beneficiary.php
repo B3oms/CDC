@@ -31,13 +31,50 @@ class Beneficiary extends Model
         'interviewed_by',
         'interviewed_at',
         'is_verified',
+        'is_indigenous',
+        'is_pwd',
+        'pwd_type',
     ];
 
     protected $casts = [
         'is_4ps_member' => 'boolean',
         'has_senior'     => 'boolean',
         'interviewed_at' => 'datetime',
+        'is_indigenous'  => 'boolean',
+        'is_pwd'         => 'boolean',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($beneficiary) {
+            if (empty($beneficiary->unique_id)) {
+                $beneficiary->unique_id = self::generateUniqueId();
+            }
+        });
+    }
+
+    public static function generateUniqueId(): string
+    {
+        do {
+            // Generate a random ID with format: BE-URAN-Y67W
+            // First part: BE (Beneficiary)
+            $prefix = 'BE';
+            
+            // Second part: 4 random letters (like URAN)
+            $letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $middlePart = substr(str_shuffle($letters), 0, 4);
+            
+            // Third part: 4 random characters (letters and numbers, like Y67W)
+            $alphanumeric = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $suffix = substr(str_shuffle($alphanumeric), 0, 4);
+            
+            $uniqueId = "{$prefix}-{$middlePart}-{$suffix}";
+        } while (self::where('unique_id', $uniqueId)->exists());
+
+        return $uniqueId;
+    }
 
     public function barangay()
     {

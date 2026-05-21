@@ -1,10 +1,46 @@
 @extends('staff.layouts.app')
 @section('title', 'Add Beneficiary')
 
+@push('styles')
+<style>
+.alert-error {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    color: #991b1b;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.alert-error i {
+    font-size: 1rem;
+}
+
+/* Badge Styles */
+.info-badge {
+    background: #3b82f6;
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+    margin-left: 0.5rem;
+}
+
+.required {
+    color: #dc3545;
+    font-weight: 600;
+}
+</style>
+@endpush
+
 @section('content')
 <div class="dash-header">
     <h1>Beneficiary Interview Form</h1>
-    <a href="{{ route('staff.beneficiaries.index') }}" class="btn-back">← Back</a>
+    <x-back-button href="{{ route('staff.beneficiaries.index') }}" label="Back" />
 </div>
 
 @if(isset($prefill))
@@ -140,6 +176,16 @@
                     <textarea name="address" rows="2"
                         placeholder="Full address">{{ old('address', $prefill->address ?? '') }}</textarea>
                 </div>
+                <div class="form-group">
+                    <label>
+                        Indigenous Status
+                    </label>
+                    <select name="is_indigenous">
+                        <option value="">-- Select --</option>
+                        <option value="0" {{ old('is_indigenous') == '0' ? 'selected' : '' }}>No</option>
+                        <option value="1" {{ old('is_indigenous') == '1' ? 'selected' : '' }}>Yes</option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -147,7 +193,7 @@
         <div class="interview-section">
             <div class="interview-section-title">Verification Criteria</div>
             <p class="hint" style="margin-bottom:1rem;">
-                Beneficiary must meet at least <strong>3 of 5 criteria</strong> to be verified.
+                Beneficiary must meet at least <strong>3 of 6 criteria</strong> to be verified.
             </p>
             <div class="form-grid">
                 <div class="form-group">
@@ -201,6 +247,37 @@
                         <option value="1" {{ old('is_4ps_member') == '1' ? 'selected' : '' }}>Yes</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label>
+                        Person with Disability (PWD)
+                        <span class="criteria-badge" id="crit-pwd">Criteria 6: PWD present</span>
+                    </label>
+                    <select name="is_pwd" id="pwd-select" onchange="togglePwdType(); updateCriteria()">
+                        <option value="">-- Select --</option>
+                        <option value="0" {{ old('is_pwd') == '0' ? 'selected' : '' }}>No</option>
+                        <option value="1" {{ old('is_pwd') == '1' ? 'selected' : '' }}>Yes</option>
+                    </select>
+                </div>
+            </div>
+
+            {{-- PWD Type Section --}}
+            <div class="form-grid" style="margin-top:1.5rem;">
+                <div class="form-group" id="pwd-type-group" style="display:none;">
+                    <label>
+                        Type of Disability
+                        <span class="required">*</span>
+                    </label>
+                    <select name="pwd_type" id="pwd-type-select">
+                        <option value="">-- Select Type --</option>
+                        <option value="visual" {{ old('pwd_type') == 'visual' ? 'selected' : '' }}>Visual Impairment</option>
+                        <option value="hearing" {{ old('pwd_type') == 'hearing' ? 'selected' : '' }}>Hearing Impairment</option>
+                        <option value="mobility" {{ old('pwd_type') == 'mobility' ? 'selected' : '' }}>Mobility Impairment</option>
+                        <option value="cognitive" {{ old('pwd_type') == 'cognitive' ? 'selected' : '' }}>Cognitive Disability</option>
+                        <option value="psychosocial" {{ old('pwd_type') == 'psychosocial' ? 'selected' : '' }}>Psychosocial Disability</option>
+                        <option value="multiple" {{ old('pwd_type') == 'multiple' ? 'selected' : '' }}>Multiple Disabilities</option>
+                        <option value="other" {{ old('pwd_type') == 'other' ? 'selected' : '' }}>Other</option>
+                    </select>
+                </div>
             </div>
 
             {{-- Live Criteria Result --}}
@@ -220,6 +297,14 @@
             </div>
         </div>
 
+        {{-- Duplicate Error Display --}}
+        @if($errors->has('duplicate'))
+            <div class="alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                {{ $errors->first('duplicate') }}
+            </div>
+        @endif
+
         <div class="form-actions">
             <button type="submit" class="btn-primary">Submit Interview</button>
             <a href="{{ route('staff.beneficiaries.index') }}" class="btn-secondary">Cancel</a>
@@ -236,12 +321,14 @@ function updateCriteria() {
     const children = parseInt(document.querySelector('[name="children_count"]').value) || 0;
     const senior   = document.querySelector('[name="has_senior"]').value === '1';
     const fourPs   = document.querySelector('[name="is_4ps_member"]').value === '1';
+    const pwd      = document.querySelector('[name="is_pwd"]').value === '1';
 
     const c1 = income <= 10000;
     const c2 = family >= 4;
     const c3 = children >= 2;
     const c4 = senior;
     const c5 = fourPs;
+    const c6 = pwd;
 
     let count = 0;
     if (c1) count++;
@@ -249,6 +336,7 @@ function updateCriteria() {
     if (c3) count++;
     if (c4) count++;
     if (c5) count++;
+    if (c6) count++;
 
     // Update badges
     document.getElementById('crit-income').className   = 'criteria-badge ' + (c1 ? 'met' : '');
@@ -256,12 +344,13 @@ function updateCriteria() {
     document.getElementById('crit-children').className = 'criteria-badge ' + (c3 ? 'met' : '');
     document.getElementById('crit-senior').className   = 'criteria-badge ' + (c4 ? 'met' : '');
     document.getElementById('crit-4ps').className       = 'criteria-badge ' + (c5 ? 'met' : '');
+    document.getElementById('crit-pwd').className        = 'criteria-badge ' + (c6 ? 'met' : '');
 
     const countEl   = document.getElementById('criteria-count');
     const verdictEl = document.getElementById('criteria-verdict');
     const resultEl  = document.getElementById('criteria-result');
 
-    countEl.textContent = count + '/5 criteria met';
+    countEl.textContent = count + '/6 criteria met';
 
     if (count >= 4) {
         verdictEl.textContent = '✓ Will be verified — High Vulnerability';
@@ -270,7 +359,7 @@ function updateCriteria() {
         verdictEl.textContent = '✓ Will be verified — Medium Vulnerability';
         resultEl.className    = 'criteria-result medium';
     } else {
-        verdictEl.textContent = '✗ Will NOT be verified (' + count + '/5 — needs at least 3)';
+        verdictEl.textContent = '✗ Will NOT be verified (' + count + '/6 — needs at least 3)';
         resultEl.className    = 'criteria-result low';
     }
 }
@@ -421,9 +510,26 @@ function getRegionFromProvince(province) {
     return regionMapping[province] || '';
 }
 
+// Toggle PWD type field based on PWD selection
+function togglePwdType() {
+    const pwdSelect = document.getElementById('pwd-select');
+    const pwdTypeGroup = document.getElementById('pwd-type-group');
+    const pwdTypeSelect = document.getElementById('pwd-type-select');
+    
+    if (pwdSelect.value === '1') {
+        pwdTypeGroup.style.display = 'block';
+        pwdTypeSelect.required = true;
+    } else {
+        pwdTypeGroup.style.display = 'none';
+        pwdTypeSelect.required = false;
+        pwdTypeSelect.value = '';
+    }
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     updateMunicipalities();
+    togglePwdType(); // Initialize PWD type field state
 });
 </script>
 @endpush

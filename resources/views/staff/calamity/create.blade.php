@@ -146,7 +146,7 @@
 
     {{-- Form Actions --}}
     <div class="cr-footer">
-      <a href="{{ route('staff.calamities.index') }}" class="cr-btn-cancel">← Back</a>
+      <x-back-button href="{{ route('staff.calamities.index') }}" label="Back" />
       <button type="submit" class="cr-btn-submit">
         <i class="fas fa-plus"></i>
         Create
@@ -157,7 +157,7 @@
   <div class="cr-card">
     <div class="cr-body" style="text-align:center;padding:3rem;">
       <p style="color:#888;font-size:16px;">Only administrators can create calamity events.</p>
-      <a href="{{ route('staff.calamities.index') }}" class="cr-btn-cancel" style="margin-top:1rem;">← Back to Calamities</a>
+      <x-back-button href="{{ route('staff.calamities.index') }}" style="margin-top:1rem;" label="Back to Calamities" />
     </div>
   </div>
   @endif

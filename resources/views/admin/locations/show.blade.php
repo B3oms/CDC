@@ -4,9 +4,7 @@
 @section('content')
 <div class="dash-header">
     <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
-        <a href="{{ route('admin.locations.index') }}" class="btn-back" style="color: #6b7280; text-decoration: none; font-size: 0.875rem;">
-            <i class="fas fa-arrow-left"></i> Back to Locations
-        </a>
+        <x-back-button href="{{ route('admin.locations.index') }}" label="Back to Locations" />
     </div>
     <h1 style="font-size: 1.5rem; font-weight: 700; color: #2c2c2a; margin: 0;">{{ $locationRequest->name }}</h1>
     <p style="color: #6b7280; font-size: 0.875rem; margin: 0.25rem 0 0 0;">{{ ucfirst($locationRequest->type) }}</p>

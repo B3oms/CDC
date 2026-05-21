@@ -7,7 +7,7 @@
         <h1>{{ $beneficiary->first_name }} {{ $beneficiary->last_name }}</h1>
         <p class="sub">{{ $beneficiary->barangay->name ?? 'N/A' }}</p>
     </div>
-    <a href="{{ route('barangay.beneficiaries.index') }}" class="btn-back">← Back</a>
+    <x-back-button href="{{ route('barangay.beneficiaries.index') }}" label="Back" />
 </div>
 
 <div class="dash-grid">
@@ -17,6 +17,7 @@
         <div class="section-card">
             <h3>Personal Information</h3>
             <table class="dist-table">
+                <tr><td class="meta-label">Unique ID</td><td><strong>{{ $beneficiary->unique_id ?? 'N/A' }}</strong></td></tr>
                 <tr><td class="meta-label">Name</td><td>{{ $beneficiary->first_name }} {{ $beneficiary->last_name }}</td></tr>
                 <tr><td class="meta-label">Gender</td><td>{{ $beneficiary->gender }}</td></tr>
                 <tr><td class="meta-label">Birthdate</td><td>{{ $beneficiary->birthdate ? \Carbon\Carbon::parse($beneficiary->birthdate)->format('M d, Y') : 'N/A' }}</td></tr>

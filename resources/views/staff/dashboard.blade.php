@@ -58,32 +58,12 @@
             <div class="chart-wrap">
                 <canvas id="chart-monthly"></canvas>
             </div>
-            <div class="chart-actions" style="position:relative;">
-                <button onclick="toggleChartPdfDropdown(event, 'monthly')" class="pdf-export-btn">
-                    <i class="fas fa-file-pdf"></i> Export PDF
-                </button>
-                <div id="pdfOptions-monthly" class="pdf-options" style="display:none;position:absolute;top:100%;right:0;background:white;border:1px solid #000000;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:12px;min-width:200px;z-index:1001;">
-                    <div style="margin-bottom:12px;">
-                        <label style="display:block;font-size:12px;font-weight:600;color:#000000;margin-bottom:6px;">Paper Size</label>
-                        <select id="paperSize-monthly" style="width:100%;padding:6px 8px;border:1px solid #000000;border-radius:4px;font-size:13px;color:#000000;">
-                            <option value="A4">A4</option>
-                            <option value="Letter">Letter</option>
-                            <option value="Legal">Legal</option>
-                        </select>
-                    </div>
-                    <div style="margin-bottom:12px;">
-                        <label style="display:block;font-size:12px;font-weight:600;color:#000000;margin-bottom:6px;">Orientation</label>
-                        <select id="orientation-monthly" style="width:100%;padding:6px 8px;border:1px solid #000000;border-radius:4px;font-size:13px;color:#000000;">
-                            <option value="portrait" selected>Portrait</option>
-                            <option value="landscape">Landscape</option>
-                        </select>
-                    </div>
-                    <button onclick="exportChartPdf('monthly')" style="width:100%;padding:8px;background:#10b981;color:white;border:none;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s;"
-                       onmouseover="this.style.background='#059669'"
-                       onmouseout="this.style.background='#10b981'">
-                        Export PDF
-                    </button>
-                </div>
+            <div class="chart-actions">
+                <x-pdf-export-dropdown
+                    dropdown-id="pdfOptions-monthly"
+                    paper-size-id="paperSize-monthly"
+                    orientation-id="orientation-monthly"
+                    export-onclick="exportChartPdf('monthly')" />
             </div>
         </div>
 
@@ -97,32 +77,12 @@
                     data-values="{{ json_encode($yearlyTrendValues) }}">
                 </canvas>
             </div>
-            <div class="chart-actions" style="position:relative;">
-                <button onclick="toggleChartPdfDropdown(event, 'yearly')" class="pdf-export-btn">
-                    <i class="fas fa-file-pdf"></i> Export PDF
-                </button>
-                <div id="pdfOptions-yearly" class="pdf-options" style="display:none;position:absolute;top:100%;right:0;background:white;border:1px solid #000000;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:12px;min-width:200px;z-index:1001;">
-                    <div style="margin-bottom:12px;">
-                        <label style="display:block;font-size:12px;font-weight:600;color:#000000;margin-bottom:6px;">Paper Size</label>
-                        <select id="paperSize-yearly" style="width:100%;padding:6px 8px;border:1px solid #000000;border-radius:4px;font-size:13px;color:#000000;">
-                            <option value="A4">A4</option>
-                            <option value="Letter">Letter</option>
-                            <option value="Legal">Legal</option>
-                        </select>
-                    </div>
-                    <div style="margin-bottom:12px;">
-                        <label style="display:block;font-size:12px;font-weight:600;color:#000000;margin-bottom:6px;">Orientation</label>
-                        <select id="orientation-yearly" style="width:100%;padding:6px 8px;border:1px solid #000000;border-radius:4px;font-size:13px;color:#000000;">
-                            <option value="portrait" selected>Portrait</option>
-                            <option value="landscape">Landscape</option>
-                        </select>
-                    </div>
-                    <button onclick="exportChartPdf('yearly')" style="width:100%;padding:8px;background:#10b981;color:white;border:none;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s;"
-                       onmouseover="this.style.background='#059669'"
-                       onmouseout="this.style.background='#10b981'">
-                        Export PDF
-                    </button>
-                </div>
+            <div class="chart-actions">
+                <x-pdf-export-dropdown
+                    dropdown-id="pdfOptions-yearly"
+                    paper-size-id="paperSize-yearly"
+                    orientation-id="orientation-yearly"
+                    export-onclick="exportChartPdf('yearly')" />
             </div>
         </div>
         @empty
@@ -320,53 +280,8 @@ function exportChartPdf(chartType) {
     document.body.removeChild(form);
     
     // Close dropdown after submission
-    document.getElementById(`pdfOptions-${chartType}`).style.display = 'none';
+    closePdfDropdown(`pdfOptions-${chartType}`);
 }
-
-let dropdownOpenTime = 0;
-
-function toggleChartPdfDropdown(event, chartType) {
-    if (event) {
-        event.stopPropagation();
-        event.preventDefault();
-    }
-    const dropdown = document.getElementById(`pdfOptions-${chartType}`);
-    if (dropdown.style.display === 'none') {
-        dropdown.style.display = 'block';
-        dropdownOpenTime = Date.now();
-    } else {
-        dropdown.style.display = 'none';
-    }
-}
-
-// Prevent dropdown from closing when clicking inside
-['monthly', 'yearly'].forEach(chartType => {
-    const dropdown = document.getElementById(`pdfOptions-${chartType}`);
-    if (dropdown) {
-        dropdown.addEventListener('click', function(event) {
-            event.stopPropagation();
-            event.preventDefault();
-        });
-    }
-});
-
-// Close dropdowns when clicking outside (with delay to prevent immediate closing)
-document.addEventListener('click', function(event) {
-    ['monthly', 'yearly'].forEach(chartType => {
-        const dropdown = document.getElementById(`pdfOptions-${chartType}`);
-        const button = event.target.closest('.pdf-export-btn');
-        const insideDropdown = event.target.closest(`#pdfOptions-${chartType}`);
-        
-        // Don't close if just opened (within 200ms)
-        if (Date.now() - dropdownOpenTime < 200) {
-            return;
-        }
-        
-        if (!button && !insideDropdown && dropdown && dropdown.style.display === 'block') {
-            dropdown.style.display = 'none';
-        }
-    });
-});
 </script>
 @endpush
 
@@ -575,26 +490,6 @@ document.addEventListener('click', function(event) {
     margin: 0.5rem 0 0;
     text-align: center;
 }
-
-/* ============================================
-   PDF EXPORT BUTTON
-   ============================================ */
-.pdf-export-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: #dc3545;
-    color: #fff;
-    border: none;
-    padding: 5px 12px;
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    cursor: pointer;
-    margin-top: 0.75rem;
-    transition: opacity .2s;
-}
-
-.pdf-export-btn:hover { opacity: .85; }
 
 /* ============================================
    SECTION CARDS

@@ -9,7 +9,7 @@
             <span class="badge-intensity {{ strtolower($calamity->intensity) }}">{{ $calamity->intensity }}</span>
         </p>
     </div>
-    <a href="{{ route('admin.dashboard') }}" class="btn-back">← Back to Dashboard</a>
+    <x-back-button href="{{ route('admin.dashboard') }}" label="Back to Dashboard" />
 </div>
 
 @if(session('success'))

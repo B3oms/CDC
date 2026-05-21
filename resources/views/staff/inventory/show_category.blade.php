@@ -19,7 +19,7 @@
         </div>
     </div>
     <div class="dash-header-actions">
-        <a href="{{ route('staff.inventory.index') }}" class="btn-back">← Back</a>
+        <x-back-button href="{{ route('staff.inventory.index') }}" label="Back" />
         <a href="{{ route('staff.inventory.subcategory.create', $category->id) }}" class="btn-primary">+ Add Subcategory</a>
         <a href="{{ route('staff.inventory.category.edit', $category->id) }}" class="btn-secondary">Edit Category</a>
     </div>
@@ -45,12 +45,11 @@
             <div class="inventory-card-img">
                 <div class="inventory-color-container" style="background-color: {{ $subcategory->color ?? '#3B82F6' }};">
                     <div class="inventory-color-text">
-                        {{ strtoupper(substr($subcategory->name, 0, 2)) }}
+                        {{ strtoupper($subcategory->name) }}
                     </div>
                 </div>
             </div>
             <div class="inventory-card-body">
-                <div class="inventory-card-name">{{ $subcategory->name }}</div>
                 <div class="inventory-card-count">{{ $subcategory->items_count }} items</div>
                 @if($subcategory->description)
                     <div class="inventory-card-desc">{{ $subcategory->description }}</div>
@@ -205,23 +204,37 @@
     height: 130px;
     overflow: hidden;
     position: relative;
+    margin: 0;
+    padding: 0;
 }
 
 .inventory-color-container {
     width: 100%;
-    height: 100%;
+    height: 130px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: transform .2s ease;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .inventory-color-text {
     color: white;
     font-weight: 700;
-    font-size: 1.5rem;
+    font-size: clamp(0.875rem, 3vw, 1.25rem);
     text-shadow: 0 1px 2px rgba(0,0,0,.3);
-    letter-spacing: 1px;
+    letter-spacing: 0.3px;
+    text-align: center;
+    padding: 0.75rem;
+    word-wrap: break-word;
+    line-height: 1.1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .inventory-category-card:hover .inventory-color-container {

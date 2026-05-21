@@ -12,7 +12,7 @@
         <a href="{{ route('staff.households.edit', $id) }}" class="btn-secondary">
             <i class="fas fa-edit"></i> Edit
         </a>
-        <a href="{{ route('staff.households.index') }}" class="btn-back">← Back</a>
+        <x-back-button href="{{ route('staff.households.index') }}" label="Back" />
     </div>
 </div>
 

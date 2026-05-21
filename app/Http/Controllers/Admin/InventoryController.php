@@ -32,10 +32,61 @@ class InventoryController extends Controller
     }
 
     // Level 1 — All categories
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->get('search');
+        
+        // Debug: Log the search term
+        if ($search) {
+            \Log::info('Search term: ' . $search);
+        }
+        
         $categories = Category::withCount('subcategories')->get();
-        return view('admin.inventory.index', compact('categories'));
+        
+        // Get low stock items
+        $lowStockItems = Inventory::where('quantity', '<=', 100)
+            ->with('item.subcategory.category')
+            ->get();
+        $lowStockCount = $lowStockItems->count();
+        
+        // Get expiring items
+        $expiringItems = Inventory::whereNotNull('expiration_date')
+            ->whereDate('expiration_date', '<=', now()->addDays(30))
+            ->with('item.subcategory.category')
+            ->get();
+        $expiringCount = $expiringItems->count();
+        
+        // Search items if search query provided
+        $searchResults = null;
+        if ($search) {
+            $searchResults = Item::with('subcategory.category')
+                ->where(function($query) use ($search) {
+                    $query->where('name', 'LIKE', '%' . $search . '%')
+                          ->orWhereHas('subcategory', function($subQuery) use ($search) {
+                              $subQuery->where('name', 'LIKE', '%' . $search . '%');
+                          })
+                          ->orWhereHas('subcategory.category', function($catQuery) use ($search) {
+                              $catQuery->where('name', 'LIKE', '%' . $search . '%');
+                          });
+                })
+                ->get();
+                
+            // Debug: Log the number of results
+            \Log::info('Search results count: ' . $searchResults->count());
+            foreach ($searchResults as $result) {
+                \Log::info('Found item: ' . $result->name);
+            }
+        }
+        
+        return view('admin.inventory.index', compact(
+            'categories',
+            'lowStockItems',
+            'lowStockCount',
+            'expiringItems',
+            'expiringCount',
+            'search',
+            'searchResults'
+        ));
     }
 
     // Level 2 — Subcategories under a category

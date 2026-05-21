@@ -6,7 +6,7 @@
 <div class="dash-header">
     <h1>Recommendation Details</h1>
     <div>
-        <a href="{{ route('barangay.recommendations.index') }}" class="btn-secondary">← Back</a>
+        <x-back-button href="{{ route('barangay.recommendations.index') }}" />
         @if($recommendation->status == 'pending')
             <a href="{{ route('barangay.recommendations.edit', $recommendation->id) }}" class="btn-primary">Edit</a>
         @endif

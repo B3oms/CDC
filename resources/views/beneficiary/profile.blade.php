@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('beneficiary.layouts.app')
 
 @section('title', 'My Profile')
 @section('breadcrumb', 'My Profile')

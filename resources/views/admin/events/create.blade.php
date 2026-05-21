@@ -9,9 +9,7 @@
         <p class="page-description">Schedule and organize relief operations for affected barangays</p>
     </div>
     <div class="page-actions">
-        <a href="{{ route('admin.events.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Events
-        </a>
+        <x-back-button href="{{ route('admin.events.index') }}" label="Back to Events" />
     </div>
 </div>
 

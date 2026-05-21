@@ -20,37 +20,8 @@
                 <i class="fas fa-play-circle"></i> Mark as Ongoing
             @endif
         </button>
-        <div class="pdf-export-dropdown" style="position:relative;display:inline-block;">
-            <button onclick="togglePdfDropdown(event)" class="btn-export-pdf"
-               style="display: inline-flex !important; align-items: center !important; gap: 6px !important; padding: 8px 16px !important; background: #10b981 !important; color: white !important; text-decoration: none !important; border-radius: 6px !important; font-size: 13px !important; font-weight: 500 !important; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3) !important; letter-spacing: 0.5px !important; border:none !important; cursor:pointer !important;"
-               onmouseover="this.style.background='#059669'"
-               onmouseout="this.style.background='#10b981'">
-                <i class="fas fa-file-pdf"></i> Export PDF
-            </button>
-            <div id="pdfOptions" class="pdf-options" style="display:none;position:absolute;top:100%;right:0;background:white;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:12px;min-width:200px;z-index:1001;">
-                <div style="margin-bottom:12px;">
-                    <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Paper Size</label>
-                    <select id="paperSize" style="width:100%;padding:6px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;color:#374151;">
-                        <option value="A4">A4</option>
-                        <option value="Letter">Letter</option>
-                        <option value="Legal">Legal</option>
-                    </select>
-                </div>
-                <div style="margin-bottom:12px;">
-                    <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Orientation</label>
-                    <select id="orientation" style="width:100%;padding:6px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;color:#374151;">
-                        <option value="portrait" selected>Portrait</option>
-                        <option value="landscape">Landscape</option>
-                    </select>
-                </div>
-                <button onclick="exportPdf({{ $event->id }})" style="width:100%;padding:8px;background:#10b981;color:white;border:none;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s;"
-                   onmouseover="this.style.background='#059669'"
-                   onmouseout="this.style.background='#10b981'">
-                    Export PDF
-                </button>
-            </div>
-        </div>
-        <a href="{{ route('staff.relief.index') }}" class="btn-back">← Back</a>
+        <x-pdf-export-dropdown export-onclick="exportPdf({{ $event->id }})" />
+        <x-back-button href="{{ route('staff.relief.index') }}" label="Back" />
     </div>
 </div>
 
@@ -398,30 +369,6 @@
 .btn-ongoing { background: #10b981; }
 .btn-default { background: #6b7280; }
 
-.btn-export-pdf {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-    padding: 8px 16px !important;
-    background: #10b981 !important;
-    color: white !important;
-    text-decoration: none !important;
-    border-radius: 6px !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3) !important;
-    letter-spacing: 0.5px !important;
-}
-
-.btn-export-pdf:hover {
-    background: #059669 !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 8px 12px -2px rgba(16, 185, 129, 0.4) !important;
-    text-decoration: none !important;
-    color: white !important;
-}
-
 /* ─── Empty states ───────────────────────────────────── */
 .empty-message {
     font-size: 13px;
@@ -535,76 +482,24 @@ function toggleEventStatus(eventId, currentStatus) {
     });
 }
 
-// PDF Export Functions
-let dropdownOpenTime = 0;
-
-function togglePdfDropdown(event) {
-    if (event) {
-        event.stopPropagation();
-        event.preventDefault();
-    }
-    const dropdown = document.getElementById('pdfOptions');
-    if (dropdown.style.display === 'none') {
-        dropdown.style.display = 'block';
-        dropdownOpenTime = Date.now();
-    } else {
-        dropdown.style.display = 'none';
-    }
-}
-
-// Prevent dropdown from closing when clicking inside
-document.getElementById('pdfOptions').addEventListener('click', function(event) {
-    event.stopPropagation();
-    event.preventDefault();
-});
-
-// Close dropdown when clicking outside (with delay to prevent immediate closing)
-document.addEventListener('click', function(event) {
-    const dropdown = document.getElementById('pdfOptions');
-    const button = event.target.closest('.pdf-export-dropdown');
-    const insideDropdown = event.target.closest('#pdfOptions');
-    
-    // Don't close if just opened (within 200ms)
-    if (Date.now() - dropdownOpenTime < 200) {
-        return;
-    }
-    
-    if (!button && !insideDropdown && dropdown && dropdown.style.display === 'block') {
-        dropdown.style.display = 'none';
-    }
-});
-
 function exportPdf(eventId) {
-    const paperSize = document.getElementById('paperSize').value;
-    const orientation = document.getElementById('orientation').value;
-    const url = `{{ route('staff.relief.pdf', ':id') }}`.replace(':id', eventId);
-    
-    // Create a hidden form to submit for download
     const form = document.createElement('form');
     form.method = 'GET';
-    form.action = url;
+    form.action = `{{ route('staff.relief.pdf', ':id') }}`.replace(':id', eventId);
     form.style.display = 'none';
-    
-    const paperSizeInput = document.createElement('input');
-    paperSizeInput.type = 'hidden';
-    paperSizeInput.name = 'paper_size';
-    paperSizeInput.value = paperSize;
-    form.appendChild(paperSizeInput);
-    
-    const orientationInput = document.createElement('input');
-    orientationInput.type = 'hidden';
-    orientationInput.name = 'orientation';
-    orientationInput.value = orientation;
-    form.appendChild(orientationInput);
-    
+
+    [['paper_size', document.getElementById('paperSize').value], ['orientation', document.getElementById('orientation').value]].forEach(([name, value]) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+    });
+
     document.body.appendChild(form);
     form.submit();
     document.body.removeChild(form);
-    
-    // Close dropdown after submission
-    document.getElementById('pdfOptions').style.display = 'none';
+    closePdfDropdown('pdfOptions');
 }
-
-// Removed click-outside listener to prevent dropdown from closing unexpectedly
 </script>
 @endpush

@@ -8,9 +8,7 @@
         <p style="color:#666;font-size:0.9rem;margin-top:0.5rem;">Submit requests for new municipalities and barangays to be added to the system</p>
     </div>
     <div class="dash-header-right">
-        <a href="{{ route('admin.location-requests.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Requests
-        </a>
+        <x-back-button href="{{ route('admin.location-requests.index') }}" label="Back to Requests" />
     </div>
 </div>
 

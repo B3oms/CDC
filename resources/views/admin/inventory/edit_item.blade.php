@@ -12,7 +12,7 @@
         </div>
         <h1>Edit — {{ $item->name }}</h1>
     </div>
-    <a href="{{ route('admin.inventory.subcategory', $subcategory->id) }}" class="btn-back">← Back</a>
+    <x-back-button href="{{ route('admin.inventory.subcategory', $subcategory->id) }}" label="Back" />
 </div>
 
 <div class="form-card">

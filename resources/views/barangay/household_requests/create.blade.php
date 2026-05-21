@@ -8,7 +8,7 @@
         <h1>New Household Request</h1>
         <p class="sub">Submit a household assistance request</p>
     </div>
-    <a href="{{ route('barangay.household_requests.index') }}" class="btn-back">← Back</a>
+    <x-back-button href="{{ route('barangay.household_requests.index') }}" label="Back" />
 </div>
 
 <div class="form-card">

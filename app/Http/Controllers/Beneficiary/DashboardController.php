@@ -25,16 +25,14 @@ class DashboardController extends Controller
 
         // Get distributions for this beneficiary
         $distributions = \App\Models\Distribution::where('beneficiary_id', $beneficiary->id)
-            ->with(['reliefEvent', 'item'])
-            ->orderBy('distributed_at', 'desc')
+            ->with('reliefOperation')
+            ->orderBy('date_distributed', 'desc')
             ->get();
 
         // Calculate statistics
         $totalEvents = $reliefEvents->count();
         $totalItemsReceived = $distributions->sum('quantity');
-        $totalValue = $distributions->sum(function($distribution) {
-            return $distribution->quantity * ($distribution->item->estimated_value ?? 0);
-        });
+        $totalValue = 0; // Simplified - remove estimated value calculation for now
 
         // Group relief events by year
         $eventsByYear = $reliefEvents->groupBy(function($event) {

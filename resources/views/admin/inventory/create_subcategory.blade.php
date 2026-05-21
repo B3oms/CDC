@@ -11,7 +11,7 @@
         </div>
         <h1>Add Subcategory</h1>
     </div>
-    <a href="{{ route('admin.inventory.category.show', $category->id) }}" class="btn-back">← Back</a>
+    <x-back-button href="{{ route('admin.inventory.category.show', $category->id) }}" label="Back" />
 </div>
 
 <div class="form-card">

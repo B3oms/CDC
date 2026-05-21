@@ -10,9 +10,7 @@
         <p class="page-description">Submit a new municipality or barangay for admin approval</p>
     </div>
     <div class="page-actions">
-        <a href="{{ route('staff.location-requests.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Requests
-        </a>
+        <x-back-button href="{{ route('staff.location-requests.index') }}" label="Back to Requests" />
     </div>
 </div>
 

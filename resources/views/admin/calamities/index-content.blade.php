@@ -1,7 +1,7 @@
 <div class="dash-header">
     <h1>Calamities</h1>
     <div style="display:flex;gap:10px;align-items:center;">
-        <a href="{{ route('staff.dashboard') }}" class="btn-back">← Back</a>
+        <x-back-button href="{{ route('staff.dashboard') }}" label="Back" />
         @if(auth()->user()->role->name !== 'Staff')
         <a href="{{ route('admin.calamity.create') }}" class="btn-primary">
             <i class="fas fa-plus"></i> Create

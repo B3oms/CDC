@@ -13,7 +13,7 @@
         <h1>{{ $subcategory->name }}</h1>
     </div>
     <div class="dash-header-actions">
-        <a href="{{ route('staff.inventory.category.show', $subcategory->category_id) }}" class="btn-back">← Back</a>
+        <x-back-button href="{{ route('staff.inventory.category.show', $subcategory->category_id) }}" label="Back" />
         <a href="{{ route('staff.inventory.item.create', $subcategory->id) }}" class="btn-primary">+ Add Item</a>
         <a href="{{ route('staff.inventory.subcategory.edit', $subcategory->id) }}" class="btn-secondary">Edit Subcategory</a>
     </div>
@@ -36,14 +36,13 @@
     @foreach($items as $item)
     <div class="inventory-item-card">
         <div class="inventory-card-img">
-            <div class="inventory-color-container" style="background-color: {{ $item->color ?? '#3B82F6' }};">
+            <div class="inventory-color-container" style="background-color: {{ $item->color ?? collect(['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#6366F1', '#84CC16', '#06B6D4', '#A855F7', '#DC2626', '#059669', '#7C3AED', '#DB2777', '#0891B2', '#EA580C', '#4F46E5', '#BE185D', '#047857'])[abs(crc32($item->name . $item->id)) % 21] }};">
                 <div class="inventory-color-text">
-                    {{ strtoupper(substr($item->name, 0, 2)) }}
+                    {{ strtoupper($item->name) }}
                 </div>
             </div>
         </div>
         <div class="inventory-item-body">
-            <div class="inventory-card-name">{{ $item->name }}</div>
             @if($item->description)
                 <div class="inventory-card-desc">{{ $item->description }}</div>
             @endif
@@ -188,26 +187,40 @@
 }
 
 .inventory-card-img {
-    height: 110px;
+    height: 130px;
     overflow: hidden;
     position: relative;
+    margin: 0;
+    padding: 0;
 }
 
 .inventory-color-container {
     width: 100%;
-    height: 100%;
+    height: 130px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: transform .2s ease;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .inventory-color-text {
     color: white;
     font-weight: 700;
-    font-size: 1.4rem;
+    font-size: clamp(0.875rem, 3vw, 1.25rem);
     text-shadow: 0 1px 2px rgba(0,0,0,.3);
-    letter-spacing: 1px;
+    letter-spacing: 0.3px;
+    text-align: center;
+    padding: 0.75rem;
+    word-wrap: break-word;
+    line-height: 1.1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .inventory-item-card:hover .inventory-color-container {

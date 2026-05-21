@@ -9,7 +9,7 @@
         <p class="sub">Submitted on {{ $request->created_at->format('M d, Y') }}</p>
     </div>
     <div>
-        <a href="{{ route('barangay.household_requests.index') }}" class="btn-back">← Back</a>
+        <x-back-button href="{{ route('barangay.household_requests.index') }}" label="Back" />
     </div>
 </div>
 

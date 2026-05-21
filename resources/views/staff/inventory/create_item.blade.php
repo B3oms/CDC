@@ -13,7 +13,7 @@
         </div>
         <h1>Add Item</h1>
     </div>
-    <a href="{{ route('staff.inventory.subcategory.show', $subcategory->id) }}" class="btn-back">← Back</a>
+    <x-back-button href="{{ route('staff.inventory.subcategory.show', $subcategory->id) }}" label="Back" />
 </div>
 
 <div class="form-card">

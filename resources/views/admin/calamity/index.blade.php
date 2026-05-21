@@ -5,7 +5,7 @@
 <div class="dash-header">
     <h1>Calamities</h1>
     <div style="display:flex;gap:10px;align-items:center;">
-        <a href="{{ route('staff.dashboard') }}" class="btn-back">← Back</a>
+        <x-back-button href="{{ route('staff.dashboard') }}" label="Back" />
         <a href="{{ route('admin.calamity.create') }}" class="btn-primary">
             <i class="fas fa-plus"></i> Create
         </a>
@@ -341,27 +341,6 @@
     padding: 1rem;
     border-radius: 6px;
     margin-bottom: 1rem;
-}
-
-/* Back Button */
-.btn-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border: 1px solid #d1d5db;
-    background: white;
-    color: #6b7280;
-    border-radius: 6px;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all 0.2s ease;
-}
-
-.btn-back:hover {
-    background: #f9fafb;
-    border-color: #9ca3af;
-    color: #374151;
 }
 
 /* Primary Button */

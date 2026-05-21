@@ -1,0 +1,21 @@
+/**
+ * Beneficiary / barangay-specific views — complements design-system.css (loaded via layout).
+ */
+
+.beneficiary-dashboard .stat-card,
+.barangay-stat-card {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+}
+
+.beneficiary-dashboard .stat-value {
+    color: var(--color-primary);
+    font-weight: var(--font-weight-bold);
+}
+
+.beneficiary-dashboard .stat-label {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+}

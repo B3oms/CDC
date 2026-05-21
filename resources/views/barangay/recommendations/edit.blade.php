@@ -5,7 +5,7 @@
 @section('content')
 <div class="dash-header">
     <h1>Edit Recommendation</h1>
-    <a href="{{ route('barangay.recommendations.index') }}" class="btn-secondary">← Back</a>
+    <x-back-button href="{{ route('barangay.recommendations.index') }}" />
 </div>
 
 <div class="section-card">

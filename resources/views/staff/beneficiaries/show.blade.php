@@ -1,13 +1,84 @@
 @extends('staff.layouts.app')
 @section('title', 'Beneficiary Details')
 
+@push('styles')
+<style>
+.header-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.btn-edit, .btn-delete {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-edit {
+    background: #f59e0b;
+    color: white;
+}
+
+.btn-edit:hover {
+    background: #d97706;
+    transform: translateY(-1px);
+}
+
+.btn-delete {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+        margin-top: 1rem;
+    }
+    
+    .dash-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+</style>
+@endpush
+
 @section('content')
 <div class="dash-header">
     <div>
         <h1>{{ $beneficiary->first_name }} {{ $beneficiary->last_name }}</h1>
         <p class="sub">{{ $beneficiary->barangay->name ?? 'N/A' }}</p>
     </div>
-    <a href="{{ route('staff.beneficiaries.index') }}" class="btn-back">← Back</a>
+    <div class="header-actions">
+        <a href="{{ route('staff.beneficiaries.edit', $beneficiary->id) }}" class="btn-edit">
+            <i class="fas fa-edit"></i> Edit
+        </a>
+        <form action="{{ route('staff.beneficiaries.destroy', $beneficiary->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this beneficiary?')" style="display: inline;">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn-delete">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        </form>
+        <x-back-button href="{{ route('staff.beneficiaries.index') }}" label="Back" />
+    </div>
 </div>
 
 <div class="dash-grid">
@@ -17,6 +88,7 @@
         <div class="section-card">
             <h3>Personal Information</h3>
             <table class="dist-table">
+                <tr><td class="meta-label">Unique ID</td><td><strong>{{ $beneficiary->unique_id ?? 'N/A' }}</strong></td></tr>
                 <tr><td class="meta-label">Name</td><td>{{ $beneficiary->first_name }} {{ $beneficiary->last_name }}</td></tr>
                 <tr><td class="meta-label">Gender</td><td>{{ $beneficiary->gender }}</td></tr>
                 <tr><td class="meta-label">Birthdate</td><td>{{ $beneficiary->birthdate ? \Carbon\Carbon::parse($beneficiary->birthdate)->format('M d, Y') : 'N/A' }}</td></tr>
