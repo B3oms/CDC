@@ -1,5 +1,6 @@
 <?php
 
+// Fixed syntax error - deployment trigger v2
 use App\Database\Migrations\SafeMigration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
