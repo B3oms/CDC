@@ -1,29 +1,18 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
+use App\Database\Migrations\SafeMigration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+return new class extends SafeMigration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    protected function tableName(): string
     {
-        Schema::table('municipalities', function (Blueprint $table) {
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending')->after('province');
-            $table->text('notes')->nullable()->after('status');
-        });
+        return 'municipalities';
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    protected function columns(Blueprint $table): void
     {
-        Schema::table('municipalities', function (Blueprint $table) {
-            $table->dropColumn(['status', 'notes']);
-        });
-    }
+        $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending')->after('province');
+        $table->text('notes')->nullable()->after('status');
+    };
 };

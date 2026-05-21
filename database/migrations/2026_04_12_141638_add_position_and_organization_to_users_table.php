@@ -1,24 +1,19 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
+use App\Database\Migrations\SafeMigration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+return new class extends SafeMigration
 {
-    public function up(): void
+    protected function tableName(): string
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('position', 100)->nullable()->after('contact_number');
-            $table->string('organization', 150)->nullable()->after('position');
-            $table->date('birthdate')->nullable()->after('organization');
-        });
+        return 'users';
     }
 
-    public function down(): void
+    protected function columns(Blueprint $table): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['position', 'organization', 'birthdate']);
-        });
-    }
+        $table->string('position', 100)->nullable()->after('contact_number');
+        $table->string('organization', 150)->nullable()->after('position');
+        $table->date('birthdate')->nullable()->after('organization');
+    };
 };

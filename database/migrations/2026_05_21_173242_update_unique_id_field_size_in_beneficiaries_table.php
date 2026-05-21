@@ -1,28 +1,17 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
+use App\Database\Migrations\SafeMigration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+return new class extends SafeMigration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    protected function tableName(): string
     {
-        Schema::table('beneficiaries', function (Blueprint $table) {
-            $table->string('unique_id', 20)->change();
-        });
+        return 'beneficiaries';
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    protected function columns(Blueprint $table): void
     {
-        Schema::table('beneficiaries', function (Blueprint $table) {
-            $table->string('unique_id', 20)->change();
-        });
-    }
+        $table->string('unique_id', 20)->change();
+    };
 };

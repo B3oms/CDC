@@ -1,28 +1,17 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
+use App\Database\Migrations\SafeMigration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+return new class extends SafeMigration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    protected function tableName(): string
     {
-        Schema::table('items', function (Blueprint $table) {
-            $table->string('color', 7)->default('#3B82F6')->after('image'); // Default blue color
-        });
+        return 'items';
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    protected function columns(Blueprint $table): void
     {
-        Schema::table('items', function (Blueprint $table) {
-            $table->dropColumn('color');
-        });
-    }
+        $table->string('color', 7)->default('#3B82F6')->after('image'); // Default blue color
+    };
 };

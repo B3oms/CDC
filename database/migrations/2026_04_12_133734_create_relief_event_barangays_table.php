@@ -1,26 +1,22 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
+use App\Database\Migrations\SafeMigration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+return new class extends SafeMigration
 {
-    public function up(): void
+    protected function tableName(): string
     {
-        Schema::create('relief_event_barangays', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('relief_event_id')->constrained('relief_events')->onDelete('cascade');
-            $table->foreignId('barangay_id')->constrained('barangays')->onDelete('cascade');
-            $table->foreignId('municipality_id')->constrained('municipalities')->onDelete('cascade');
-            $table->timestamps();
-
-            $table->unique(['relief_event_id', 'barangay_id']);
-        });
+        return 'relief_event_barangays';
     }
 
-    public function down(): void
+    protected function columns(Blueprint $table): void
     {
-        Schema::dropIfExists('relief_event_barangays');
-    }
+        $table->id();
+        $table->foreignId('relief_event_id')->constrained('relief_events')->onDelete('cascade');
+        $table->foreignId('barangay_id')->constrained('barangays')->onDelete('cascade');
+        $table->foreignId('municipality_id')->constrained('municipalities')->onDelete('cascade');
+        $table->timestamps();
+        $table->unique(['relief_event_id', 'barangay_id']);
+    };
 };

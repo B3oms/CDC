@@ -1,33 +1,23 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
+use App\Database\Migrations\SafeMigration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+return new class extends SafeMigration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    protected function tableName(): string
     {
-        Schema::create('household_members', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('household_request_id');
-            $table->string('name');
-            $table->integer('age');
-            $table->string('sex');
-            $table->timestamps();
-
-            $table->foreign('household_request_id')->references('id')->on('household_requests')->onDelete('cascade');
-        });
+        return 'household_members';
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    protected function columns(Blueprint $table): void
     {
-        Schema::dropIfExists('household_members');
-    }
+        $table->id();
+        $table->unsignedBigInteger('household_request_id');
+        $table->string('name');
+        $table->integer('age');
+        $table->string('sex');
+        $table->timestamps();
+        $table->foreign('household_request_id')->references('id')->on('household_requests')->onDelete('cascade');
+    };
 };

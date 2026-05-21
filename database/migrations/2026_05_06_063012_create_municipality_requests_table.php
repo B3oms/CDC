@@ -1,38 +1,28 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
+use App\Database\Migrations\SafeMigration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+return new class extends SafeMigration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    protected function tableName(): string
     {
-        Schema::create('municipality_requests', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('requested_by')->constrained('users')->onDelete('cascade');
-            $table->string('name');
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
-            $table->text('remarks')->nullable();
-            $table->foreignId('approved_by')->nullable()->constrained('users')->onDelete('set null');
-            $table->timestamp('approved_at')->nullable();
-            $table->text('rejection_reason')->nullable();
-            $table->timestamps();
-            
-            $table->index('status');
-            $table->index('requested_by');
-            $table->index('approved_by');
-        });
+        return 'municipality_requests';
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    protected function columns(Blueprint $table): void
     {
-        Schema::dropIfExists('municipality_requests');
-    }
+        $table->id();
+        $table->foreignId('requested_by')->constrained('users')->onDelete('cascade');
+        $table->string('name');
+        $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+        $table->text('remarks')->nullable();
+        $table->foreignId('approved_by')->nullable()->constrained('users')->onDelete('set null');
+        $table->timestamp('approved_at')->nullable();
+        $table->text('rejection_reason')->nullable();
+        $table->timestamps();
+        $table->index('status');
+        $table->index('requested_by');
+        $table->index('approved_by');
+    };
 };

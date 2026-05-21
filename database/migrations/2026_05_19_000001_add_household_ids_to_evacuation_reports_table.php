@@ -1,22 +1,17 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
+use App\Database\Migrations\SafeMigration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+return new class extends SafeMigration
 {
-    public function up()
+    protected function tableName(): string
     {
-        Schema::table('evacuation_reports', function (Blueprint $table) {
-            $table->json('household_ids')->nullable()->after('evacuee_count');
-        });
+        return 'evacuation_reports';
     }
 
-    public function down()
+    protected function columns(Blueprint $table): void
     {
-        Schema::table('evacuation_reports', function (Blueprint $table) {
-            $table->dropColumn('household_ids');
-        });
-    }
+        $table->json('household_ids')->nullable()->after('evacuee_count');
+    };
 };

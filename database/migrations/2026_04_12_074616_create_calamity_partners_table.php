@@ -1,22 +1,20 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
+use App\Database\Migrations\SafeMigration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+return new class extends SafeMigration
 {
-    public function up()
-{
-    if (!Schema::hasTable('calamity_partners')) {
-        Schema::create('calamity_partners', function (Blueprint $table) {
-            // ...
-        });
-    }
-}
-
-    public function down(): void
+    protected function tableName(): string
     {
-        Schema::dropIfExists('calamity_partners');
+        return 'calamity_partners';
     }
+
+    protected function columns(Blueprint $table): void
+    {
+        $table->id();
+        $table->foreignId('calamity_id')->constrained()->cascadeOnDelete();
+        $table->foreignId('barangay_id')->constrained()->cascadeOnDelete();
+        $table->timestamps();
+    };
 };

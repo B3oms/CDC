@@ -1,27 +1,21 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
+use App\Database\Migrations\SafeMigration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+return new class extends SafeMigration
 {
-    public function up(): void
+    protected function tableName(): string
     {
-        Schema::table('items', function (Blueprint $table) {
-            $table->foreignId('subcategory_id')
-                ->nullable()
-                ->after('category_id')
-                ->constrained('subcategories')
-                ->onDelete('set null');
-        });
+        return 'items';
     }
 
-    public function down(): void
+    protected function columns(Blueprint $table): void
     {
-        Schema::table('items', function (Blueprint $table) {
-            $table->dropForeign(['subcategory_id']);
-            $table->dropColumn('subcategory_id');
-        });
-    }
+        $table->foreignId('subcategory_id')
+        ->nullable()
+        ->after('category_id')
+        ->constrained('subcategories')
+        ->onDelete('set null');
+    };
 };

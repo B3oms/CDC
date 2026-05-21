@@ -1,27 +1,23 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
+use App\Database\Migrations\SafeMigration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+return new class extends SafeMigration
 {
-    public function up(): void
+    protected function tableName(): string
     {
-        Schema::create('relief_event_beneficiaries', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('relief_event_id')->constrained('relief_events')->onDelete('cascade');
-            $table->foreignId('barangay_id')->constrained('barangays')->onDelete('cascade');
-            $table->foreignId('beneficiary_id')->constrained('beneficiaries')->onDelete('cascade');
-            $table->timestamps();
-
-            // Shortened index name to avoid MySQL 64-char limit
-            $table->unique(['relief_event_id', 'barangay_id', 'beneficiary_id'], 'reb_unique');
-        });
+        return 'relief_event_beneficiaries';
     }
 
-    public function down(): void
+    protected function columns(Blueprint $table): void
     {
-        Schema::dropIfExists('relief_event_beneficiaries');
-    }
+        $table->id();
+        $table->foreignId('relief_event_id')->constrained('relief_events')->onDelete('cascade');
+        $table->foreignId('barangay_id')->constrained('barangays')->onDelete('cascade');
+        $table->foreignId('beneficiary_id')->constrained('beneficiaries')->onDelete('cascade');
+        $table->timestamps();
+        // Shortened index name to avoid MySQL 64-char limit
+        $table->unique(['relief_event_id', 'barangay_id', 'beneficiary_id'], 'reb_unique');
+    };
 };

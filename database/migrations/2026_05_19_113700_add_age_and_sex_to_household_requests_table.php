@@ -1,29 +1,18 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
+use App\Database\Migrations\SafeMigration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+return new class extends SafeMigration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    protected function tableName(): string
     {
-        Schema::table('household_requests', function (Blueprint $table) {
-            $table->integer('head_age')->nullable()->after('head_of_household');
-            $table->string('head_sex')->nullable()->after('head_age');
-        });
+        return 'household_requests';
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    protected function columns(Blueprint $table): void
     {
-        Schema::table('household_requests', function (Blueprint $table) {
-            $table->dropColumn(['head_age', 'head_sex']);
-        });
-    }
+        $table->integer('head_age')->nullable()->after('head_of_household');
+        $table->string('head_sex')->nullable()->after('head_age');
+    };
 };
