@@ -27,6 +27,7 @@ use App\Http\Controllers\Staff\CalamityController as StaffCalamityController;
 use App\Http\Controllers\Barangay\HouseholdRequestController as BarangayHouseholdRequestController;
 use App\Http\Controllers\Barangay\BeneficiaryController as BarangayBeneficiaryController;
 use App\Http\Controllers\Barangay\ProfileController as BarangayProfileController;
+use App\Http\Controllers\Beneficiary\DashboardController as BeneficiaryDashboardController;
 
 // ──────────────────────────────────────────────────────────
 // Auth Routes
@@ -226,17 +227,21 @@ Route::prefix('staff')->name('staff.')->middleware(['isStaff'])->group(function 
 
     // Calamities (Staff View - Admin Content with Staff Layout)
     Route::get('calamities',               [\App\Http\Controllers\Admin\CalamityController::class, 'index'])->name('calamities.index');
+    Route::get('calamities/create',        [\App\Http\Controllers\Admin\CalamityController::class, 'create'])->name('calamities.create');
+    Route::post('calamities',              [\App\Http\Controllers\Admin\CalamityController::class, 'store'])->name('calamities.store');
     Route::get('calamities/{id}',          [\App\Http\Controllers\Admin\CalamityController::class, 'show'])->name('calamities.show');
+    Route::get('calamities/{id}/pdf',      [\App\Http\Controllers\Admin\CalamityController::class, 'pdf'])->name('calamities.pdf');
 
     // Relief Monitor (Staff View)
-    Route::get('relief',                   [StaffReliefController::class, 'index'])->name('relief.index');
-    Route::get('relief/create',            [StaffReliefController::class, 'create'])->name('relief.create');
-    Route::post('relief',                  [StaffReliefController::class, 'store'])->name('relief.store');
-    Route::get('relief/{id}',              [StaffReliefController::class, 'show'])->name('relief.show');
-    Route::get('relief/{id}/pdf',          [StaffReliefController::class, 'pdf'])->name('relief.pdf');
-    Route::put('relief/{id}',              [StaffReliefController::class, 'update'])->name('relief.update');
-    Route::post('relief/{id}/status',     [StaffReliefController::class, 'updateStatus'])->name('relief.updateStatus');
-    Route::delete('relief/{id}',           [StaffReliefController::class, 'destroy'])->name('relief.destroy');
+    Route::get('relief',                   [\App\Http\Controllers\Staff\ReliefController::class, 'index'])->name('relief.index');
+    Route::get('relief/create',            [\App\Http\Controllers\Staff\ReliefController::class, 'create'])->name('relief.create');
+    Route::post('relief',                  [\App\Http\Controllers\Staff\ReliefController::class, 'store'])->name('relief.store');
+    Route::get('relief/{id}',              [\App\Http\Controllers\Staff\ReliefController::class, 'show'])->name('relief.show');
+    Route::get('relief/{id}/pdf',          [\App\Http\Controllers\Staff\ReliefController::class, 'pdf'])->name('relief.pdf');
+    Route::put('relief/{id}',              [\App\Http\Controllers\Staff\ReliefController::class, 'update'])->name('relief.update');
+    Route::post('relief/{id}/status',     [\App\Http\Controllers\Staff\ReliefController::class, 'updateStatus'])->name('relief.updateStatus');
+    Route::delete('relief/{id}',           [\App\Http\Controllers\Staff\ReliefController::class, 'destroy'])->name('relief.destroy');
+    Route::get('relief/stats',             [\App\Http\Controllers\Staff\ReliefController::class, 'getStats'])->name('relief.stats');
     
     // Inventory (Staff View)
     Route::get('inventory',               [\App\Http\Controllers\Staff\InventoryController::class, 'index'])->name('inventory.index');
@@ -320,4 +325,14 @@ Route::prefix('barangay')->name('barangay.')->middleware(['isBarangay'])->group(
     Route::get('profile/edit',                 [BarangayProfileController::class, 'edit'])->name('profile.edit');
     Route::put('profile',                     [BarangayProfileController::class, 'update'])->name('profile.update');
     Route::put('profile/password',             [BarangayProfileController::class, 'updatePassword'])->name('profile.updatePassword');
+});
+
+// ──────────────────────────────────────────────────────────
+// Beneficiary Only
+// ──────────────────────────────────────────────────────────
+Route::prefix('beneficiary')->name('beneficiary.')->middleware(['isBeneficiary'])->group(function () {
+    // Dashboard
+    Route::get('dashboard',        [BeneficiaryDashboardController::class, 'index'])->name('dashboard');
+    Route::get('profile',          [BeneficiaryDashboardController::class, 'profile'])->name('profile');
+    Route::get('relief-history',   [BeneficiaryDashboardController::class, 'reliefHistory'])->name('relief-history');
 });

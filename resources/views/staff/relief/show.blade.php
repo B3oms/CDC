@@ -577,7 +577,7 @@ document.addEventListener('click', function(event) {
 function exportPdf(eventId) {
     const paperSize = document.getElementById('paperSize').value;
     const orientation = document.getElementById('orientation').value;
-    const url = `{{ route('staff.relief.event.pdf', ':id') }}`.replace(':id', eventId);
+    const url = `{{ route('staff.relief.pdf', ':id') }}`.replace(':id', eventId);
     
     // Create a hidden form to submit for download
     const form = document.createElement('form');

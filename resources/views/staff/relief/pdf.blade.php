@@ -198,9 +198,16 @@
     @endif
 
     <div class="section-title">Beneficiaries Served</div>
-    @if($event->eventBarangays->isNotEmpty())
+    @if($event->beneficiaries->isNotEmpty())
+        @php
+            // Group beneficiaries by barangay
+            $beneficiariesByBarangay = $event->beneficiaries->groupBy('barangay_id');
+        @endphp
         @foreach($event->eventBarangays as $eventBarangay)
-            @if($eventBarangay->beneficiaries->isNotEmpty())
+            @php
+                $barangayBeneficiaries = $beneficiariesByBarangay->get($eventBarangay->barangay_id, collect());
+            @endphp
+            @if($barangayBeneficiaries->isNotEmpty())
                 <h4 style="margin: 20px 0 10px 0; color: #185fa5;">{{ $eventBarangay->barangay->name }}</h4>
                 <table style="margin-bottom: 20px;">
                     <thead>
@@ -212,7 +219,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($eventBarangay->beneficiaries as $i => $beneficiary)
+                        @foreach($barangayBeneficiaries as $i => $beneficiary)
                             <tr>
                                 <td>{{ $i + 1 }}</td>
                                 <td>{{ $beneficiary->beneficiary->first_name }} {{ $beneficiary->beneficiary->last_name }}</td>

@@ -11,323 +11,457 @@
 @endif
 
 @if($activeCalamity)
-<div class="alert alert-info" style="margin-bottom:1.5rem;">
+<div class="cal-alert">
     <i class="fas fa-info-circle"></i>
-    <strong>Active Calamity:</strong> {{ $activeCalamity->name }} 
+    <strong>Active Calamity:</strong> {{ $activeCalamity->name }}
     <span class="badge-intensity {{ strtolower($activeCalamity->intensity) }}">{{ $activeCalamity->intensity }}</span>
 </div>
 
-<div class="dash-grid" style="grid-template-columns: 1fr; gap: 1.5rem;">
-    {{-- Forms Section --}}
-    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-        <div class="dash-grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-            {{-- Evacuation Center Form --}}
-            <div class="section-card" style="flex: 1; display: flex; flex-direction: column;">
-                <h3>Evacuation Center</h3>
-                <form method="POST" action="{{ route('barangay.setCenter') }}" style="flex: 1; display: flex; flex-direction: column;">
-                    @csrf
-                    <input type="hidden" name="calamity_id" value="{{ $activeCalamity->id }}">
-                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
-                        <div>
-                            <div class="form-group">
-                                <label>Venue</label>
-                                <input type="text" name="venue" value="{{ $evacuationCenter->venue ?? '' }}" 
-                                       placeholder="e.g. Barangay Hall, Community Center" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Location</label>
-                                <input type="text" name="location" value="{{ $evacuationCenter->location ?? '' }}" 
-                                       placeholder="e.g. Purok 3, Sumacab Este" required>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn-primary" style="width:100%;margin-top:auto;">
-                            {{ $evacuationCenter ? 'Update Center' : 'Set Center' }}
-                        </button>
-                    </div>
-                </form>
+<div class="forms-grid">
+
+    {{-- Evacuation Center Form --}}
+    <div class="form-card">
+        <div class="form-card-section-label">EVACUATION CENTER</div>
+        <form method="POST" action="{{ route('barangay.setCenter') }}">
+            @csrf
+            <input type="hidden" name="calamity_id" value="{{ $activeCalamity->id }}">
+
+            <div class="field-group">
+                <label class="field-label">Venue <span class="required">*</span></label>
+                <input type="text" name="venue"
+                       value="{{ $evacuationCenter->venue ?? '' }}"
+                       placeholder="e.g. Barangay Hall, Community Center"
+                       required class="field-input">
             </div>
 
-            {{-- Report Form --}}
-            @if($evacuationCenter)
-            <div class="section-card" style="flex: 1; display: flex; flex-direction: column;">
-                <h3>Submit Report</h3>
-                <form method="POST" action="{{ route('barangay.submitReport') }}" style="flex: 1; display: flex; flex-direction: column;">
-                    @csrf
-                    <input type="hidden" name="calamity_id" value="{{ $activeCalamity->id }}">
-                    <input type="hidden" name="evacuation_center_id" value="{{ $evacuationCenter->id }}">
-                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
-                        <div>
-                            <div class="form-group">
-                                <label>Select Households in Evacuation</label>
-                                <div class="collapsible-selector">
-                                    <div class="selector-trigger" onclick="toggleHouseholdSelector()">
-                                        <div class="trigger-content">
-                                            <span class="trigger-icon">▼</span>
-                                            <span class="trigger-text">
-                                                🏠 Select Households 
-                                                <span class="selected-badge" id="selected-count">0</span>
-                                            </span>
-                                            <span class="trigger-info">{{ $households ? $households->count() : 0 }} available</span>
-                                        </div>
-                                    </div>
-                                    <div class="selector-content" id="household-selector-content" style="display: none;">
-                                        <div class="selector-header">
-                                            <span class="selector-info">
-                                                📋 Registered Households: {{ $households ? $households->count() : 0 }}
-                                            </span>
-                                            <span class="selected-info">
-                                                Selected: <strong id="selected-count-inner">0</strong>
-                                            </span>
-                                        </div>
-                                        <div class="household-list">
-                                            @if($households && $households->count() > 0)
-                                                @foreach($households as $household)
-                                                <label class="household-item">
-                                                    <input type="checkbox" name="household_ids[]" value="{{ $household->id }}" 
-                                                           data-family-size="{{ $household->family_size }}"
-                                                           onchange="updateSelectedCount()">
-                                                    <span class="household-info">
-                                                        <span class="household-name">{{ $household->head_of_household }}</span>
-                                                        <span class="family-size">({{ $household->family_size }} members)</span>
-                                                    </span>
-                                                </label>
-                                                @endforeach
-                                            @else
-                                                <div style="padding: 20px; text-align: center; color: #6b7280;">
-                                                    <p>No approved households found for your barangay.</p>
-                                                    <p style="font-size: 0.875rem; margin-top: 8px;">Please contact the administrator if you believe this is an error.</p>
-                                                </div>
-                                            @endif
-                                        </div>
-                                        <div class="selector-footer">
-                                            <small class="selector-help">
-                                                💡 Click households to select them for evacuation
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Total Evacuees (Auto-calculated)</label>
-                                <div class="evacuees-display">
-                                    <input type="number" name="evacuee_count" id="evacuee-count" min="0" readonly
-                                           value="{{ $latestReport->evacuee_count ?? 0 }}" required>
-                                    <small class="evacuees-info">
-                                        📊 Calculated from family sizes of selected households
-                                    </small>
-                                </div>
-                            </div>
-                                                </div>
-                        <button type="submit" class="btn-primary" style="width:100%;margin-top:auto;">
-                            Update Report
-                        </button>
-                    </div>
-                </form>
+            <div class="field-group">
+                <label class="field-label">Location <span class="required">*</span></label>
+                <input type="text" name="location"
+                       value="{{ $evacuationCenter->location ?? '' }}"
+                       placeholder="e.g. Purok 3, Sumacab Este"
+                       required class="field-input">
             </div>
-            @else
-            <div class="section-card" style="opacity:0.7; flex: 1; display: flex; flex-direction: column;">
-                <h3>Submit Report</h3>
-                <div style="flex: 1; display: flex; align-items: center; justify-content: center; color: #6b7280;">
-                    <p>You must set an evacuation center before submitting reports.</p>
+
+            <button type="submit" class="btn-submit {{ $evacuationCenter ? 'green' : '' }}">
+    {{ $evacuationCenter ? 'Update Center' : 'Set Center' }}
+</button>
+        </form>
+    </div>
+
+    {{-- Report Form --}}
+    @if($evacuationCenter)
+    <div class="form-card">
+        <div class="form-card-section-label">SUBMIT REPORT</div>
+        <form method="POST" action="{{ route('barangay.submitReport') }}">
+            @csrf
+            <input type="hidden" name="calamity_id" value="{{ $activeCalamity->id }}">
+            <input type="hidden" name="evacuation_center_id" value="{{ $evacuationCenter->id }}">
+
+            <div class="field-group">
+                <label class="field-label">Select Households in Evacuation</label>
+                <div class="custom-select" id="householdDropdown">
+                    <button type="button" class="select-trigger" onclick="toggleHouseholdSelector()">
+                        <span id="trigger-text">Select households</span>
+                        <span class="select-meta">
+                            <span class="select-count" id="selected-count" style="display:none;">0 selected</span>
+                            <span class="select-available">{{ $households ? $households->count() : 0 }} available</span>
+                            <i class="fas fa-chevron-down select-arrow" id="dropdown-arrow"></i>
+                        </span>
+                    </button>
+                    <div class="select-panel" id="household-selector-content">
+                        <div class="select-panel-header">
+                            <span>{{ $households ? $households->count() : 0 }} Registered Households</span>
+                            <span>Selected: <strong id="selected-count-inner">0</strong></span>
+                        </div>
+                        <div class="select-list">
+                            @if($households && $households->count() > 0)
+                                @foreach($households as $household)
+                                <label class="select-item">
+                                    <input type="checkbox"
+                                           name="household_ids[]"
+                                           value="{{ $household->id }}"
+                                           data-family-size="{{ $household->family_size }}"
+                                           onchange="updateSelectedCount()">
+                                    <span class="select-item-check"></span>
+                                    <span class="select-item-info">
+                                        <span class="select-item-name">{{ $household->head_of_household }}</span>
+                                        <span class="select-item-meta">{{ $household->family_size }} members</span>
+                                    </span>
+                                </label>
+                                @endforeach
+                            @else
+                                <div class="select-empty">
+                                    <p>No approved households found for your barangay.</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
-            @endif
-        </div>
 
+            <div class="field-group">
+                <label class="field-label">Total Evacuees <span class="field-note">(Auto-calculated)</span></label>
+                <input type="number" name="evacuee_count" id="evacuee-count"
+                       min="0" readonly
+                       value="{{ $latestReport->evacuee_count ?? 0 }}"
+                       required class="field-input readonly">
+                <span class="field-hint">Calculated from family sizes of selected households</span>
             </div>
+
+            <button type="submit" class="btn-submit green">
+                @if($latestReport)
+                    Update Report
+                @else
+                    Submit Report
+                @endif
+            </button>
+        </form>
+    </div>
+
+    @else
+    <div class="form-card disabled-card">
+        <div class="form-card-section-label">SUBMIT REPORT</div>
+        <div class="disabled-body">
+            <p>Set an evacuation center first before submitting reports.</p>
+        </div>
+    </div>
+    @endif
+
 </div>
 
 @else
-<div class="section-card" style="text-align:center;padding:3rem;">
-    <p style="font-size:1.1rem;color:#888;">No active calamity at the moment.</p>
-    <p style="font-size:0.9rem;color:#aaa;margin-top:8px;">You will be notified when the CDC opens one.</p>
+<div class="form-card" style="text-align:center; padding: 3rem 2rem;">
+    <p style="color:#888; font-size:1rem; margin:0;">No active calamity at the moment.</p>
+    <p style="color:#aaa; font-size:0.875rem; margin-top:6px;">You will be notified when the CDC opens one.</p>
 </div>
 @endif
 
 @push('styles')
 <style>
-/* Collapsible Household Selector Styles */
-.collapsible-selector {
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
-    overflow: hidden;
+/* ── Variables ───────────────────────────── */
+:root {
+    --green:        #1a3d1f;
+    --green-mid:    #1a6b2a;
+    --green-light:  #eaf3de;
+    --yellow:       #ef9f27;
+    --yellow-light: #fffbeb;
+    --border:       #e5e7eb;
+    --radius:       8px;
+    --text:         #1f2937;
+    --muted:        #6b7280;
+    --bg:           #f9fafb;
+}
+
+/* ── Alert ───────────────────────────────── */
+.cal-alert {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--yellow-light);
+    border: 1px solid #fde68a;
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+}
+
+.cal-alert i { color: var(--yellow); }
+
+/* ── Grid ────────────────────────────────── */
+.forms-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    align-items: start;
+}
+
+/* ── Card ────────────────────────────────── */
+.form-card {
     background: #fff;
-    transition: border-color 0.2s ease;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
 }
 
-.collapsible-selector:hover {
-    border-color: #d1d5db;
+.form-card-section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
 }
 
-.selector-trigger {
-    padding: 12px 16px;
-    background: #f9fafb;
-    cursor: pointer;
-    user-select: none;
-    transition: background-color 0.2s ease;
+/* ── Fields ──────────────────────────────── */
+.field-group {
+    margin-bottom: 1rem;
 }
 
-.selector-trigger:hover {
-    background: #f3f4f6;
-}
-
-.trigger-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.trigger-icon {
+.field-label {
+    display: block;
     font-size: 0.875rem;
-    color: #6b7280;
-    transition: transform 0.2s ease;
-    margin-right: 8px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 0.35rem;
 }
 
-.trigger-icon.rotated {
-    transform: rotate(180deg);
-}
-
-.trigger-text {
-    flex: 1;
-    font-weight: 600;
-    color: #374151;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.selected-badge {
-    background: #059669;
-    color: white;
-    padding: 2px 8px;
-    border-radius: 12px;
+.field-note {
     font-size: 0.75rem;
-    font-weight: 500;
-    min-width: 20px;
-    text-align: center;
+    font-weight: 400;
+    color: var(--muted);
 }
 
-.trigger-info {
+.required { color: #dc2626; margin-left: 2px; }
+
+.field-input {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     font-size: 0.875rem;
-    color: #6b7280;
-    font-weight: 500;
+    color: var(--text);
+    background: #fff;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
 }
 
-.selector-content {
-    border-top: 1px solid #e5e7eb;
+.field-input:focus {
+    border-color: var(--green-mid);
+    box-shadow: 0 0 0 3px rgba(26,107,42,0.08);
 }
 
-.selector-header {
+.field-input.readonly {
+    background: var(--bg);
+    color: var(--muted);
+    cursor: not-allowed;
+}
+
+.field-hint {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 0.3rem;
+}
+
+/* ── Buttons ─────────────────────────────── */
+.btn-submit {
+    width: 100%;
+    margin-top: 1.25rem;
+    padding: 0.6rem 1rem;
+    background: var(--yellow);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.btn-submit:hover { background: #d4890f; }
+
+.btn-submit.green { background: var(--green-mid); }
+.btn-submit.green:hover { background: var(--green); }
+
+/* ── Custom Select ───────────────────────── */
+.custom-select { position: relative; }
+
+.select-trigger {
+    width: 100%;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
-    background: #f9fafb;
-    border-bottom: 1px solid #e5e7eb;
+    justify-content: space-between;
+    padding: 0.55rem 0.75rem;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
 }
 
-.selector-info {
-    font-size: 0.875rem;
-    color: #6b7280;
-    font-weight: 500;
+.select-trigger:hover { border-color: #d1d5db; }
+
+.select-trigger.open {
+    border-color: var(--green-mid);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    box-shadow: 0 0 0 3px rgba(26,107,42,0.08);
 }
 
-.selected-info {
-    font-size: 0.875rem;
-    color: #1f2937;
+.select-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.select-count {
+    font-size: 0.72rem;
+    background: var(--green-mid);
+    color: #fff;
+    padding: 1px 7px;
+    border-radius: 10px;
     font-weight: 600;
 }
 
-.selected-info strong {
-    color: #059669;
-    font-size: 1rem;
+.select-available {
+    font-size: 0.75rem;
+    color: var(--muted);
 }
 
-.household-list {
+.select-arrow {
+    font-size: 0.7rem;
+    color: var(--muted);
+    transition: transform 0.2s;
+}
+
+.select-arrow.rotated { transform: rotate(180deg); }
+
+.select-panel {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid var(--green-mid);
+    border-top: none;
+    border-bottom-left-radius: var(--radius);
+    border-bottom-right-radius: var(--radius);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    z-index: 50;
+}
+
+.select-panel-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+}
+
+.select-panel-header strong { color: var(--green-mid); }
+
+.select-list {
     max-height: 200px;
     overflow-y: auto;
-    padding: 8px;
+    padding: 0.25rem;
 }
 
-.household-item {
+.select-list::-webkit-scrollbar { width: 4px; }
+.select-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.select-item {
     display: flex;
     align-items: center;
-    padding: 8px 12px;
-    margin: 2px 0;
+    gap: 0.6rem;
+    padding: 0.5rem 0.6rem;
     border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
-    border: 1px solid transparent;
+    transition: background 0.1s;
+    user-select: none;
 }
 
-.household-item:hover {
-    background-color: #f3f4f6;
-}
+.select-item:hover { background: var(--green-light); }
 
-.household-item input[type="checkbox"] {
-    margin-right: 12px;
+.select-item input[type="checkbox"] { display: none; }
+
+.select-item-check {
     width: 16px;
     height: 16px;
-    accent-color: #059669;
-}
-
-.household-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.household-name {
-    font-weight: 500;
-    color: #374151;
-    font-size: 0.875rem;
-}
-
-.family-size {
-    color: #6b7280;
-    font-weight: 400;
-    font-size: 0.75rem;
-}
-
-.selector-footer {
-    padding: 8px 16px;
-    background: #f9fafb;
-    border-top: 1px solid #e5e7eb;
-}
-
-.selector-help {
-    color: #6b7280;
-    font-size: 0.75rem;
-    font-style: italic;
-}
-
-/* Evacuees Display Styling */
-.evacuees-display {
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    background: #fff;
     position: relative;
 }
 
-.evacuees-display input[readonly] {
-    background: #f9fafb;
-    cursor: not-allowed;
-    border-color: #d1d5db;
+.select-item input[type="checkbox"]:checked ~ .select-item-check {
+    background: var(--green-mid);
+    border-color: var(--green-mid);
 }
 
-.evacuees-info {
-    color: #059669;
-    font-size: 0.75rem;
+.select-item input[type="checkbox"]:checked ~ .select-item-check::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 5px;
+    height: 9px;
+    border: 2px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg);
+}
+
+.select-item:has(input:checked) { background: var(--green-light); }
+
+.select-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.select-item-name {
+    font-size: 0.85rem;
     font-weight: 500;
-    display: block;
-    margin-top: 4px;
+    color: var(--text);
 }
 
-/* Enhanced form group styling */
-.form-group label {
+.select-item-meta {
+    font-size: 0.72rem;
+    color: var(--muted);
+}
+
+.select-empty {
+    padding: 1.25rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+
+/* ── Disabled Card ───────────────────────── */
+.disabled-card { opacity: 0.55; }
+
+.disabled-body {
+    padding: 2rem 0;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--muted);
+}
+
+/* ── Badge Intensity ─────────────────────── */
+.badge-intensity {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.72rem;
     font-weight: 600;
-    color: #374151;
-    margin-bottom: 8px;
-    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.badge-intensity.low      { background: #d4edda; color: #155724; }
+.badge-intensity.medium   { background: var(--yellow-light); color: #92650a; }
+.badge-intensity.high     { background: #f8d7da; color: #721c24; }
+.badge-intensity.critical { background: #d1ecf1; color: #0c5460; }
+.badge-intensity.unknown  { background: #f3f4f6; color: var(--muted); }
+
+/* ── Responsive ──────────────────────────── */
+@media (max-width: 768px) {
+    .forms-grid { grid-template-columns: 1fr; }
 }
 </style>
 @endpush
@@ -335,82 +469,50 @@
 @push('scripts')
 <script>
 function toggleHouseholdSelector() {
-    const content = document.getElementById('household-selector-content');
-    const icon = document.querySelector('.trigger-icon');
-    
-    if (content.style.display === 'none') {
-        content.style.display = 'block';
-        icon.classList.add('rotated');
-    } else {
-        content.style.display = 'none';
-        icon.classList.remove('rotated');
-    }
+    const panel   = document.getElementById('household-selector-content');
+    const arrow   = document.getElementById('dropdown-arrow');
+    const trigger = document.querySelector('.select-trigger');
+    const isOpen  = panel.style.display === 'block';
+
+    panel.style.display = isOpen ? 'none' : 'block';
+    arrow.classList.toggle('rotated', !isOpen);
+    trigger.classList.toggle('open', !isOpen);
 }
 
 function updateSelectedCount() {
-    const checkboxes = document.querySelectorAll('input[name="household_ids[]"]:checked');
-    const count = checkboxes.length;
-    
-    // Calculate total evacuees based on family sizes
-    let totalEvacuees = 0;
-    checkboxes.forEach(checkbox => {
-        const familySize = parseInt(checkbox.dataset.familySize) || 0;
-        totalEvacuees += familySize;
-    });
-    
-    // Update both count displays
-    const outerCount = document.getElementById('selected-count');
-    const innerCount = document.getElementById('selected-count-inner');
-    
-    if (outerCount) outerCount.textContent = count;
-    if (innerCount) innerCount.textContent = count;
-    
-    // Update evacuees count
-    const evacueesInput = document.getElementById('evacuee-count');
-    if (evacueesInput) {
-        evacueesInput.value = totalEvacuees;
-    }
-    
-    // Update selected info styling
-    const selectedInfo = document.querySelector('.selected-info');
-    if (selectedInfo) {
-        if (count > 0) {
-            selectedInfo.style.color = '#059669';
-        } else {
-            selectedInfo.style.color = '#1f2937';
-        }
-    }
-    
-    // Update trigger badge visibility
-    const badge = document.querySelector('.selected-badge');
+    const checked = document.querySelectorAll('input[name="household_ids[]"]:checked');
+    const count   = checked.length;
+
+    let total = 0;
+    checked.forEach(cb => total += parseInt(cb.dataset.familySize) || 0);
+
+    const badge = document.getElementById('selected-count');
+    const inner = document.getElementById('selected-count-inner');
+
     if (badge) {
-        if (count > 0) {
-            badge.style.display = 'inline-block';
-        } else {
-            badge.style.display = 'none';
-        }
+        badge.textContent = count + ' selected';
+        badge.style.display = count > 0 ? 'inline-block' : 'none';
     }
+    if (inner) inner.textContent = count;
+
+    const input = document.getElementById('evacuee-count');
+    if (input) input.value = total;
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Initial count update
-    updateSelectedCount();
-    
-    // Add click handlers to household items for better UX
-    const householdItems = document.querySelectorAll('.household-item');
-    householdItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-            // Prevent toggling when clicking on checkbox directly
-            if (e.target.type !== 'checkbox') {
-                const checkbox = this.querySelector('input[type="checkbox"]');
-                if (checkbox) {
-                    checkbox.checked = !checkbox.checked;
-                    updateSelectedCount();
-                }
-            }
-        });
-    });
+document.addEventListener('click', function(e) {
+    const dropdown = document.getElementById('householdDropdown');
+    const panel    = document.getElementById('household-selector-content');
+    const arrow    = document.getElementById('dropdown-arrow');
+    const trigger  = document.querySelector('.select-trigger');
+
+    if (dropdown && !dropdown.contains(e.target) && panel.style.display === 'block') {
+        panel.style.display = 'none';
+        arrow.classList.remove('rotated');
+        trigger.classList.remove('open');
+    }
 });
+
+document.addEventListener('DOMContentLoaded', updateSelectedCount);
 </script>
 @endpush
 

@@ -32,7 +32,11 @@ class CalamityController extends Controller
     public function create()
     {
         $municipalities = Municipality::with('barangays')->get();
-        return view('admin.calamity.create', compact('municipalities'));
+        
+        // Use staff layout if user is staff, otherwise use admin layout
+        $view = auth()->user()->role->name === 'Staff' ? 'staff.calamity.create' : 'admin.calamity.create';
+        
+        return view($view, compact('municipalities'));
     }
 
     // Store new calamity event
@@ -46,6 +50,15 @@ class CalamityController extends Controller
             'barangay_ids'  => 'required|array|min:1',
             'barangay_ids.*'=> 'exists:barangays,id',
         ]);
+
+        // Check if there's already an open calamity
+        $existingOpenCalamity = Calamity::where('status', 'Open')->first();
+        if ($existingOpenCalamity) {
+            // Allow multiple open calamities - remove this check if you want to restrict
+            // If you want to restrict, uncomment the lines below:
+            // return redirect()->back()
+            //     ->with('error', 'Cannot create new calamity event while "' . $existingOpenCalamity->name . '" is still open. Please close the existing portal first.');
+        }
 
         $calamity = Calamity::create([
             'name'          => $request->name,
@@ -64,7 +77,10 @@ class CalamityController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.calamity.show', $calamity->id)
+        // Use staff route if user is staff, otherwise use admin route
+        $route = auth()->user()->role->name === 'Staff' ? 'staff.calamities.show' : 'admin.calamity.show';
+        
+        return redirect()->route($route, $calamity->id)
             ->with('success', 'Calamity event created successfully.');
     }
 

@@ -18,7 +18,7 @@ class BeneficiaryController extends Controller
         $q->where('municipality_id', $request->municipality_id);
     })->get();
 
-    $beneficiaries = Beneficiary::with('barangay.municipality')
+    $beneficiaries = Beneficiary::with(['barangay.municipality', 'user'])
         ->when($request->municipality_id, function ($q) use ($request) {
             $q->whereHas('barangay', function ($q2) use ($request) {
                 $q2->where('municipality_id', $request->municipality_id);

@@ -2,6 +2,24 @@
 @section('title', 'Beneficiaries')
 @section('breadcrumb', 'Beneficiaries')
 
+@push('styles')
+<style>
+/* Unique ID Badge */
+.unique-id-badge {
+    background: #eaf3de;
+    color: #1a6b2a;
+    border: 1px solid #1a6b2a;
+    border-radius: 6px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.05em;
+    display: inline-block;
+}
+</style>
+@endpush
+
 @section('content')
 <div class="beneficiaries-page">
     <div class="page-header">
@@ -106,6 +124,7 @@
                 <thead>
                     <tr>
                         <th>#</th>
+                        <th>Unique ID</th>
                         <th>Name</th>
                         <th>Gender</th>
                         <th>4Ps</th>
@@ -122,6 +141,11 @@
                     @forelse($beneficiaries as $i => $b)
                     <tr>
                         <td>{{ $beneficiaries->firstItem() + $i }}</td>
+                        <td>
+                            <span class="unique-id-badge">
+                                {{ $b->unique_id ?? 'N/A' }}
+                            </span>
+                        </td>
                         <td class="td-name">{{ $b->first_name }} {{ $b->last_name }}</td>
                         <td><span class="text-capitalize">{{ $b->gender ?? 'N/A' }}</span></td>
                         <td>

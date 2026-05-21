@@ -19,8 +19,7 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ route('staff.inventory.category.update', $category->id) }}"
-        enctype="multipart/form-data">
+    <form method="POST" action="{{ route('staff.inventory.category.update', $category->id) }}">
         @csrf
         @method('PUT')
 
@@ -31,19 +30,6 @@
                     value="{{ old('name', $category->name) }}" required>
             </div>
 
-            <div class="form-group">
-                <label>Image</label>
-                @if($category->image)
-                    <img src="{{ asset('storage/' . $category->image) }}"
-                        id="preview-cat"
-                        style="width:80px;height:80px;object-fit:cover;border-radius:8px;margin-bottom:8px;">
-                @else
-                    <img id="preview-cat" src="#" alt="Preview"
-                        style="display:none;width:80px;height:80px;object-fit:cover;border-radius:8px;margin-bottom:8px;">
-                @endif
-                <input type="file" name="image" accept="image/*"
-                    onchange="previewImage(this, 'preview-cat')">
-            </div>
 
             <div class="form-group full-width">
                 <label>Description</label>

@@ -27,8 +27,7 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ route('staff.inventory.item.update', $item->id) }}"
-        enctype="multipart/form-data">
+    <form method="POST" action="{{ route('staff.inventory.item.update', $item->id) }}">
         @csrf
         @method('PUT')
         <div class="form-grid">
@@ -52,19 +51,6 @@
                 <label>Expiration Date</label>
                 <input type="date" name="expiration_date"
                     value="{{ old('expiration_date', $item->expiration_date ? $item->expiration_date->format('Y-m-d') : '') }}">
-            </div>
-                        <div class="form-group">
-                <label>Image</label>
-                @if($item->image)
-                    <img src="{{ asset('storage/' . $item->image) }}"
-                        id="preview-item"
-                        style="width:80px;height:80px;object-fit:cover;border-radius:8px;margin-bottom:8px;">
-                @else
-                    <img id="preview-item" src="#" alt="Preview"
-                        style="display:none;width:80px;height:80px;object-fit:cover;border-radius:8px;margin-bottom:8px;">
-                @endif
-                <input type="file" name="image" accept="image/*"
-                    onchange="previewImage(this, 'preview-item')">
             </div>
             <div class="form-group full-width">
                 <label>Description</label>

@@ -19,7 +19,7 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ route('staff.inventory.category.store') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('staff.inventory.category.store') }}">
         @csrf
         <div class="form-grid">
             <div class="form-group">
@@ -28,12 +28,6 @@
                     placeholder="e.g. Can Goods" required>
             </div>
 
-            <div class="form-group">
-                <label>Image</label>
-                <input type="file" name="image" accept="image/*" onchange="previewImage(this, 'preview-cat')">
-                <img id="preview-cat" src="#" alt="Preview"
-                    style="display:none;width:80px;height:80px;object-fit:cover;border-radius:8px;margin-top:8px;">
-            </div>
 
             <div class="form-group full-width">
                 <label>Description</label>

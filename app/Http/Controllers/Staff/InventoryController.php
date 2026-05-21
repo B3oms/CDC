@@ -76,14 +76,8 @@ class InventoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'description' => 'nullable|string'
         ]);
-
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('categories', 'public');
-            $validated['image'] = $imagePath;
-        }
 
         Category::create($validated);
 
@@ -103,18 +97,8 @@ class InventoryController extends Controller
         
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'description' => 'nullable|string'
         ]);
-
-        if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($category->image) {
-                Storage::disk('public')->delete($category->image);
-            }
-            $imagePath = $request->file('image')->store('categories', 'public');
-            $validated['image'] = $imagePath;
-        }
 
         $category->update($validated);
 
@@ -182,14 +166,8 @@ class InventoryController extends Controller
             'unit' => 'required|string|max:50',
             'location' => 'nullable|string|max:255',
             'condition' => 'nullable|string|max:255',
-            'expiration_date' => 'nullable|date',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'expiration_date' => 'nullable|date'
         ]);
-
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('items', 'public');
-        }
 
         $item = Item::create([
             'category_id'    => $subcategory->category_id,
@@ -197,7 +175,6 @@ class InventoryController extends Controller
             'name'           => $validated['name'],
             'description'    => $validated['description'],
             'unit'           => $validated['unit'],
-            'image'          => $imagePath,
         ]);
 
         // Create inventory record
@@ -228,20 +205,14 @@ class InventoryController extends Controller
             'unit' => 'required|string|max:50',
             'location' => 'nullable|string|max:255',
             'condition' => 'nullable|string|max:255',
-            'expiration_date' => 'nullable|date',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'expiration_date' => 'nullable|date'
         ]);
 
-        if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($item->image) {
-                Storage::disk('public')->delete($item->image);
-            }
-            $imagePath = $request->file('image')->store('items', 'public');
-            $validated['image'] = $imagePath;
-        }
-
-        $item->update($validated);
+        $item->update([
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'unit' => $validated['unit'],
+        ]);
 
         // Update inventory record
         if ($item->inventory) {

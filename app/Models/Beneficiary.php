@@ -11,6 +11,7 @@ class Beneficiary extends Model
     protected $fillable = [
         'user_id',
         'barangay_id',
+        'unique_id',
         'first_name',
         'middle_name',
         'last_name',
@@ -56,6 +57,18 @@ class Beneficiary extends Model
     public function distributions()
     {
         return $this->hasMany(Distribution::class);
+    }
+
+    public function reliefEvents()
+    {
+        return $this->hasMany(ReliefEventBeneficiary::class);
+    }
+
+    public function participatedReliefEvents()
+    {
+        return $this->belongsToMany(ReliefEvent::class, 'relief_event_beneficiaries')
+            ->withPivot('barangay_id')
+            ->withTimestamps();
     }
 
     // Auto-verification logic

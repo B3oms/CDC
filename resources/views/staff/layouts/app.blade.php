@@ -111,6 +111,10 @@
                 style="display: block !important; visibility: visible !important;">
                 <i class="fas fa-hands-helping"></i> Relief Monitor
             </a>
+            <a href="{{ route('staff.calamities.index') }}"
+                class="{{ request()->routeIs('staff.calamities.*') ? 'active' : '' }}">
+                <i class="fas fa-exclamation-triangle"></i> Calamity Meter
+            </a>
             <a href="{{ route('staff.locations.index') }}"
                 class="{{ request()->routeIs('staff.locations.*') ? 'active' : '' }}">
                 <i class="fas fa-map-marker-alt"></i> Locations

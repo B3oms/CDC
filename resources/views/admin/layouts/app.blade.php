@@ -39,10 +39,6 @@
                     class="{{ request()->routeIs('barangay.household_requests.*') ? 'active' : '' }}">
                     <i class="fas fa-home"></i> Household Requests
                 </a>
-                <a href="{{ route('barangay.household_requests.households') }}"
-                    class="{{ request()->routeIs('barangay.household_requests.households') ? 'active' : '' }}">
-                    <i class="fas fa-household"></i> Households
-                </a>
                 <a href="{{ route('barangay.beneficiaries.index') }}"
                     class="{{ request()->routeIs('barangay.beneficiaries.*') ? 'active' : '' }}">
                     <i class="fas fa-users"></i> Beneficiaries

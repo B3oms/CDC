@@ -354,4 +354,52 @@ class ReliefController extends Controller
                 ->with('error', 'Failed to generate PDF: ' . $e->getMessage());
         }
     }
+
+    // Fetch real-time statistics
+    public function getStats()
+    {
+        $events = ReliefEvent::all();
+        
+        $stats = [
+            'ongoingCount' => $events->where('status', 'Ongoing')->count(),
+            'upcomingCount' => $events->where('status', 'Upcoming')->count(),
+            'completedCount' => $events->where('status', 'Done')->count(),
+            'totalBeneficiaries' => ReliefEventBeneficiary::whereIn('relief_event_id', $events->pluck('id'))->count(),
+            'lastUpdated' => now()->format('M d, Y H:i:s')
+        ];
+
+        return response()->json($stats);
+    }
+
+    // Download individual event report as PDF
+    public function pdf(Request $request, $id)
+    {
+        $event = ReliefEvent::with([
+            'eventBarangays.barangay',
+            'eventBarangays.municipality',
+            'distributedItems.item',
+            'beneficiaries.beneficiary',
+            'creator',
+            'calamity',
+            'facilitators.role'
+        ])->findOrFail($id);
+
+        // Get paper size and orientation from request (default to A4 portrait)
+        $paperSize = $request->input('paper_size', 'A4');
+        $orientation = $request->input('orientation', 'portrait');
+
+        try {
+            $pdf = Pdf::loadView('staff.relief.pdf', compact('event'));
+            $pdf->setPaper($paperSize, $orientation);
+            return $pdf->download('relief-event-' . $event->name . '-' . now()->format('Y-m-d') . '.pdf');
+
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            \Log::error('PDF Generation Error: ' . $e->getMessage());
+            \Log::error('PDF Generation Trace: ' . $e->getTraceAsString());
+
+            return redirect()->route('staff.relief.show', $id)
+                ->with('error', 'Failed to generate PDF: ' . $e->getMessage());
+        }
+    }
 }

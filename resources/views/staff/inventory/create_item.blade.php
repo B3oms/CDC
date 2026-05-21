@@ -27,8 +27,7 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ route('staff.inventory.item.store', $subcategory->id) }}"
-        enctype="multipart/form-data">
+    <form method="POST" action="{{ route('staff.inventory.item.store', $subcategory->id) }}">
         @csrf
         <div class="form-grid">
             <div class="form-group">
@@ -50,13 +49,6 @@
                 <label>Expiration Date</label>
                 <input type="date" name="expiration_date"
                     value="{{ old('expiration_date') }}">
-            </div>
-                        <div class="form-group">
-                <label>Image</label>
-                <input type="file" name="image" accept="image/*"
-                    onchange="previewImage(this, 'preview-item')">
-                <img id="preview-item" src="#" alt="Preview"
-                    style="display:none;width:80px;height:80px;object-fit:cover;border-radius:8px;margin-top:8px;">
             </div>
             <div class="form-group full-width">
                 <label>Description</label>

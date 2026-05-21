@@ -17,7 +17,14 @@ class HouseholdRequestController extends Controller
             ->latest()
             ->get();
 
-        return view('barangay.household_requests.index', compact('requests'));
+        // Get households (approved requests) for this barangay
+        $households = HouseholdRequest::where('barangay_id', auth()->user()->barangay_id)
+            ->where('status', 'approved')
+            ->with('members')
+            ->orderBy('head_of_household')
+            ->get();
+
+        return view('barangay.household_requests.index', compact('requests', 'households'));
     }
 
     // Show household request creation form

@@ -1,6 +1,24 @@
 @extends('staff.layouts.app')
 @section('title', 'Beneficiaries')
 
+@push('styles')
+<style>
+/* Unique ID Badge */
+.unique-id-badge {
+    background: #eaf3de;
+    color: #1a6b2a;
+    border: 1px solid #1a6b2a;
+    border-radius: 6px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.05em;
+    display: inline-block;
+}
+</style>
+@endpush
+
 @section('content')
 <div class="beneficiaries-page">
     <div class="page-header">
@@ -71,7 +89,7 @@
                        style="border:none !important;cursor:pointer !important;">
                         <i class="fas fa-file-pdf"></i> PDF
                     </button>
-                    <div id="pdfOptions" class="pdf-options" style="display:none;position:absolute;top:100%;right:0;background:white;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:12px;min-width:200px;z-index:1001;">
+                    <div id="pdfOptions" class="pdf-options" style="display:none;position:absolute;top:100%;left:0;background:white;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:12px;min-width:200px;z-index:1001;">
                         <div style="margin-bottom:12px;">
                             <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Paper Size</label>
                             <select id="paperSize" style="width:100%;padding:6px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;color:#374151;">
@@ -108,6 +126,7 @@
                 <thead>
                     <tr>
                         <th>#</th>
+                        <th>Unique ID</th>
                         <th>Name</th>
                         <th>Gender</th>
                         <th>4Ps</th>
@@ -124,6 +143,11 @@
                     @forelse($beneficiaries as $i => $b)
                     <tr>
                         <td>{{ $beneficiaries->firstItem() + $i }}</td>
+                        <td>
+                            <span class="unique-id-badge">
+                                {{ $b->unique_id ?? 'N/A' }}
+                            </span>
+                        </td>
                         <td class="td-name">{{ $b->first_name }} {{ $b->last_name }}</td>
                         <td><span class="text-capitalize">{{ $b->gender ?? 'N/A' }}</span></td>
                         <td>
@@ -571,13 +595,12 @@ document.addEventListener('click', function(event) {
 function exportPdf() {
     const paperSize = document.getElementById('paperSize').value;
     const orientation = document.getElementById('orientation').value;
-    const currentUrl = new URL(window.location.href);
-    const baseUrl = currentUrl.origin + currentUrl.pathname;
+    const url = `{{ route('staff.beneficiaries.pdf') }}`;
     
     // Create a hidden form to submit for download
     const form = document.createElement('form');
     form.method = 'GET';
-    form.action = baseUrl;
+    form.action = url;
     form.style.display = 'none';
     
     const paperSizeInput = document.createElement('input');
@@ -591,6 +614,50 @@ function exportPdf() {
     orientationInput.name = 'orientation';
     orientationInput.value = orientation;
     form.appendChild(orientationInput);
+    
+    // Add filter parameters if they exist
+    const currentUrl = new URL(window.location.href);
+    const params = currentUrl.searchParams;
+    
+    if (params.has('municipality_id')) {
+        const municipalityInput = document.createElement('input');
+        municipalityInput.type = 'hidden';
+        municipalityInput.name = 'municipality_id';
+        municipalityInput.value = params.get('municipality_id');
+        form.appendChild(municipalityInput);
+    }
+    
+    if (params.has('barangay_id')) {
+        const barangayInput = document.createElement('input');
+        barangayInput.type = 'hidden';
+        barangayInput.name = 'barangay_id';
+        barangayInput.value = params.get('barangay_id');
+        form.appendChild(barangayInput);
+    }
+    
+    if (params.has('gender')) {
+        const genderInput = document.createElement('input');
+        genderInput.type = 'hidden';
+        genderInput.name = 'gender';
+        genderInput.value = params.get('gender');
+        form.appendChild(genderInput);
+    }
+    
+    if (params.has('status')) {
+        const statusInput = document.createElement('input');
+        statusInput.type = 'hidden';
+        statusInput.name = 'status';
+        statusInput.value = params.get('status');
+        form.appendChild(statusInput);
+    }
+    
+    if (params.has('is_4ps_member')) {
+        const fourPsInput = document.createElement('input');
+        fourPsInput.type = 'hidden';
+        fourPsInput.name = 'is_4ps_member';
+        fourPsInput.value = params.get('is_4ps_member');
+        form.appendChild(fourPsInput);
+    }
     
     document.body.appendChild(form);
     form.submit();

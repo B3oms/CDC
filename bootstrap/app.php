@@ -7,6 +7,7 @@ use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\IsBarangay;
 use App\Http\Middleware\IsStaff;
 use App\Http\Middleware\IsAdminOrStaff;
+use App\Http\Middleware\IsBeneficiary;
 
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -34,6 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
     'isBarangay'     => IsBarangay::class,
     'isStaff'        => IsStaff::class,
     'isAdminOrStaff' => IsAdminOrStaff::class,
+    'isBeneficiary'  => IsBeneficiary::class,
 ]);
 
     $middleware->redirectGuestsTo('/');

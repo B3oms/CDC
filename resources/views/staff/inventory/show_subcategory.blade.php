@@ -50,7 +50,13 @@
             <div class="inventory-item-meta">
                 <div class="meta-row">
                     <span class="meta-label">Stock</span>
-                    <span class="meta-value">{{ $item->stock ?? 0 }}</span>
+                    <span class="meta-value">
+                        @if($item->inventory)
+                            {{ $item->inventory->quantity ?? 0 }}
+                        @else
+                            0
+                        @endif
+                    </span>
                 </div>
                 @if($item->unit)
                 <div class="meta-row">

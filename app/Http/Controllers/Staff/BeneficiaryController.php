@@ -11,7 +11,8 @@ use App\Models\Role;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class BeneficiaryController extends Controller
 {
@@ -25,7 +26,7 @@ class BeneficiaryController extends Controller
             $barangays = Barangay::where('municipality_id', $request->municipality_id)->get();
         }
         
-        $query = Beneficiary::with('barangay');
+        $query = Beneficiary::with(['barangay', 'user', 'distributions']);
 
         if ($request->municipality_id) {
             $query->whereHas('barangay', function($q) use ($request) {
@@ -165,35 +166,49 @@ class BeneficiaryController extends Controller
     public function pdf(Request $request)
     {
         try {
-            $query = Beneficiary::with('barangay');
-
-            if ($request->municipality_id) {
-                $query->whereHas('barangay', function($q) use ($request) {
-                    $q->where('municipality_id', $request->municipality_id);
-                });
-            }
-
-            if ($request->barangay_id) {
-                $query->where('barangay_id', $request->barangay_id);
-            }
-
-            if ($request->status === 'verified') {
-                $query->where('is_verified', 1);
-            } elseif ($request->status === 'pending') {
-                $query->where('is_verified', 0);
-            }
-
-            $beneficiaries = $query->latest()->get();
-
             // Get paper size and orientation from request (default to A4 portrait)
             $paperSize = $request->input('paper_size', 'A4');
             $orientation = $request->input('orientation', 'portrait');
 
-            $pdf = PDF::loadView('staff.beneficiaries.pdf', compact('beneficiaries'));
+            // Build query with same filters as index method
+            $beneficiaries = Beneficiary::with('barangay.municipality')
+                ->when($request->municipality_id, function ($q) use ($request) {
+                    $q->whereHas('barangay', function ($q2) use ($request) {
+                        $q2->where('municipality_id', $request->municipality_id);
+                    });
+                })
+                ->when($request->barangay_id, function ($q) use ($request) {
+                    $q->where('barangay_id', $request->barangay_id);
+                })
+                ->when($request->gender, function ($q) use ($request) {
+                    $q->where('gender', $request->gender);
+                })
+                ->when($request->is_4ps_member !== null, function ($q) use ($request) {
+                    $q->where('is_4ps_member', $request->is_4ps_member);
+                })
+                ->when($request->status, function ($q) use ($request) {
+                    if ($request->status === 'verified') {
+                        $q->where('is_verified', 1);
+                    } elseif ($request->status === 'pending') {
+                        $q->where('is_verified', 0);
+                    }
+                })
+                ->orderBy('created_at', 'desc')
+                ->get(); // No pagination for PDF
+
+            // Generate PDF using Barryvdh DomPDF
+            $pdf = Pdf::loadView('staff.beneficiaries.pdf', compact('beneficiaries'));
             $pdf->setPaper($paperSize, $orientation);
-            return $pdf->download('beneficiaries-list.pdf');
+            
+            // Generate filename with current date
+            $filename = 'beneficiaries-' . Carbon::now()->format('Y-m-d') . '.pdf';
+            
+            return $pdf->download($filename);
 
         } catch (\Exception $e) {
+            // Log error and return with error message
+            \Log::error('PDF generation failed: ' . $e->getMessage());
+            
             return redirect()->route('staff.beneficiaries.index')
                 ->with('error', 'Failed to generate PDF: ' . $e->getMessage());
         }
