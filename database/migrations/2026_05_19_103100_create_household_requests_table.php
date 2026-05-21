@@ -27,5 +27,5 @@ return new class extends SafeMigration
         $table->timestamps();
         $table->foreign('barangay_id')->references('id')->on('barangays')->onDelete('cascade');
         $table->foreign('approved_by')->references('id')->on('users')->onDelete('set null');
-    };
+    }
 };

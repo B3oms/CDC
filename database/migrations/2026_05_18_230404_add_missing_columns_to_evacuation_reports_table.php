@@ -16,5 +16,5 @@ return new class extends SafeMigration
         if (!Schema::hasColumn('evacuation_reports', 'barangay_id')) {
         $table->unsignedBigInteger('barangay_id')->nullable()->after('id');
         $table->foreign('barangay_id')->references('id')->on('barangays')->onDelete('cascade');
-    };
+    }
 };

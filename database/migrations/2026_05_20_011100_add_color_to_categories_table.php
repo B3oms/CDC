@@ -13,5 +13,5 @@ return new class extends SafeMigration
     protected function columns(Blueprint $table): void
     {
         $table->string('color', 7)->default('#10B981')->after('name'); // Default green color
-    };
+    }
 };

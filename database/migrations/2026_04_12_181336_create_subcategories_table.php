@@ -18,5 +18,5 @@ return new class extends SafeMigration
         $table->text('description')->nullable();
         $table->string('image', 255)->nullable();
         $table->timestamps();
-    };
+    }
 };

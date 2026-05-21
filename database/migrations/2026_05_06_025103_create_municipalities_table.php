@@ -18,5 +18,5 @@ return new class extends SafeMigration
         $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
         $table->text('notes')->nullable();
         $table->timestamps();
-    };
+    }
 };

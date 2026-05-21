@@ -13,5 +13,5 @@ return new class extends SafeMigration
     protected function columns(Blueprint $table): void
     {
         $table->string('middle_name')->nullable()->after('first_name');
-    };
+    }
 };

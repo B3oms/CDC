@@ -23,5 +23,5 @@ return new class extends SafeMigration
         $table->timestamps();
         $table->index(['user_id', 'read']);
         $table->index(['type', 'created_at']);
-    };
+    }
 };

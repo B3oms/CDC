@@ -24,5 +24,5 @@ return new class extends SafeMigration
         $table->index('status');
         $table->index('requested_by');
         $table->index('approved_by');
-    };
+    }
 };

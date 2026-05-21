@@ -14,5 +14,5 @@ return new class extends SafeMigration
     {
         $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending')->after('province');
         $table->text('notes')->nullable()->after('status');
-    };
+    }
 };

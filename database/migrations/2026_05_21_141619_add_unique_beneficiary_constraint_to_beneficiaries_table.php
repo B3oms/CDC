@@ -14,5 +14,5 @@ return new class extends SafeMigration
     {
         // Add unique composite constraint on first_name, last_name, and birthdate
         $table->unique(['first_name', 'last_name', 'birthdate'], 'unique_beneficiary');
-    };
+    }
 };

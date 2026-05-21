@@ -20,5 +20,5 @@ return new class extends SafeMigration
         $table->foreignId('calamity_id')->nullable()->constrained('calamities')->onDelete('set null');
         $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
         $table->timestamps();
-    };
+    }
 };

@@ -18,5 +18,5 @@ return new class extends SafeMigration
         $table->string('venue', 255);
         $table->string('location', 255);
         $table->timestamps();
-    };
+    }
 };

@@ -18,5 +18,5 @@ return new class extends SafeMigration
         $table->foreignId('municipality_id')->constrained('municipalities')->onDelete('cascade');
         $table->timestamps();
         $table->unique(['relief_event_id', 'barangay_id']);
-    };
+    }
 };

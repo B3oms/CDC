@@ -13,5 +13,5 @@ return new class extends SafeMigration
     protected function columns(Blueprint $table): void
     {
         $table->boolean('is_4ps_member')->default(false)->after('gender');
-    };
+    }
 };

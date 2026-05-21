@@ -20,5 +20,5 @@ return new class extends SafeMigration
         ->constrained('users')->onDelete('set null')
         ->after('interview_notes');
         $table->timestamp('interviewed_at')->nullable()->after('interviewed_by');
-    };
+    }
 };

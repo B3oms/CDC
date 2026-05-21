@@ -13,5 +13,5 @@ return new class extends SafeMigration
     protected function columns(Blueprint $table): void
     {
         $table->renameColumn('province', 'region');
-    };
+    }
 };

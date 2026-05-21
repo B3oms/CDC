@@ -19,5 +19,5 @@ return new class extends SafeMigration
         $table->timestamps();
         // Shortened index name to avoid MySQL 64-char limit
         $table->unique(['relief_event_id', 'barangay_id', 'beneficiary_id'], 'reb_unique');
-    };
+    }
 };

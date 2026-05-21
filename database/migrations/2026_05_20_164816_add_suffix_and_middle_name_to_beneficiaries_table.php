@@ -14,5 +14,5 @@ return new class extends SafeMigration
     {
         if (!Schema::hasColumn('beneficiaries', 'suffix')) {
         $table->string('suffix')->nullable()->after('last_name');
-    };
+    }
 };

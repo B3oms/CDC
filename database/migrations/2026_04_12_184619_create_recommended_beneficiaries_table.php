@@ -21,5 +21,5 @@ return new class extends SafeMigration
         $table->text('address')->nullable();
         $table->enum('status', ['Pending', 'Converted', 'Rejected'])->default('Pending');
         $table->timestamps();
-    };
+    }
 };

@@ -19,5 +19,5 @@ return new class extends SafeMigration
         $table->string('sex');
         $table->timestamps();
         $table->foreign('household_request_id')->references('id')->on('household_requests')->onDelete('cascade');
-    };
+    }
 };

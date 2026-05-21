@@ -15,5 +15,5 @@ return new class extends SafeMigration
         $table->string('position', 100)->nullable()->after('contact_number');
         $table->string('organization', 150)->nullable()->after('position');
         $table->date('birthdate')->nullable()->after('organization');
-    };
+    }
 };

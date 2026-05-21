@@ -14,5 +14,5 @@ return new class extends SafeMigration
     {
         $table->integer('head_age')->nullable()->after('head_of_household');
         $table->string('head_sex')->nullable()->after('head_age');
-    };
+    }
 };

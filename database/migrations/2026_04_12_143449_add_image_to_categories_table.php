@@ -13,5 +13,5 @@ return new class extends SafeMigration
     protected function columns(Blueprint $table): void
     {
         $table->string('image', 255)->nullable()->after('description');
-    };
+    }
 };

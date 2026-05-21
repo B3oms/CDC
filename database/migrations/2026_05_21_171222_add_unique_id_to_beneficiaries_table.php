@@ -13,5 +13,5 @@ return new class extends SafeMigration
     protected function columns(Blueprint $table): void
     {
         $table->string('unique_id', 20)->unique()->after('id')->comment('Random unique beneficiary ID');
-    };
+    }
 };

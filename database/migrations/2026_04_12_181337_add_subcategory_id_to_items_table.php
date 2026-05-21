@@ -17,5 +17,5 @@ return new class extends SafeMigration
         ->after('category_id')
         ->constrained('subcategories')
         ->onDelete('set null');
-    };
+    }
 };

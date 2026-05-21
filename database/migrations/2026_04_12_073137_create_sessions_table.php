@@ -18,5 +18,5 @@ return new class extends SafeMigration
         $table->text('user_agent')->nullable();
         $table->longText('payload');
         $table->integer('last_activity')->index();
-    };
+    }
 };

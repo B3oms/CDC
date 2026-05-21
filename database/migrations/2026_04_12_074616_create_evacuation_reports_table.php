@@ -22,5 +22,5 @@ return new class extends SafeMigration
         $table->enum('severity_level', ['1', '2', '3', '4', '5'])->default('1');
         $table->decimal('ranking_score', 8, 2)->default(0.00);
         $table->timestamps();
-    };
+    }
 };

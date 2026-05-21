@@ -16,5 +16,5 @@ return new class extends SafeMigration
         $table->foreignId('calamity_id')->constrained()->cascadeOnDelete();
         $table->foreignId('barangay_id')->constrained()->cascadeOnDelete();
         $table->timestamps();
-    };
+    }
 };
