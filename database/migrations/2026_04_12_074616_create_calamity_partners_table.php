@@ -6,17 +6,14 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up(): void
-    {
+    public function up()
+{
+    if (!Schema::hasTable('calamity_partners')) {
         Schema::create('calamity_partners', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('calamity_id')->constrained('calamities')->onDelete('cascade');
-            $table->foreignId('barangay_id')->constrained('barangays')->onDelete('cascade');
-            $table->timestamps();
-
-            $table->unique(['calamity_id', 'barangay_id']);
+            // ...
         });
     }
+}
 
     public function down(): void
     {
