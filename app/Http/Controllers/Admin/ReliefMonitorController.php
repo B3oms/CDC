@@ -237,6 +237,22 @@ class ReliefMonitorController extends Controller
     public function markOngoing($id)
     {
         $event = ReliefEvent::findOrFail($id);
+        
+        // Prevent finished events from being marked as ongoing
+        if ($event->status === 'Done') {
+            return redirect()->route('admin.relief.show', $id)
+                ->with('error', 'Cannot mark a finished event as ongoing. Events marked as done cannot be reverted to ongoing status.');
+        }
+        
+        // Validate that the event date is today or has passed
+        $eventDate = \Carbon\Carbon::parse($event->date);
+        $today = \Carbon\Carbon::today();
+        
+        if ($eventDate->greaterThan($today)) {
+            return redirect()->route('admin.relief.show', $id)
+                ->with('error', 'Cannot mark event as ongoing. The event date (' . $eventDate->format('M d, Y') . ') is in the future.');
+        }
+        
         $event->update(['status' => 'Ongoing']);
 
         return redirect()->route('admin.relief.show', $id)
@@ -251,6 +267,27 @@ class ReliefMonitorController extends Controller
         $request->validate([
             'status' => 'required|in:Ongoing,Done'
         ]);
+
+        // Prevent finished events from being marked as ongoing
+        if ($request->status === 'Ongoing' && $event->status === 'Done') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot mark a finished event as ongoing. Events marked as done cannot be reverted to ongoing status.'
+            ]);
+        }
+
+        // Validate that the event date is today or has passed if trying to mark as ongoing
+        if ($request->status === 'Ongoing') {
+            $eventDate = \Carbon\Carbon::parse($event->date);
+            $today = \Carbon\Carbon::today();
+            
+            if ($eventDate->greaterThan($today)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot mark event as ongoing. The event date (' . $eventDate->format('M d, Y') . ') is in the future.'
+                ]);
+            }
+        }
 
         $event->update(['status' => $request->status]);
 

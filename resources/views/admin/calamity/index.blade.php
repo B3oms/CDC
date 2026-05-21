@@ -1,6 +1,3 @@
-@extends('admin.layouts.app')
-@section('title', 'Calamities')
-
 @section('content')
 <div class="dash-header">
     <h1>Calamities</h1>

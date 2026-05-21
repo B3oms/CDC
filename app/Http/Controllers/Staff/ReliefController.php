@@ -291,6 +291,27 @@ class ReliefController extends Controller
             'status' => 'required|in:Ongoing,Done,Upcoming'
         ]);
 
+        // Prevent finished events from being marked as ongoing
+        if ($request->status === 'Ongoing' && $event->status === 'Done') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot mark a finished event as ongoing. Events marked as done cannot be reverted to ongoing status.'
+            ]);
+        }
+
+        // Validate that the event date is today or has passed if trying to mark as ongoing
+        if ($request->status === 'Ongoing') {
+            $eventDate = \Carbon\Carbon::parse($event->date);
+            $today = \Carbon\Carbon::today();
+            
+            if ($eventDate->greaterThan($today)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot mark event as ongoing. The event date (' . $eventDate->format('M d, Y') . ') is in the future.'
+                ]);
+            }
+        }
+
         $event->update([
             'status' => $request->status
         ]);

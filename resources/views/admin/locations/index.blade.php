@@ -5,11 +5,6 @@
 
 <div class="dash-header">
     <h1>Location Management</h1>
-    <div class="dash-header-actions">
-        <a href="{{ route('admin.locations.create') }}" class="btn-primary">
-            <i class="fas fa-plus"></i> Add Location
-        </a>
-    </div>
 </div>
 
 {{-- ===================== ALERTS ===================== --}}
@@ -50,10 +45,7 @@
     <div class="empty-state">
         <div class="empty-icon"><i class="fas fa-map-marked-alt"></i></div>
         <h3>No location requests yet</h3>
-        <p>Start by adding your first location request</p>
-        <a href="{{ route('admin.locations.create') }}" class="btn-add-location">
-            <i class="fas fa-plus"></i> Add First Location
-        </a>
+        <p>Staff members can submit location requests for your approval</p>
     </div>
 @else
 
@@ -102,20 +94,20 @@
                 </div>
                 <div class="table-cell" data-label="Actions">
                     <div class="action-buttons">
-                        <form method="POST" action="{{ route('admin.locations.approve', $request->id) }}" style="display:contents">
+                        <form method="POST" action="{{ route('admin.location-requests.approve', $request->id) }}" style="display:contents">
                             @csrf
                             <button type="submit" class="btn-action btn-approve" title="Approve">
                                 <i class="fas fa-check"></i>
                             </button>
                         </form>
-                        <form method="POST" action="{{ route('admin.locations.reject', $request->id) }}" style="display:contents">
+                        <form method="POST" action="{{ route('admin.location-requests.reject', $request->id) }}" style="display:contents">
                             @csrf
                             <input type="hidden" name="rejection_reason" value="Rejected by admin">
                             <button type="submit" class="btn-action btn-reject" title="Reject">
                                 <i class="fas fa-times"></i>
                             </button>
                         </form>
-                        <a href="{{ route('admin.locations.show', $request->id) }}" class="btn-action btn-view" title="View">
+                        <a href="{{ route('admin.location-requests.show', $request->id) }}" class="btn-action btn-view" title="View">
                             <i class="fas fa-eye"></i>
                         </a>
                     </div>
@@ -162,14 +154,14 @@
                             </div>
                             <span class="stat-badge">
                                 <i class="fas fa-map-marker-alt"></i>
-                                {{ $barangays->where('municipality_name', $municipality->name)->count() }}
+                                {{ $barangays->where('municipality_id', $municipality->id)->count() }}
                             </span>
                         </div>
                         <div class="location-card-body">
                             <div class="detail-item"><i class="fas fa-globe"></i><span>{{ $municipality->province }}</span></div>
                             <div class="detail-item">
                                 <i class="fas fa-map-marker-alt"></i>
-                                <span>{{ $barangays->where('municipality_name', $municipality->name)->count() }} barangays</span>
+                                <span>{{ $barangays->where('municipality_id', $municipality->id)->count() }} barangays</span>
                             </div>
                         </div>
                         <div class="location-card-actions">
@@ -198,10 +190,10 @@
                                 <span class="hierarchy-name">{{ $municipality->name }}</span>
                                 <span class="hierarchy-type">Municipality</span>
                             </div>
-                            <span class="hierarchy-count">{{ $barangays->where('municipality_name', $municipality->name)->count() }} barangays</span>
+                            <span class="hierarchy-count">{{ $barangays->where('municipality_id', $municipality->id)->count() }} barangays</span>
                         </div>
                         <div id="muni-{{ $municipality->id }}" class="hierarchy-children">
-                            @foreach($barangays->where('municipality_name', $municipality->name)->sortBy('name') as $barangay)
+                            @foreach($barangays->where('municipality_id', $municipality->id)->sortBy('name') as $barangay)
                             <div class="hierarchy-item barangay-hierarchy">
                                 <div class="hierarchy-header">
                                     <div class="hierarchy-info">

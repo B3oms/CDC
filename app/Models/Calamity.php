@@ -33,6 +33,11 @@ class Calamity extends Model
         return $this->hasMany(ReliefOperation::class);
     }
 
+    public function reliefEvents()
+    {
+        return $this->hasMany(ReliefEvent::class, 'calamity_id');
+    }
+
     public function partners()
     {
         return $this->hasMany(CalamityPartner::class);

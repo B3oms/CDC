@@ -12,7 +12,6 @@ use App\Models\EvacuationReport;
 use App\Models\HouseholdRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use PDF;
 
 class CalamityController extends Controller
 {
@@ -22,8 +21,11 @@ class CalamityController extends Controller
         $calamities = Calamity::with(['barangays', 'creator'])
             ->orderBy('created_at', 'desc')
             ->get();
-            
-        return view('admin.calamity.index', compact('calamities'));
+        
+        // Use staff layout if user is staff, otherwise use admin layout
+        $view = auth()->user()->role->name === 'Staff' ? 'staff.calamity.index' : 'admin.calamity.index';
+        
+        return view($view, compact('calamities'));
     }
 
     // Show add event form
@@ -86,7 +88,10 @@ class CalamityController extends Controller
             ->with('barangay')
             ->get();
 
-        return view('admin.calamity.show', compact('calamity', 'rankings'));
+        // Use staff layout if user is staff, otherwise use admin layout
+        $view = auth()->user()->role->name === 'Staff' ? 'staff.calamity.show' : 'admin.calamity.show';
+        
+        return view($view, compact('calamity', 'rankings'));
     }
 
     // Close portal
@@ -284,14 +289,45 @@ class CalamityController extends Controller
             $paperSize = $request->input('paper_size', 'A4');
             $orientation = $request->input('orientation', 'landscape');
 
-            // Generate PDF
-            $pdf = PDF::loadView('admin.calamity.pdf', $pdfData);
-
-            // Set paper size and orientation
-            $pdf->setPaper($paperSize, $orientation);
-
-            // Download the PDF
-            return $pdf->download('calamity-' . $calamity->name . '-' . $calamity->id . '.pdf');
+            // Generate PDF using DomPDF
+            try {
+                $html = view('admin.calamity.pdf', $pdfData)->render();
+                
+                $dompdf = new \Dompdf\Dompdf();
+                $dompdf->loadHtml($html);
+                
+                // Set paper size and orientation
+                $dompdf->setPaper($paperSize, $orientation);
+                
+                // Set options for better rendering
+                $options = new \Dompdf\Options();
+                $options->set('defaultFont', 'Arial');
+                $options->set('isRemoteEnabled', true);
+                $options->set('isHtml5ParserEnabled', true);
+                $options->set('isFontSubsettingEnabled', true);
+                $dompdf->setOptions($options);
+                
+                // Render the PDF
+                $dompdf->render();
+                
+                // Generate filename
+                $filename = 'calamity-' . $calamity->name . '-' . $calamity->id . '.pdf';
+                
+                // Return PDF download
+                return response($dompdf->output(), 200, [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+                ]);
+            } catch (\Exception $e) {
+                // Log the error for debugging
+                \Log::error('PDF generation failed: ' . $e->getMessage());
+                
+                // Return a simple error response
+                return response()->json([
+                    'error' => 'PDF generation failed: ' . $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ], 500);
+            }
 
         } catch (\Exception $e) {
             return redirect()->route('admin.calamity.show', $id)

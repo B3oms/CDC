@@ -73,7 +73,7 @@
     <div class="chart-card">
         <div class="chart-title">MONTHLY TREND</div>
         <canvas id="chart-monthly" style="width:100%; max-height:220px;"></canvas>
-        <div class="chart-actions">
+        <div class="chart-actions" style="position:relative;">
             <button onclick="toggleChartPdfDropdown(event, 'monthly')" class="pdf-export-btn">
                 <i class="fas fa-file-pdf"></i> Export PDF
             </button>
@@ -93,7 +93,7 @@
                         <option value="landscape">Landscape</option>
                     </select>
                 </div>
-                <button onclick="exportChartToPDF('chart-monthly', 'monthly-trend', 'monthly')" style="width:100%;padding:8px;background:#10b981;color:white;border:none;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s;"
+                <button onclick="exportChartPdf('monthly')" style="width:100%;padding:8px;background:#10b981;color:white;border:none;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s;"
                    onmouseover="this.style.background='#059669'"
                    onmouseout="this.style.background='#10b981'">
                     Export PDF
@@ -110,7 +110,7 @@
             data-values="{{ json_encode($yearlyTrendValues) }}"
             style="width:100%; max-height:220px;">
         </canvas>
-        <div class="chart-actions">
+        <div class="chart-actions" style="position:relative;">
             <button onclick="toggleChartPdfDropdown(event, 'yearly')" class="pdf-export-btn">
                 <i class="fas fa-file-pdf"></i> Export PDF
             </button>
@@ -130,7 +130,7 @@
                         <option value="landscape">Landscape</option>
                     </select>
                 </div>
-                <button onclick="exportChartToPDF('chart-yearly-trend', 'yearly-trend', 'yearly')" style="width:100%;padding:8px;background:#10b981;color:white;border:none;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s;"
+                <button onclick="exportChartPdf('yearly')" style="width:100%;padding:8px;background:#10b981;color:white;border:none;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s;"
                    onmouseover="this.style.background='#059669'"
                    onmouseout="this.style.background='#10b981'">
                     Export PDF

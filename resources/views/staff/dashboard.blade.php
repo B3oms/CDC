@@ -3,15 +3,12 @@
 
 @section('content')
 
-{{-- ===== HEADER ===== --}}
 <div class="dash-header">
-    <div class="dash-greeting">
-        <h1>Hello, {{ auth()->user()->first_name }}!</h1>
-        <p class="dash-date">{{ now()->format('l, F j, Y') }}</p>
-    </div>
+    <h1>Hello, {{ auth()->user()->first_name }}!</h1>
+
     <a href="{{ route('admin.calamity.index') }}"
-       class="calamity-meter {{ $activeCalamity ? 'active' : 'none' }}"
-       style="text-decoration:none;">
+        class="calamity-meter {{ $activeCalamity ? 'active' : 'none' }}"
+        style="text-decoration:none;">
         <div class="cal-label">Calamity Meter ↗</div>
         @if($activeCalamity)
             <div class="cal-name">{{ $activeCalamity->name }}</div>
@@ -21,6 +18,14 @@
         @endif
     </a>
 </div>
+
+@if($activeCalamity)
+<div class="alert alert-info" style="margin-bottom:1.5rem;">
+    <i class="fas fa-info-circle"></i>
+    <strong>Active Calamity:</strong> {{ $activeCalamity->name }}
+    <span class="badge-intensity {{ strtolower($activeCalamity->intensity) }}">{{ $activeCalamity->intensity }}</span>
+</div>
+@endif
 
 {{-- ===== STATS ROW ===== --}}
 <div class="stats-row">
@@ -53,7 +58,7 @@
             <div class="chart-wrap">
                 <canvas id="chart-monthly"></canvas>
             </div>
-            <div class="chart-actions">
+            <div class="chart-actions" style="position:relative;">
                 <button onclick="toggleChartPdfDropdown(event, 'monthly')" class="pdf-export-btn">
                     <i class="fas fa-file-pdf"></i> Export PDF
                 </button>
@@ -73,7 +78,7 @@
                             <option value="landscape">Landscape</option>
                         </select>
                     </div>
-                    <button onclick="exportChartToPDF('chart-monthly', 'monthly-trend', 'monthly')" style="width:100%;padding:8px;background:#10b981;color:white;border:none;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s;"
+                    <button onclick="exportChartPdf('monthly')" style="width:100%;padding:8px;background:#10b981;color:white;border:none;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s;"
                        onmouseover="this.style.background='#059669'"
                        onmouseout="this.style.background='#10b981'">
                         Export PDF
@@ -92,7 +97,7 @@
                     data-values="{{ json_encode($yearlyTrendValues) }}">
                 </canvas>
             </div>
-            <div class="chart-actions">
+            <div class="chart-actions" style="position:relative;">
                 <button onclick="toggleChartPdfDropdown(event, 'yearly')" class="pdf-export-btn">
                     <i class="fas fa-file-pdf"></i> Export PDF
                 </button>
@@ -112,7 +117,7 @@
                             <option value="landscape">Landscape</option>
                         </select>
                     </div>
-                    <button onclick="exportChartToPDF('chart-yearly-trend', 'yearly-trend', 'yearly')" style="width:100%;padding:8px;background:#10b981;color:white;border:none;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s;"
+                    <button onclick="exportChartPdf('yearly')" style="width:100%;padding:8px;background:#10b981;color:white;border:none;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s;"
                        onmouseover="this.style.background='#059669'"
                        onmouseout="this.style.background='#10b981'">
                         Export PDF
@@ -776,5 +781,93 @@ document.addEventListener('click', function(event) {
         max-height: 130px;
     }
 }
+
+/* ─── Calamity Meter (Original Staff Style) ─────────────────────────────────── */
+.calamity-meter {
+    background: #faeeda;
+    border: 1px solid #ef9f27;
+    border-radius: 6px;
+    padding: 8px 12px;
+    text-align: right;
+    min-width: 140px;
+    font-size: 0.85rem;
+}
+
+.calamity-meter .cal-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #b8860b;
+    margin-bottom: 2px;
+    font-weight: 500;
+}
+
+.calamity-meter .cal-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: #633806;
+    line-height: 1.2;
+}
+
+.calamity-meter .cal-badge {
+    display: inline-block;
+    background: #e24b4a;
+    color: #fff;
+    font-size: 8px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+.calamity-meter.none {
+    background: #eaf3de;
+    border-color: #639922;
+}
+
+.calamity-meter.none .cal-label { color: #3b6d11; }
+.calamity-meter.none .cal-name  { color: #27500a; }
+
+/* ─── Badge Intensity ─────────────────────────────────────── */
+.badge-intensity {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-left: 8px;
+}
+
+.badge-intensity.low {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.badge-intensity.medium {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.badge-intensity.high {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.badge-intensity.critical {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.badge-intensity.unknown {
+    background: #e2e3e5;
+    color: #383d41;
+    border: 1px solid #d6d8db;
+}
+
 </style>
 @endpush

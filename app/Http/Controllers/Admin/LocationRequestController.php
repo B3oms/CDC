@@ -15,12 +15,49 @@ class LocationRequestController extends Controller
 {
     public function index()
     {
-        $requests = LocationRequest::with(['requester', 'municipality'])
-            ->latest()
+        // Get all location requests with user details (for pending section)
+        $locationRequests = DB::table('location_requests')
+            ->leftJoin('users as requested_by', 'location_requests.requested_by', '=', 'requested_by.id')
+            ->leftJoin('users as approved_by', 'location_requests.approved_by', '=', 'approved_by.id')
+            ->select(
+                'location_requests.*',
+                'requested_by.first_name as requested_by_firstname',
+                'requested_by.last_name as requested_by_lastname',
+                'approved_by.first_name as approved_by_firstname',
+                'approved_by.last_name as approved_by_lastname'
+            )
+            ->orderBy('location_requests.created_at', 'desc')
             ->get();
 
-        return view('admin.location-requests.index', compact('requests'));
+        // Get all actual locations from the system
+        $municipalities = Municipality::orderBy('name')->get();
+        $barangays = Barangay::orderBy('name')->get();
+        $allLocations = $municipalities->concat($barangays);
+        
+        // Get orphaned barangays (barangays without valid municipality)
+        $orphanedBarangays = $barangays->filter(function ($barangay) use ($municipalities) {
+            return !$municipalities->contains('id', $barangay->municipality_id);
+        });
+
+        // Get statistics
+        $pendingRequests = $locationRequests->where('status', 'pending')->count();
+        $approvedRequests = $locationRequests->where('status', 'approved')->count();
+        $rejectedRequests = $locationRequests->where('status', 'rejected')->count();
+        $totalLocations = $allLocations->count();
+        
+        return view('admin.locations.index', compact(
+            'locationRequests',
+            'allLocations',
+            'municipalities',
+            'barangays',
+            'orphanedBarangays',
+            'pendingRequests',
+            'approvedRequests',
+            'rejectedRequests',
+            'totalLocations'
+        ));
     }
+
 
     public function show(LocationRequest $locationRequest)
     {
@@ -29,13 +66,18 @@ class LocationRequestController extends Controller
         return view('admin.location-requests.show', compact('locationRequest'));
     }
 
-    public function approve(LocationRequest $locationRequest)
+    public function approve($id)
     {
-        if (!$locationRequest->canBeApproved()) {
-            return back()->with('error', 'This request cannot be approved.');
-        }
-
         try {
+            $locationRequest = LocationRequest::findOrFail($id);
+            
+            // Debug: Log the current status
+            \Log::info('Attempting to approve LocationRequest ID: ' . $locationRequest->id . ', Current status: ' . $locationRequest->status);
+            
+            if (!$locationRequest->canBeApproved()) {
+                return back()->with('error', 'This request cannot be approved. Current status: ' . $locationRequest->status);
+            }
+
             DB::beginTransaction();
 
             // Update request status
@@ -49,6 +91,7 @@ class LocationRequestController extends Controller
             if ($locationRequest->type === 'municipality') {
                 Municipality::create([
                     'name' => $locationRequest->name,
+                    'province' => $locationRequest->region ?? 'Unknown', // Use region as province or default
                     'status' => 'approved',
                     'notes' => $locationRequest->remarks,
                 ]);
@@ -59,8 +102,14 @@ class LocationRequestController extends Controller
                 ]);
             }
 
-            // Trigger notification for approval
-            NotificationService::locationRequestApproved($locationRequest->id, Auth::id());
+            // Trigger notification for approval (optional - don't fail if notification fails)
+            try {
+                if (class_exists('App\Services\NotificationService')) {
+                    NotificationService::locationRequestApproved($locationRequest->id, Auth::id());
+                }
+            } catch (\Exception $notificationException) {
+                \Log::warning('Notification failed but approval succeeded: ' . $notificationException->getMessage());
+            }
 
             DB::commit();
 
@@ -68,7 +117,9 @@ class LocationRequestController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Failed to approve location request. Please try again.');
+            \Log::error('Location request approval failed: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            return back()->with('error', 'Failed to approve location request. Error: ' . $e->getMessage());
         }
     }
 

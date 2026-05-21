@@ -96,9 +96,11 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
+    width: 100%;
+    max-width: none;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
     .inventory-grid {
         grid-template-columns: repeat(3, 1fr);
         gap: 1.25rem;

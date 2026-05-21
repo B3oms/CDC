@@ -8,7 +8,7 @@
         <p style="color:#666;font-size:0.9rem;margin-top:0.5rem;">Submit requests for new municipalities and barangays to be added to the system</p>
     </div>
     <div class="dash-header-right">
-        <a href="{{ route('admin.locations.index') }}" class="btn btn-secondary">
+        <a href="{{ route('admin.location-requests.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Back to Requests
         </a>
     </div>
@@ -25,7 +25,7 @@
 <div class="relief-section">
     <div class="relief-section-title">Request New Municipality</div>
     <div class="form-card">
-        <form method="POST" action="{{ route('admin.locations.store') }}">
+        <form method="POST" action="{{ route('admin.location-requests.store') }}">
             @csrf
             <input type="hidden" name="type" value="municipality">
             
@@ -90,7 +90,7 @@
 <div class="relief-section">
     <div class="relief-section-title">Request New Barangay</div>
     <div class="form-card">
-        <form method="POST" action="{{ route('admin.locations.store') }}">
+        <form method="POST" action="{{ route('admin.location-requests.store') }}">
             @csrf
             <input type="hidden" name="type" value="barangay">
             

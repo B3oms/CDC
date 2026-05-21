@@ -69,7 +69,7 @@
                        style="border:none !important;cursor:pointer !important;">
                         <i class="fas fa-file-pdf"></i> PDF
                     </button>
-                    <div id="pdfOptions" class="pdf-options" style="display:none;position:absolute;top:100%;right:0;background:white;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:12px;min-width:200px;z-index:1001;">
+                    <div id="pdfOptions" class="pdf-options" style="display:none;position:absolute;top:100%;left:0;background:white;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:12px;min-width:200px;z-index:1001;">
                         <div style="margin-bottom:12px;">
                             <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Paper Size</label>
                             <select id="paperSize" style="width:100%;padding:6px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;color:#374151;">
@@ -486,6 +486,30 @@
     .filter-select {
         font-size: 0.8rem;
     }
+    
+    .pdf-options {
+        max-width: 90vw;
+        left: 0 !important;
+        right: auto !important;
+    }
+    
+    @media (max-width: 768px) {
+        .pdf-options {
+            left: 0 !important;
+            right: auto !important;
+            max-width: 85vw;
+            min-width: 250px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .pdf-options {
+            left: 0 !important;
+            right: auto !important;
+            max-width: 80vw;
+            min-width: 200px;
+        }
+    }
 }
 </style>
 @push('scripts')
@@ -532,15 +556,19 @@ document.addEventListener('click', function(event) {
 function exportPdf() {
     const paperSize = document.getElementById('paperSize').value;
     const orientation = document.getElementById('orientation').value;
-    const currentUrl = new URL(window.location.href);
-    const baseUrl = currentUrl.origin + currentUrl.pathname;
+    
+    // Get current filter values
+    const municipalityId = document.getElementById('municipality')?.value || '';
+    const barangayId = document.getElementById('barangay')?.value || '';
+    const status = document.querySelector('select[name="status"]')?.value || '';
     
     // Create a hidden form to submit for download
     const form = document.createElement('form');
     form.method = 'GET';
-    form.action = baseUrl;
+    form.action = '{{ route('admin.beneficiaries.pdf') }}';
     form.style.display = 'none';
     
+    // Add PDF options
     const paperSizeInput = document.createElement('input');
     paperSizeInput.type = 'hidden';
     paperSizeInput.name = 'paper_size';
@@ -552,6 +580,31 @@ function exportPdf() {
     orientationInput.name = 'orientation';
     orientationInput.value = orientation;
     form.appendChild(orientationInput);
+    
+    // Add filter parameters
+    if (municipalityId) {
+        const municipalityInput = document.createElement('input');
+        municipalityInput.type = 'hidden';
+        municipalityInput.name = 'municipality_id';
+        municipalityInput.value = municipalityId;
+        form.appendChild(municipalityInput);
+    }
+    
+    if (barangayId) {
+        const barangayInput = document.createElement('input');
+        barangayInput.type = 'hidden';
+        barangayInput.name = 'barangay_id';
+        barangayInput.value = barangayId;
+        form.appendChild(barangayInput);
+    }
+    
+    if (status) {
+        const statusInput = document.createElement('input');
+        statusInput.type = 'hidden';
+        statusInput.name = 'status';
+        statusInput.value = status;
+        form.appendChild(statusInput);
+    }
     
     document.body.appendChild(form);
     form.submit();

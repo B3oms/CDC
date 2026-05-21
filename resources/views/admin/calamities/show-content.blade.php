@@ -1,24 +1,23 @@
-@extends('admin.layouts.app')
-@section('title', 'Calamity')
-
-@section('content')
 <div class="dash-header">
     <div>
         <h1>{{ $calamity->name }}</h1>
         <p class="sub">{{ $calamity->type }} · {{ $calamity->date_occurred }}</p>
     </div>
     <div style="display:flex;gap:10px;align-items:center;">
-        <a href="{{ route('admin.calamity.index') }}" class="btn-back">← Back</a>
+        <a href="{{ route(auth()->user()->role->name === 'Staff' ? 'staff.calamities.index' : 'admin.calamity.index') }}" class="btn-back">← Back</a>
         @if($calamity->status === 'Open')
         <span class="status-open">● OPEN</span>
+        @if(auth()->user()->role->name !== 'Staff')
         <form method="POST" action="{{ route('admin.calamity.close', $calamity->id) }}">
             @csrf
             <button type="submit" class="btn-danger" onclick="return confirm('Close this calamity and generate report?')">
                 Close
             </button>
         </form>
+        @endif
         @else
         <span class="status-closed">● CLOSED</span>
+        @if(auth()->user()->role->name !== 'Staff')
         <div class="pdf-export-dropdown" style="position:relative;display:inline-block;">
             <button onclick="togglePdfDropdown(event)" class="btn-export-pdf"
                style="display: inline-flex !important; align-items: center !important; gap: 6px !important; padding: 8px 16px !important; background: #10b981 !important; color: white !important; text-decoration: none !important; border-radius: 6px !important; font-size: 13px !important; font-weight: 500 !important; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3) !important; letter-spacing: 0.5px !important; border:none !important; cursor:pointer !important;">
@@ -47,6 +46,7 @@
                 </button>
             </div>
         </div>
+        @endif
         @endif
     </div>
 </div>
@@ -168,7 +168,6 @@
         </div>
     </div>
 </div>
-@endsection
 
 <style>
 /* Partner Barangays Layout Styles */
@@ -248,169 +247,147 @@
     padding-left: 24px;
 }
 
-.venue-info.empty .no-venue {
-    color: #adb5bd;
+.no-venue {
+    color: #6c757d;
     font-style: italic;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
 }
 
-/* Ensure dot styling works with new layout */
-.barangay-name .dot {
-    background: #007bff;
+.dot {
     width: 8px;
     height: 8px;
+    background: #007bff;
     border-radius: 50%;
-    flex-shrink: 0;
 }
 
-.btn-export-pdf {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-    padding: 8px 16px !important;
-    background: #10b981 !important;
-    color: white !important;
-    text-decoration: none !important;
-    border-radius: 6px !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3) !important;
-    letter-spacing: 0.5px !important;
+.status-open {
+    background: #28a745;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 
-.btn-export-pdf:hover {
-    background: #059669 !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 8px 12px -2px rgba(16, 185, 129, 0.4) !important;
-    text-decoration: none !important;
-    color: white !important;
+.status-closed {
+    background: #6c757d;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.btn-view-households {
+    color: #007bff;
+}
+
+.btn-view-households:hover {
+    color: #0056b3;
+}
+
+.top-rank {
+    background: #fff3cd;
+}
+
+.dist-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.dist-table th,
+.dist-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.dist-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+}
+
+.dist-table tr:hover {
+    background: #f8f9fa;
 }
 </style>
 
-@push('scripts')
 <script>
-let currentBarangayId = null;
-
 function toggleHouseholds(barangayId) {
-    const detailsSection = document.getElementById('household-details-section');
-    const icon = document.getElementById('icon-' + barangayId);
+    const section = document.getElementById('household-details-section');
     const title = document.getElementById('household-details-title');
     const tbody = document.getElementById('household-details-body');
+    const icon = document.getElementById('icon-' + barangayId);
     
-    // Reset all icons
-    document.querySelectorAll('[id^="icon-"]').forEach(i => {
-        i.className = 'fas fa-eye';
-    });
-    
-    // If clicking the same barangay, toggle visibility
-    if (currentBarangayId === barangayId && detailsSection.style.display === 'block') {
-        detailsSection.style.display = 'none';
-        icon.className = 'fas fa-eye';
-        currentBarangayId = null;
-        return;
-    }
-    
-    // Show loading state
-    title.textContent = 'Loading household details...';
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;">Loading...</td></tr>';
-    detailsSection.style.display = 'block';
-    icon.className = 'fas fa-eye-slash';
-    currentBarangayId = barangayId;
-    
-    // Fetch household data via AJAX
-    const calamityId = {{ $calamity->id }};
-    fetch(`/admin/calamity/households/${calamityId}/${barangayId}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (!data.success) {
-                throw new Error(data.error || 'Unknown error occurred');
-            }
-            
-            // Update title with barangay name and total count
-            title.textContent = `${data.barangay_name} - Household Details (${data.total_households} households)`;
-            
-            // Clear tbody
-            tbody.innerHTML = '';
-            
-            if (data.households.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#888;">No households registered</td></tr>';
-                return;
-            }
-            
-            // Add household rows
-            data.households.forEach(household => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><strong>${household.head_name || 'N/A'}</strong></td>
-                    <td>${household.member_count || 0}</td>
-                    <td>${household.household_code || 'N/A'}</td>
-                    <td>${household.contact_number || 'N/A'}</td>
-                `;
-                tbody.appendChild(row);
+    if (section.style.display === 'none') {
+        // Show household details
+        fetch(`/barangays/${barangayId}/households`)
+            .then(response => response.json())
+            .then(data => {
+                title.textContent = `Household Details - ${data.barangay_name}`;
+                tbody.innerHTML = data.households.map(household => `
+                    <tr>
+                        <td>${household.head_name}</td>
+                        <td>${household.members_count}</td>
+                        <td>${household.household_code}</td>
+                        <td>${household.contact_number || 'N/A'}</td>
+                    </tr>
+                `).join('');
+                section.style.display = 'block';
+                icon.className = 'fas fa-eye-slash';
+            })
+            .catch(error => {
+                console.error('Error fetching household details:', error);
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:red;">Error loading household details</td></tr>';
+                section.style.display = 'block';
+                icon.className = 'fas fa-eye-slash';
             });
-        })
-        .catch(error => {
-            console.error('Error fetching households:', error);
-            title.textContent = 'Error Loading Household Details';
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:20px;color:#dc3545;">Failed to load household data: ${error.message}</td></tr>`;
-        });
+    } else {
+        // Hide household details
+        section.style.display = 'none';
+        icon.className = 'fas fa-eye';
+    }
 }
-
-// PDF Export Functions
-let dropdownOpenTime = 0;
 
 function togglePdfDropdown(event) {
-    if (event) {
-        event.stopPropagation();
-        event.preventDefault();
-    }
-    const dropdown = document.getElementById('pdfOptions');
-    if (dropdown.style.display === 'none') {
-        dropdown.style.display = 'block';
-        dropdownOpenTime = Date.now();
-    } else {
-        dropdown.style.display = 'none';
-    }
-}
-
-// Prevent dropdown from closing when clicking inside
-document.getElementById('pdfOptions').addEventListener('click', function(event) {
     event.stopPropagation();
-    event.preventDefault();
-});
-
-// Close dropdown when clicking outside (with delay to prevent immediate closing)
-document.addEventListener('click', function(event) {
     const dropdown = document.getElementById('pdfOptions');
-    const button = event.target.closest('.pdf-export-dropdown');
-    const insideDropdown = event.target.closest('#pdfOptions');
-    
-    // Don't close if just opened (within 200ms)
-    if (Date.now() - dropdownOpenTime < 200) {
-        return;
-    }
-    
-    if (!button && !insideDropdown && dropdown && dropdown.style.display === 'block') {
-        dropdown.style.display = 'none';
-    }
-});
+    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+}
 
 function exportPdf(calamityId) {
     const paperSize = document.getElementById('paperSize').value;
     const orientation = document.getElementById('orientation').value;
-    const url = `{{ route('admin.calamity.pdf', ':id') }}`.replace(':id', calamityId);
     
-    // Create a hidden form to submit for download
     const form = document.createElement('form');
-    form.method = 'GET';
-    form.action = url;
+    form.method = 'POST';
+    form.action = `/admin/calamity/${calamityId}/pdf`;
     form.style.display = 'none';
+    
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (csrfToken) {
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = csrfToken.getAttribute('content');
+        form.appendChild(csrfInput);
+    }
     
     const paperSizeInput = document.createElement('input');
     paperSizeInput.type = 'hidden';
@@ -426,12 +403,13 @@ function exportPdf(calamityId) {
     
     document.body.appendChild(form);
     form.submit();
-    document.body.removeChild(form);
-    
-    // Close dropdown after submission
-    document.getElementById('pdfOptions').style.display = 'none';
 }
 
-// Removed click-outside listener to prevent dropdown from closing unexpectedly
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('pdfOptions');
+    if (dropdown && !event.target.closest('.pdf-export-dropdown')) {
+        dropdown.style.display = 'none';
+    }
+});
 </script>
-@endpush

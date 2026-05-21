@@ -7,7 +7,6 @@ use App\Models\Municipality;
 use App\Models\Beneficiary;
 use App\Models\Barangay;
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class BeneficiaryController extends Controller
 {
@@ -58,30 +57,62 @@ class BeneficiaryController extends Controller
     }
 
     public function downloadPDF(Request $request)
-{
-    $beneficiaries = Beneficiary::with('barangay')
-        ->when($request->municipality_id, function ($q) use ($request) {
-            $q->whereHas('barangay', function ($q2) use ($request) {
-                $q2->where('municipality_id', $request->municipality_id);
-            });
-        })
-        ->when($request->barangay_id, function ($q) use ($request) {
-            $q->where('barangay_id', $request->barangay_id);
-        })
-        ->when($request->status, function ($q) use ($request) {
-            $q->where('is_verified', $request->status == 'verified');
-        })
-        ->get();
+    {
+        try {
+            $beneficiaries = Beneficiary::with('barangay')
+                ->when($request->municipality_id, function ($q) use ($request) {
+                    $q->whereHas('barangay', function ($q2) use ($request) {
+                        $q2->where('municipality_id', $request->municipality_id);
+                    });
+                })
+                ->when($request->barangay_id, function ($q) use ($request) {
+                    $q->where('barangay_id', $request->barangay_id);
+                })
+                ->when($request->status, function ($q) use ($request) {
+                    $q->where('is_verified', $request->status == 'verified');
+                })
+                ->get();
 
-    // Get paper size and orientation from request (default to A4 portrait)
-    $paperSize = $request->input('paper_size', 'A4');
-    $orientation = $request->input('orientation', 'portrait');
+            // Get paper size and orientation from request (default to A4 portrait)
+            $paperSize = $request->input('paper_size', 'A4');
+            $orientation = $request->input('orientation', 'portrait');
 
-    $pdf = Pdf::loadView('admin.beneficiaries.pdf', compact('beneficiaries'));
-    $pdf->setPaper($paperSize, $orientation);
-
-    return $pdf->download('beneficiaries.pdf');
-}
+            // Generate PDF using DomPDF
+            $html = view('admin.beneficiaries.pdf', compact('beneficiaries'))->render();
+            
+            $dompdf = new \Dompdf\Dompdf();
+            $dompdf->loadHtml($html);
+            
+            // Set paper size and orientation
+            $dompdf->setPaper($paperSize, $orientation);
+            
+            // Set options for better rendering
+            $options = new \Dompdf\Options();
+            $options->set('defaultFont', 'Arial');
+            $options->set('isRemoteEnabled', true);
+            $options->set('isHtml5ParserEnabled', true);
+            $options->set('isFontSubsettingEnabled', true);
+            $dompdf->setOptions($options);
+            
+            // Render the PDF
+            $dompdf->render();
+            
+            // Return PDF download
+            return response($dompdf->output(), 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="beneficiaries.pdf"'
+            ]);
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            \Log::error('PDF generation failed: ' . $e->getMessage());
+            
+            // Return a simple error response
+            return response()->json([
+                'error' => 'PDF generation failed: ' . $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ], 500);
+        }
+    }
 }
 
     

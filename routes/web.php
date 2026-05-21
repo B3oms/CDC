@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Staff\LocationRequestController as StaffLocationRequestController;
 use App\Http\Controllers\Staff\HouseholdController;
 use App\Http\Controllers\Staff\HouseholdRequestController as StaffHouseholdRequestController;
+use App\Http\Controllers\Staff\CalamityController as StaffCalamityController;
 use App\Http\Controllers\Barangay\HouseholdRequestController as BarangayHouseholdRequestController;
 use App\Http\Controllers\Barangay\BeneficiaryController as BarangayBeneficiaryController;
 use App\Http\Controllers\Barangay\ProfileController as BarangayProfileController;
@@ -223,15 +224,19 @@ Route::prefix('staff')->name('staff.')->middleware(['isStaff'])->group(function 
     Route::post('household-requests/{id}/reject',  [StaffHouseholdRequestController::class, 'reject'])->name('household_requests.reject');
     Route::delete('household-requests/{id}',   [StaffHouseholdRequestController::class, 'destroy'])->name('household_requests.destroy');
 
+    // Calamities (Staff View - Admin Content with Staff Layout)
+    Route::get('calamities',               [\App\Http\Controllers\Admin\CalamityController::class, 'index'])->name('calamities.index');
+    Route::get('calamities/{id}',          [\App\Http\Controllers\Admin\CalamityController::class, 'show'])->name('calamities.show');
+
     // Relief Monitor (Staff View)
-    Route::get('relief',                   [\App\Http\Controllers\Staff\ReliefController::class, 'index'])->name('relief.index');
-    Route::get('relief/create',            [\App\Http\Controllers\Staff\ReliefController::class, 'create'])->name('relief.create');
-    Route::post('relief',                  [\App\Http\Controllers\Staff\ReliefController::class, 'store'])->name('relief.store');
-    Route::get('relief/{id}',              [\App\Http\Controllers\Staff\ReliefController::class, 'show'])->name('relief.show');
-    Route::post('relief/{id}/status',    [\App\Http\Controllers\Staff\ReliefController::class, 'updateStatus'])->name('relief.updateStatus');
-    Route::get('relief/{id}/pdf',         [\App\Http\Controllers\Staff\ReliefController::class, 'downloadPDF'])->name('relief.event.pdf');
-    Route::get('relief/stats',             [\App\Http\Controllers\Staff\ReliefController::class, 'stats'])->name('relief.stats');
-    Route::delete('relief/{id}',           [\App\Http\Controllers\Staff\ReliefController::class, 'destroy'])->name('relief.destroy');
+    Route::get('relief',                   [StaffReliefController::class, 'index'])->name('relief.index');
+    Route::get('relief/create',            [StaffReliefController::class, 'create'])->name('relief.create');
+    Route::post('relief',                  [StaffReliefController::class, 'store'])->name('relief.store');
+    Route::get('relief/{id}',              [StaffReliefController::class, 'show'])->name('relief.show');
+    Route::get('relief/{id}/pdf',          [StaffReliefController::class, 'pdf'])->name('relief.pdf');
+    Route::put('relief/{id}',              [StaffReliefController::class, 'update'])->name('relief.update');
+    Route::post('relief/{id}/status',     [StaffReliefController::class, 'updateStatus'])->name('relief.updateStatus');
+    Route::delete('relief/{id}',           [StaffReliefController::class, 'destroy'])->name('relief.destroy');
     
     // Inventory (Staff View)
     Route::get('inventory',               [\App\Http\Controllers\Staff\InventoryController::class, 'index'])->name('inventory.index');

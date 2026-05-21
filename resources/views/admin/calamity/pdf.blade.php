@@ -170,7 +170,7 @@
     </div>
 
     <div class="section-title">Partner Barangays and Households</div>
-    @if($calamity->barangays->isNotEmpty())
+    @if($calamity->barangays && $calamity->barangays->count() > 0)
         @foreach($calamity->barangays as $barangay)
             @php
                 $latestReport = $calamity->evacuationReports
@@ -182,7 +182,7 @@
                 <div class="barangay-item" style="margin-bottom: 10px;">
                     <div class="barangay-name">{{ $barangay->name }}</div>
                     <div style="font-size: 11px; color: #666; margin-top: 3px;">
-                        Total Households: {{ $households->count() }}
+                        Total Households: {{ count($households) }}
                     </div>
                     @if($latestReport && $latestReport->evacuationCenter)
                         <div class="venue-info">
@@ -200,7 +200,7 @@
                     @endif
                 </div>
                 
-                @if($households->isNotEmpty())
+                @if($households && count($households) > 0)
                     <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px;">
                         <thead>
                             <tr>
@@ -233,7 +233,7 @@
     @endif
 
     <div class="section-title">Live Rankings — Top 10 Barangays</div>
-    @if($rankings->isNotEmpty())
+    @if($rankings && $rankings->count() > 0)
         <table>
             <thead>
                 <tr>

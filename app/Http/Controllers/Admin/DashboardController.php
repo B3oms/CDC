@@ -335,15 +335,160 @@ class DashboardController extends Controller
         $paperSize = $request->query('paper_size', 'A4');
         $orientation = $request->query('orientation', 'portrait');
         
-        // Generate PDF based on chart type
-        // This is a placeholder implementation
-        // You'll need to implement actual PDF generation based on your requirements
+        // Get chart data based on type
+        if ($type === 'monthly') {
+            $chartData = $this->getMonthlyChartData();
+            $chartTitle = 'Monthly Relief Trend Analysis';
+            $chartInterpretation = $this->getMonthlyInterpretation($chartData);
+        } elseif ($type === 'yearly') {
+            $chartData = $this->getYearlyChartData();
+            $chartTitle = 'Yearly Relief Trend Analysis';
+            $chartInterpretation = $this->getYearlyInterpretation($chartData);
+        } else {
+            return response()->json(['error' => 'Invalid chart type'], 400);
+        }
         
-        return response()->json([
-            'message' => 'PDF export not yet implemented',
-            'type' => $type,
-            'paper_size' => $paperSize,
+        // Generate PDF
+        $pdf = $this->generateChartPdf($chartTitle, $chartData, $chartInterpretation, $paperSize, $orientation);
+        
+        return $pdf;
+    }
+    
+    private function getMonthlyChartData()
+    {
+        $monthlyData = ReliefEvent::select(
+                DB::raw('MONTH(date) as month'),
+                DB::raw('COUNT(*) as total')
+            )
+            ->whereYear('date', now()->year)
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+            
+        $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        $data = [];
+        
+        foreach ($months as $index => $month) {
+            $data[$month] = $monthlyData->where('month', $index + 1)->first()?->total ?? 0;
+        }
+        
+        return [
+            'labels' => array_keys($data),
+            'values' => array_values($data)
+        ];
+    }
+    
+    private function getYearlyChartData()
+    {
+        $yearlyData = ReliefEvent::select(
+                DB::raw('YEAR(date) as year'),
+                DB::raw('COUNT(*) as total')
+            )
+            ->whereYear('date', '>=', now()->year - 2)
+            ->groupBy('year')
+            ->orderBy('year')
+            ->get();
+            
+        $data = [];
+        foreach ($yearlyData as $year) {
+            $data[$year->year] = $year->total;
+        }
+        
+        return [
+            'labels' => array_keys($data),
+            'values' => array_values($data)
+        ];
+    }
+    
+    private function getMonthlyInterpretation($chartData)
+    {
+        $totalEvents = array_sum($chartData['values']);
+        $maxEvents = max($chartData['values']);
+        $maxMonth = $chartData['labels'][array_search($maxEvents, $chartData['values'])];
+        
+        return [
+            'summary' => "Total relief events this year: {$totalEvents}",
+            'peak' => "Peak activity in {$maxMonth} with {$maxEvents} events",
+            'trend' => $this->analyzeTrend($chartData['values']),
+            'recommendations' => [
+                'Focus resources during peak months',
+                'Prepare contingency plans for low activity periods',
+                'Monitor patterns for better resource allocation'
+            ]
+        ];
+    }
+    
+    private function getYearlyInterpretation($chartData)
+    {
+        $totalEvents = array_sum($chartData['values']);
+        $avgEvents = count($chartData['values']) > 0 ? $totalEvents / count($chartData['values']) : 0;
+        
+        return [
+            'summary' => "Total relief events in analyzed period: {$totalEvents}",
+            'average' => "Average events per year: " . round($avgEvents, 1),
+            'trend' => $this->analyzeTrend($chartData['values']),
+            'recommendations' => [
+                'Maintain consistent disaster preparedness',
+                'Strengthen response capabilities',
+                'Develop long-term relief strategies'
+            ]
+        ];
+    }
+    
+    private function analyzeTrend($values)
+    {
+        if (count($values) < 2) {
+            return 'Insufficient data for trend analysis';
+        }
+        
+        $first = $values[0];
+        $last = end($values);
+        
+        if ($last > $first * 1.2) {
+            return 'Increasing trend - relief activities are growing';
+        } elseif ($last < $first * 0.8) {
+            return 'Decreasing trend - relief activities are declining';
+        } else {
+            return 'Stable trend - relief activities remain consistent';
+        }
+    }
+    
+    private function generateChartPdf($title, $chartData, $interpretation, $paperSize, $orientation)
+    {
+        // Create HTML content for PDF
+        $html = view('admin.charts.pdf', [
+            'title' => $title,
+            'chartData' => $chartData,
+            'interpretation' => $interpretation,
+            'paperSize' => $paperSize,
             'orientation' => $orientation
+        ])->render();
+        
+        // Generate PDF using DomPDF
+        $dompdf = new \Dompdf\Dompdf();
+        $dompdf->loadHtml($html);
+        
+        // Set paper size and orientation
+        $dompdf->setPaper($paperSize, $orientation);
+        
+        // Set options for better rendering
+        $options = new \Dompdf\Options();
+        $options->set('defaultFont', 'Arial');
+        $options->set('isRemoteEnabled', true);
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isFontSubsettingEnabled', true);
+        $dompdf->setOptions($options);
+        
+        // Render the PDF
+        $dompdf->render();
+        
+        // Generate filename
+        $filename = str_replace(' ', '_', $title) . '.pdf';
+        
+        // Return PDF download
+        return response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"'
         ]);
     }
 }
