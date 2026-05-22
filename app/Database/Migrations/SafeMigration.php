@@ -42,8 +42,9 @@ abstract class SafeMigration extends Migration
 
     private function applyMissingColumns(string $table, Blueprint $blueprint): void
     {
-        // For existing tables, just run the columns method
-        // Laravel will handle adding only missing columns automatically
-        $this->columns($blueprint);
+        // For production safety, skip existing tables entirely
+        // This prevents any column conflicts or duplicate column errors
+        // If columns need to be added to existing tables, create separate migrations
+        return;
     }
 }
