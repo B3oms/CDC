@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('household_members', function (Blueprint $table) {
+        if (!Schema::hasTable('household_members')) {
+            Schema::create('household_members', function (Blueprint $table) {
             $table->id();
             $table->foreignId('household_id')->constrained('households')->onDelete('cascade');
             $table->string('name');
@@ -18,7 +19,8 @@ return new class extends Migration
             $table->timestamps();
             
             $table->index('household_id');
-        });
+            });
+        }
     }
 
     public function down(): void
