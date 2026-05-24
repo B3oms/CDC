@@ -34,6 +34,30 @@
 }
 </style>
 
+{{-- Filter Form --}}
+<div class="filter-section" style="margin-bottom: 1.5rem; background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+    <form method="GET" action="{{ route('staff.relief.index') }}" style="display: flex; gap: 1rem; align-items: end; flex-wrap: wrap;">
+        <div class="filter-group" style="flex: 1; min-width: 200px;">
+            <label class="filter-label" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151;">Date From</label>
+            <input type="date" name="date_from" value="{{ request('date_from') }}" class="filter-input" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px;">
+        </div>
+        
+        <div class="filter-group" style="flex: 1; min-width: 200px;">
+            <label class="filter-label" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151;">Search Calamity</label>
+            <input type="text" name="calamity_search" value="{{ request('calamity_search') }}" placeholder="Search by calamity name..." class="filter-input" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px;">
+        </div>
+        
+        <div class="filter-actions" style="display: flex; gap: 0.5rem;">
+            <button type="submit" class="btn-primary" style="padding: 0.5rem 1rem; border: none; border-radius: 6px; background: #3b82f6; color: white; cursor: pointer;">
+                <i class="fas fa-filter"></i> Filter
+            </button>
+            <a href="{{ route('staff.relief.index') }}" class="btn-secondary" style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; background: white; color: #374151; text-decoration: none;">
+                <i class="fas fa-redo"></i> Reset
+            </a>
+        </div>
+    </form>
+</div>
+
 {{-- Stats Row --}}
 <div class="stats-row" style="margin-bottom:1.5rem;">
     <div class="stat-card" style="text-align: center;">

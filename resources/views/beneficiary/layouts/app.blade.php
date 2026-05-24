@@ -275,8 +275,11 @@
         <!-- Top Header -->
         <header class="top-header">
             <div class="header-left">
-                <div class="breadcrumb-nav">
-                    @yield('breadcrumb', 'Dashboard')
+                <div style="display:flex;align-items:center;gap:15px;">
+                    <img src="{{ asset('images/images-5.jpeg') }}" alt="SPUP-CDC Logo" style="height:35px;width:auto;border-radius:50%;object-fit:cover;">
+                    <div class="breadcrumb-nav">
+                        @yield('breadcrumb', 'Dashboard')
+                    </div>
                 </div>
             </div>
             

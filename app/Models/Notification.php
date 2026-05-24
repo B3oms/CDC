@@ -94,13 +94,16 @@ class Notification extends Model
     public function getIconAttribute(): string
     {
         $icons = [
-            'portal_open' => 'fas fa-door-open',
-            'barangay_report' => 'fas fa-exclamation-triangle',
-            'inventory_addition' => 'fas fa-box',
-            'beneficiary_addition' => 'fas fa-users',
-            'event_creation' => 'fas fa-calendar-alt',
+            'portal_open'               => 'fas fa-door-open',
+            'barangay_report'           => 'fas fa-exclamation-triangle',
+            'inventory_addition'        => 'fas fa-box',
+            'beneficiary_addition'      => 'fas fa-users',
+            'event_creation'            => 'fas fa-calendar-alt',
             'location_request_approved' => 'fas fa-check-circle',
             'location_request_rejected' => 'fas fa-times-circle',
+            'recommendation_submitted'  => 'fas fa-hand-point-up',
+            'recommendation_converted'  => 'fas fa-user-check',
+            'recommendation_rejected'   => 'fas fa-user-times',
         ];
 
         return $icons[$this->type] ?? 'fas fa-bell';
@@ -112,15 +115,18 @@ class Notification extends Model
     public function getColorAttribute(): string
     {
         $colors = [
-            'portal_open' => 'info',
-            'barangay_report' => 'warning',
-            'inventory_addition' => 'success',
-            'beneficiary_addition' => 'primary',
-            'event_creation' => 'secondary',
-            'location_request_approved' => 'success',
-            'location_request_rejected' => 'danger',
+            'portal_open'               => '#3b82f6',
+            'barangay_report'           => '#f59e0b',
+            'inventory_addition'        => '#10b981',
+            'beneficiary_addition'      => '#6366f1',
+            'event_creation'            => '#8b5cf6',
+            'location_request_approved' => '#059669',
+            'location_request_rejected' => '#dc2626',
+            'recommendation_submitted'  => '#f59e0b',
+            'recommendation_converted'  => '#059669',
+            'recommendation_rejected'   => '#dc2626',
         ];
 
-        return $colors[$this->type] ?? 'secondary';
+        return $colors[$this->type] ?? '#6b7280';
     }
 }

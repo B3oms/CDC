@@ -11,32 +11,16 @@
             color: #333;
             line-height: 1.4;
         }
-        .header {
-            text-align: center;
-            border-bottom: 2px solid #1a3d1f;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
-        .header h1 {
-            color: #1a3d1f;
-            margin: 0;
-            font-size: 20px;
-            font-weight: 700;
-        }
-        .header .subtitle {
-            color: #666;
-            font-size: 14px;
-            margin-top: 5px;
-        }
+        .top-bar { background-color: #1a3d1f; height: 5px; margin-bottom: 0; }
+        .page-header { padding: 15px 0 14px; margin-bottom: 20px; border-bottom: 1px solid #dee2e6; }
+        .header-tbl { width: 100%; border-collapse: collapse; }
+        .org-lbl { font-size: 9px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+        .rpt-badge { background-color: #1a3d1f; color: white; padding: 5px 12px; font-size: 9px; font-weight: bold; text-transform: uppercase; }
         .info-section {
             margin-bottom: 30px;
         }
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
+        .info-grid-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        .info-grid-table td { padding: 4px; vertical-align: top; width: 50%; }
         .info-item {
             padding: 12px;
             background: #f8f9fa;
@@ -134,35 +118,35 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>{{ $calamity->name }}</h1>
-        <div class="subtitle">Calamity Report</div>
+    <div class="top-bar"></div>
+    <div class="page-header">
+        <table class="header-tbl">
+            <tr>
+                <td style="vertical-align: middle;">
+                    <div class="org-lbl">SPUP-CDC Disaster Response System</div>
+                    <div style="font-size: 19px; font-weight: bold; color: #1a3d1f;">{{ $calamity->name }}</div>
+                    <div style="font-size: 10px; color: #9ca3af; margin-top: 2px;">Calamity Report &bull; Generated: {{ $generated_date }}</div>
+                </td>
+                <td style="text-align: right; vertical-align: top;">
+                    <span class="rpt-badge">Official Report</span>
+                </td>
+            </tr>
+        </table>
     </div>
 
     <div class="info-section">
-        <div class="info-grid">
-            <div class="info-item">
-                <strong>Calamity Type</strong>
-                {{ $calamity->type }}
-            </div>
-            <div class="info-item">
-                <strong>Date Occurred</strong>
-                {{ \Carbon\Carbon::parse($calamity->date_occurred)->format('F d, Y') }}
-            </div>
-            <div class="info-item">
-                <strong>Status</strong>
-                <span class="status-badge {{ $calamity->status === 'Open' ? 'status-open' : 'status-closed' }}">
-                    {{ $calamity->status }}
-                </span>
-            </div>
-            <div class="info-item">
-                <strong>Total Partner Barangays</strong>
-                {{ $calamity->barangays->count() }}
-            </div>
-        </div>
-        
+        <table class="info-grid-table">
+            <tr>
+                <td><div class="info-item"><strong>Calamity Type</strong>{{ $calamity->type }}</div></td>
+                <td><div class="info-item"><strong>Date Occurred</strong>{{ \Carbon\Carbon::parse($calamity->date_occurred)->format('F d, Y') }}</div></td>
+            </tr>
+            <tr>
+                <td><div class="info-item"><strong>Status</strong><span class="status-badge {{ $calamity->status === 'Open' ? 'status-open' : 'status-closed' }}">{{ $calamity->status }}</span></div></td>
+                <td><div class="info-item"><strong>Total Partner Barangays</strong>{{ $calamity->barangays->count() }}</div></td>
+            </tr>
+        </table>
         @if($calamity->description)
-        <div class="info-item" style="grid-column: 1 / -1;">
+        <div class="info-item" style="margin-bottom: 15px;">
             <strong>Description</strong>
             {{ $calamity->description }}
         </div>
@@ -267,8 +251,8 @@
     @endif
 
     <div class="footer">
-        <div>Report generated on {{ $generated_date }}</div>
-        <div>Calamity Monitoring and Response System</div>
+        <strong style="color: #6b7280; font-size: 10px;">SPUP-CDC Disaster Response System</strong><br>
+        Calamity Monitoring Report &bull; This is a system-generated document
     </div>
 </body>
 </html>

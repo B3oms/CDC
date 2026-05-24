@@ -16,11 +16,9 @@
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="logo">
-            <div class="logo-circle"></div>
-            @php $role = auth()->user()->role->name ?? 'Admin'; @endphp
-            <a href="{{ $role === 'Staff' ? route('staff.dashboard') : ($role === 'Barangay Partner' ? route('barangay.dashboard') : route('admin.dashboard')) }}"
-                style="color:#fff;text-decoration:none;">
-                SPUP-CDC
+            <a href="{{ route('admin.dashboard') }}" style="color:#fff;text-decoration:none;display:flex;align-items:center;gap:10px;">
+                <img src="{{ asset('images/images-5.jpeg') }}" alt="SPUP-CDC Logo" style="height:40px;width:auto;border-radius:50%;object-fit:cover;">
+                <span>SPUP-CDC</span>
             </a>
         </div>
         
@@ -36,9 +34,9 @@
                     class="{{ request()->routeIs('barangay.recommendations.*') ? 'active' : '' }}">
                     <i class="fas fa-hand-point-up"></i> Recommend
                 </a>
-                <a href="{{ route('barangay.household_requests.index') }}"
-                    class="{{ request()->routeIs('barangay.household_requests.*') ? 'active' : '' }}">
-                    <i class="fas fa-home"></i> Household Requests
+                <a href="{{ route('barangay.households.index') }}"
+                    class="{{ request()->routeIs('barangay.households.*') ? 'active' : '' }}">
+                    <i class="fas fa-home"></i> Households
                 </a>
                 <a href="{{ route('barangay.beneficiaries.index') }}"
                     class="{{ request()->routeIs('barangay.beneficiaries.*') ? 'active' : '' }}">
@@ -94,13 +92,9 @@
                 </a>
                 <a href="{{ route('admin.calamity.index') }}"
                     class="{{ request()->routeIs('admin.calamity.*') ? 'active' : '' }}">
-                    <i class="fas fa-cloud-sun-rain"></i> Calamities
+                    <i class="fas fa-exclamation-triangle"></i> Calamity Meter
                 </a>
-                <a href="{{ route('admin.household_requests.index') }}"
-                    class="{{ request()->routeIs('admin.household_requests.*') ? 'active' : '' }}">
-                    <i class="fas fa-clipboard-list"></i> Household Requests
-                </a>
-                <a href="{{ route('admin.locations.index') }}"
+                                <a href="{{ route('admin.locations.index') }}"
                     class="{{ request()->routeIs('admin.locations.*') ? 'active' : '' }}">
                     <i class="fas fa-map-marker-alt"></i> Barangay Partners
                 </a>
@@ -234,11 +228,18 @@ function toggleNotifications() {
     });
 }
 
+@php
+    $notifRole = auth()->user()->role->name ?? 'Admin';
+    $notifIndexUrl  = $notifRole === 'Barangay Partner' ? route('barangay.notifications.index')   : route('admin.notifications.index');
+    $notifReadUrl   = $notifRole === 'Barangay Partner' ? route('barangay.notifications.read', ':id') : route('admin.notifications.read', ':id');
+    $notifReadAllUrl= $notifRole === 'Barangay Partner' ? route('barangay.notifications.readAll') : route('admin.notifications.readAll');
+@endphp
+
 // Load real-time notifications
 function loadNotifications() {
     const notificationList = document.getElementById('notificationList');
     
-    fetch('{{ route("admin.notifications.index") }}')
+    fetch('{{ $notifIndexUrl }}')
         .then(response => response.json())
         .then(data => {
             updateNotificationBadge(data.unread_count);
@@ -298,7 +299,7 @@ function updateNotificationBadge(count) {
 
 // Mark notification as read
 function markNotificationRead(notificationId) {
-    fetch(`{{ route('admin.notifications.read', ':notificationId') }}`.replace(':notificationId', notificationId), {
+    fetch(`{{ $notifReadUrl }}`.replace(':id', notificationId), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -328,7 +329,7 @@ function markNotificationRead(notificationId) {
 
 // Mark all notifications as read
 function markAllNotificationsRead() {
-    fetch('{{ route("admin.notifications.readAll") }}', {
+    fetch('{{ $notifReadAllUrl }}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -378,37 +379,6 @@ function toggleQuickActions() {
 document.querySelector('.mark-all-read')?.addEventListener('click', function() {
     markAllNotificationsRead();
 });
-
-function markAllNotificationsRead() {
-    document.querySelectorAll('.notification-item.unread').forEach(item => {
-        item.classList.remove('unread');
-    });
-    const badge = document.querySelector('.notification-badge');
-    if (badge) {
-        badge.style.display = 'none';
-    }
-}
-
-function markNotificationRead(notificationId) {
-    const notification = document.querySelector(`[onclick*="${notificationId}"]`);
-    if (notification) {
-        notification.classList.remove('unread');
-        updateNotificationBadge();
-    }
-}
-
-function updateNotificationBadge() {
-    const unreadCount = document.querySelectorAll('.notification-item.unread').length;
-    const badge = document.querySelector('.notification-badge');
-    if (badge) {
-        if (unreadCount > 0) {
-            badge.textContent = unreadCount;
-            badge.style.display = 'block';
-        } else {
-            badge.style.display = 'none';
-        }
-    }
-}
 </script>
 
 <style>

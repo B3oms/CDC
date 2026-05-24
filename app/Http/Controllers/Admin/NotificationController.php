@@ -21,21 +21,36 @@ class NotificationController extends Controller
         return response()->json([
             'notifications' => $notifications->map(function ($notification) {
                 return [
-                    'id' => $notification->id,
+                    'id'    => $notification->id,
                     'title' => $notification->title,
-                    'message' => $notification->message,
-                    'type' => $notification->type,
-                    'icon' => $notification->icon,
+                    'text'  => $notification->message,
+                    'type'  => $notification->type,
+                    'icon'  => $notification->icon,
                     'color' => $notification->color,
-                    'read' => $notification->read,
-                    'created_at' => $notification->created_at->diffForHumans(),
-                    'related_type' => $notification->related_type,
-                    'related_id' => $notification->related_id,
-                    'url' => '#', // Default URL for now
+                    'unread'=> !$notification->read,
+                    'time'  => $notification->created_at->diffForHumans(),
+                    'url'   => self::resolveUrl($notification->type, $notification->related_type, $notification->related_id),
                 ];
             }),
             'unread_count' => $unreadCount,
         ]);
+    }
+
+    private static function resolveUrl(string $type, ?string $relatedType, ?int $relatedId): string
+    {
+        try {
+            return match($type) {
+                'beneficiary_addition'      => route('admin.beneficiaries.index'),
+                'inventory_addition'        => route('admin.inventory.index'),
+                'event_creation'            => route('admin.relief.index'),
+                'recommendation_submitted'  => route('admin.recommended.index'),
+                'location_request_approved',
+                'location_request_rejected' => route('admin.location-requests.index'),
+                default                     => '#',
+            };
+        } catch (\Exception $e) {
+            return '#';
+        }
     }
 
     /**

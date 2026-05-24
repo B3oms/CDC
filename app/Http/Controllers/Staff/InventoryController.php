@@ -17,7 +17,27 @@ class InventoryController extends Controller
     public function index()
     {
         $categories = Category::withCount('subcategories')->get();
-        return view('staff.inventory.index', compact('categories'));
+        
+        // Get low stock items
+        $lowStockItems = Inventory::where('quantity', '<=', 100)
+            ->with('item.subcategory.category')
+            ->get();
+        $lowStockCount = $lowStockItems->count();
+        
+        // Get expiring items
+        $expiringItems = Inventory::whereNotNull('expiration_date')
+            ->whereDate('expiration_date', '<=', now()->addDays(30))
+            ->with('item.subcategory.category')
+            ->get();
+        $expiringCount = $expiringItems->count();
+        
+        return view('staff.inventory.index', compact(
+            'categories',
+            'lowStockItems',
+            'lowStockCount',
+            'expiringItems',
+            'expiringCount'
+        ));
     }
 
     // PDF Generation - Inventory by Category

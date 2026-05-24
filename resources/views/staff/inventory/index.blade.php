@@ -15,6 +15,117 @@
     <div class="alert-success">{{ session('success') }}</div>
 @endif
 
+{{-- Inventory Alerts Section --}}
+@if($lowStockItems->count() > 0 || $expiringItems->count() > 0)
+<div class="inventory-alerts-section" style="margin-bottom:2rem;">
+    @if($lowStockItems->count() > 0)
+    <div class="section-card inventory-alert-card" style="margin-bottom:1.5rem;">
+        <h3 class="section-title" style="color:#dc3545;display:flex;align-items:center;gap:8px;">
+            <i class="fas fa-exclamation-triangle"></i> Low Stock Items ({{ $lowStockItems->count() }})
+        </h3>
+        <div class="table-scroll">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Item Name</th>
+                        <th>Category</th>
+                        <th>Current Stock</th>
+                        <th>Unit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($lowStockItems as $inventory)
+                    <tr>
+                        <td>
+                            @if($inventory->item->subcategory_id)
+                                <a href="{{ route('staff.inventory.subcategory.show', $inventory->item->subcategory_id) }}" class="link">
+                                    {{ $inventory->item->name }}
+                                </a>
+                            @else
+                                {{ $inventory->item->name }}
+                            @endif
+                        </td>
+                        <td>
+                            @if($inventory->item->subcategory)
+                                {{ $inventory->item->subcategory->category->name ?? 'Unknown' }} > {{ $inventory->item->subcategory->name }}
+                            @else
+                                Unknown Category
+                            @endif
+                        </td>
+                        <td style="color:#dc3545;font-weight:600;">{{ $inventory->quantity }}</td>
+                        <td>{{ $inventory->item->unit }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+    
+    @if($expiringItems->count() > 0)
+    <div class="section-card inventory-alert-card">
+        <h3 class="section-title" style="color:#ffc107;display:flex;align-items:center;gap:8px;">
+            <i class="fas fa-clock"></i> Expiring Items ({{ $expiringItems->count() }})
+        </h3>
+        <div class="table-scroll">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Item Name</th>
+                        <th>Category</th>
+                        <th>Expiration Date</th>
+                        <th>Days Until Expiry</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($expiringItems as $inventory)
+                    <tr>
+                        <td>
+                            @if($inventory->item->subcategory_id)
+                                <a href="{{ route('staff.inventory.subcategory.show', $inventory->item->subcategory_id) }}" class="link">
+                                    {{ $inventory->item->name }}
+                                </a>
+                            @else
+                                {{ $inventory->item->name }}
+                            @endif
+                        </td>
+                        <td>
+                            @if($inventory->item->subcategory)
+                                {{ $inventory->item->subcategory->category->name ?? 'Unknown' }} > {{ $inventory->item->subcategory->name }}
+                            @else
+                                Unknown Category
+                            @endif
+                        </td>
+                        <td>{{ \Carbon\Carbon::parse($inventory->expiration_date)->format('M d, Y') }}</td>
+                        <td style="color:#ffc107;font-weight:600;">
+                            @php
+                                $expirationDate = \Carbon\Carbon::parse($inventory->expiration_date);
+                                $daysUntil = (int) $expirationDate->diffInDays(\Carbon\Carbon::now(), false);
+                                if ($daysUntil < 0) {
+                                    $daysText = abs($daysUntil) . ' days ago (Expired)';
+                                    $textColor = '#dc3545';
+                                } elseif ($daysUntil == 0) {
+                                    $daysText = 'Expires today';
+                                    $textColor = '#ff6b35';
+                                } else {
+                                    $daysText = $daysUntil . ' days';
+                                    $textColor = '#ffc107';
+                                }
+                            @endphp
+                            <span style="color:{{ $textColor }};">{{ $daysText }}</span>
+                        </td>
+                        <td>{{ $inventory->quantity }} {{ $inventory->item->unit }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+</div>
+@endif
+
 @if($categories->isEmpty())
 <div class="section-card" style="text-align:center;padding:3rem;">
     <p style="color:#888;">No categories yet.</p>

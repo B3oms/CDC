@@ -129,6 +129,82 @@
     transform: translateY(-1px);
 }
 
+/* Family Background Styles */
+.family-member-card {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.member-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.member-header h4 {
+    color: #3b82f6;
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.btn-add-child {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-add-child:hover {
+    background: #059669;
+    transform: translateY(-1px);
+}
+
+.btn-remove-child {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-remove-child:hover {
+    background: #dc2626;
+}
+
+.child-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.child-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.child-header h5 {
+    color: #6b7280;
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
 @media (max-width: 768px) {
     .form-grid {
         grid-template-columns: 1fr;
@@ -208,6 +284,11 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" name="age" value="{{ old('age', $beneficiary->age) }}" required
+                           min="1" max="120" placeholder="Enter age">
+                </div>
+                <div class="form-group">
                     <label>Birthdate</label>
                     <input type="date" name="birthdate"
                         value="{{ old('birthdate', $beneficiary->birthdate) }}" required>
@@ -260,7 +341,126 @@
             </div>
         </div>
 
-        {{-- Section 3: Family --}}
+        {{-- Section 3: Family Background --}}
+        <div class="interview-section">
+            <div class="interview-section-title">Family Background</div>
+            
+            {{-- Mother Information --}}
+            <div class="family-member-card">
+                <div class="member-header">
+                    <h4>Mother Information</h4>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Mother's Name</label>
+                        <input type="text" name="mother_name" value="{{ old('mother_name', $beneficiary->mother_name) }}" 
+                               placeholder="Enter mother's full name">
+                    </div>
+                    <div class="form-group">
+                        <label>Mother's Age</label>
+                        <input type="number" name="mother_age" value="{{ old('mother_age', $beneficiary->mother_age) }}" 
+                               min="1" max="120" placeholder="Enter age">
+                    </div>
+                    <div class="form-group">
+                        <label>Mother's Sex</label>
+                        <select name="mother_sex">
+                            <option value="">-- Select --</option>
+                            <option value="female" {{ old('mother_sex', $beneficiary->mother_sex) == 'female' ? 'selected' : '' }}>Female</option>
+                            <option value="male" {{ old('mother_sex', $beneficiary->mother_sex) == 'male' ? 'selected' : '' }}>Male</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Mother's Birthdate</label>
+                        <input type="date" name="mother_birthdate" value="{{ old('mother_birthdate', $beneficiary->mother_birthdate) }}" 
+                               max="{{ now()->format('Y-m-d') }}">
+                    </div>
+                </div>
+            </div>
+
+            {{-- Father Information --}}
+            <div class="family-member-card">
+                <div class="member-header">
+                    <h4>Father Information</h4>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Father's Name</label>
+                        <input type="text" name="father_name" value="{{ old('father_name', $beneficiary->father_name) }}" 
+                               placeholder="Enter father's full name">
+                    </div>
+                    <div class="form-group">
+                        <label>Father's Age</label>
+                        <input type="number" name="father_age" value="{{ old('father_age', $beneficiary->father_age) }}" 
+                               min="1" max="120" placeholder="Enter age">
+                    </div>
+                    <div class="form-group">
+                        <label>Father's Sex</label>
+                        <select name="father_sex">
+                            <option value="">-- Select --</option>
+                            <option value="male" {{ old('father_sex', $beneficiary->father_sex) == 'male' ? 'selected' : '' }}>Male</option>
+                            <option value="female" {{ old('father_sex', $beneficiary->father_sex) == 'female' ? 'selected' : '' }}>Female</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Father's Birthdate</label>
+                        <input type="date" name="father_birthdate" value="{{ old('father_birthdate', $beneficiary->father_birthdate) }}" 
+                               max="{{ now()->format('Y-m-d') }}">
+                    </div>
+                </div>
+            </div>
+
+            {{-- Spouse Information --}}
+            <div class="family-member-card">
+                <div class="member-header">
+                    <h4>Spouse Information (if applicable)</h4>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Spouse's Name</label>
+                        <input type="text" name="spouse_name" value="{{ old('spouse_name', $beneficiary->spouse_name) }}" 
+                               placeholder="Enter spouse's full name">
+                    </div>
+                    <div class="form-group">
+                        <label>Spouse's Age</label>
+                        <input type="number" name="spouse_age" value="{{ old('spouse_age', $beneficiary->spouse_age) }}" 
+                               min="1" max="120" placeholder="Enter age">
+                    </div>
+                    <div class="form-group">
+                        <label>Spouse's Sex</label>
+                        <select name="spouse_sex">
+                            <option value="">-- Select --</option>
+                            <option value="male" {{ old('spouse_sex', $beneficiary->spouse_sex) == 'male' ? 'selected' : '' }}>Male</option>
+                            <option value="female" {{ old('spouse_sex', $beneficiary->spouse_sex) == 'female' ? 'selected' : '' }}>Female</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Spouse's Birthdate</label>
+                        <input type="date" name="spouse_birthdate" value="{{ old('spouse_birthdate', $beneficiary->spouse_birthdate) }}" 
+                               max="{{ now()->format('Y-m-d') }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Spouse's Occupation</label>
+                        <input type="text" name="spouse_occupation" value="{{ old('spouse_occupation', $beneficiary->spouse_occupation) }}" 
+                               placeholder="Enter spouse's occupation">
+                    </div>
+                </div>
+            </div>
+
+            {{-- Children Information --}}
+            <div class="family-member-card">
+                <div class="member-header">
+                    <h4>Children Information</h4>
+                    <button type="button" class="btn-add-child" onclick="addChild()">
+                        <i class="fas fa-plus"></i> Add Child
+                    </button>
+                </div>
+                <div id="children-container">
+                    <!-- Children will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+
+        {{-- Section 4: Family --}}
         <div class="interview-section">
             <div class="interview-section-title">Family Information</div>
             <div class="form-grid">
@@ -349,5 +549,99 @@ document.getElementById('municipality').addEventListener('change', function() {
             .catch(error => console.error('Error fetching barangays:', error));
     }
 });
+
+// Dynamic Children Management
+let childCount = 0;
+
+// Initialize with existing children data
+@if($beneficiary->children && is_array($beneficiary->children))
+    @foreach($beneficiary->children as $index => $child)
+        childCount = {{ $index + 1 }};
+        addChild({{ json_encode($child['name'] ?? '') }}, {{ json_encode($child['age'] ?? '') }}, {{ json_encode($child['sex'] ?? '') }}, {{ json_encode($child['birthdate'] ?? '') }});
+    @endforeach
+@endif
+
+function addChild(name = '', age = '', sex = '', birthdate = '') {
+    childCount++;
+    const container = document.getElementById('children-container');
+    
+    const childCard = document.createElement('div');
+    childCard.className = 'child-card';
+    childCard.id = `child-${childCount}`;
+    
+    childCard.innerHTML = `
+        <div class="child-header">
+            <h5>Child ${childCount}</h5>
+            <button type="button" class="btn-remove-child" onclick="removeChild(${childCount})">
+                <i class="fas fa-trash"></i> Remove
+            </button>
+        </div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Child's Name</label>
+                <input type="text" name="children[${childCount}][name]" value="${name}" placeholder="Enter child's name">
+            </div>
+            <div class="form-group">
+                <label>Child's Age</label>
+                <input type="number" name="children[${childCount}][age]" value="${age}" min="0" max="120" placeholder="Enter age">
+            </div>
+            <div class="form-group">
+                <label>Child's Sex</label>
+                <select name="children[${childCount}][sex]">
+                    <option value="">-- Select --</option>
+                    <option value="male" ${sex === 'male' ? 'selected' : ''}>Male</option>
+                    <option value="female" ${sex === 'female' ? 'selected' : ''}>Female</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Child's Birthdate</label>
+                <input type="date" name="children[${childCount}][birthdate]" value="${birthdate}" max="{{ now()->format('Y-m-d') }}">
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(childCard);
+    updateChildNumbers();
+}
+
+function removeChild(childId) {
+    const childCard = document.getElementById(`child-${childId}`);
+    if (childCard) {
+        childCard.remove();
+        updateChildNumbers();
+    }
+}
+
+function updateChildNumbers() {
+    const container = document.getElementById('children-container');
+    const childCards = container.querySelectorAll('.child-card');
+    
+    childCards.forEach((card, index) => {
+        const header = card.querySelector('.child-header h5');
+        if (header) {
+            header.textContent = `Child ${index + 1}`;
+        }
+        
+        // Update the child ID in the card element
+        const currentId = card.id.replace('child-', '');
+        card.id = `child-${index + 1}`;
+        
+        // Update the remove button onclick
+        const removeButton = card.querySelector('.btn-remove-child');
+        if (removeButton) {
+            removeButton.setAttribute('onclick', `removeChild(${index + 1})`);
+        }
+        
+        // Update the input names to maintain sequential numbering
+        const inputs = card.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            const currentName = input.name;
+            const newName = currentName.replace(/\[\d+\]/, `[${index + 1}]`);
+            input.name = newName;
+        });
+    });
+    
+    childCount = childCards.length;
+}
 </script>
 @endsection

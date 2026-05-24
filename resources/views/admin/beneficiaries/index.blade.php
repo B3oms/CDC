@@ -17,6 +17,53 @@
     letter-spacing: 0.05em;
     display: inline-block;
 }
+
+/* Scrollable Table */
+.table-card {
+    position: relative;
+}
+
+.table-responsive {
+    max-height: 70vh;
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.table-responsive table {
+    margin-bottom: 0;
+}
+
+.table-responsive thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #f8f9fa;
+}
+
+.table-responsive thead th {
+    border-bottom: 2px solid #e5e7eb;
+    background: #f8f9fa;
+}
+
+/* Custom scrollbar */
+.table-responsive::-webkit-scrollbar {
+    width: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
 </style>
 @endpush
 
@@ -64,6 +111,15 @@
             </div>
 
             <div class="filter-group">
+                <label class="filter-label">Verification Status</label>
+                <select name="status" class="filter-select" onchange="document.getElementById('filterForm').submit()">
+                    <option value="">All</option>
+                    <option value="verified" {{ request('status') == 'verified' ? 'selected' : '' }}>Verified</option>
+                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
                 <label class="filter-label">4Ps Status</label>
                 <select name="is_4ps_member" class="filter-select" onchange="document.getElementById('filterForm').submit()">
                     <option value="">All</option>
@@ -72,15 +128,7 @@
                 </select>
             </div>
 
-            <div class="filter-group">
-                <label class="filter-label">Status</label>
-                <select name="status" class="filter-select" onchange="document.getElementById('filterForm').submit()">
-                    <option value="">All</option>
-                    <option value="verified" {{ request('status') == 'verified' ? 'selected' : '' }}>Verified</option>
-                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                </select>
-            </div>
-
+            
             <div class="filter-actions">
                 <x-pdf-export-dropdown align="left" export-onclick="exportPdf()" />
                 <a href="{{ route('admin.beneficiaries.index') }}" class="btn-filter-reset">
@@ -518,7 +566,9 @@ function exportPdf() {
     // Get current filter values
     const municipalityId = document.getElementById('municipality')?.value || '';
     const barangayId = document.getElementById('barangay')?.value || '';
+    const gender = document.querySelector('select[name="gender"]')?.value || '';
     const status = document.querySelector('select[name="status"]')?.value || '';
+    const is4psMember = document.querySelector('select[name="is_4ps_member"]')?.value || '';
     
     // Create a hidden form to submit for download
     const form = document.createElement('form');
@@ -555,13 +605,29 @@ function exportPdf() {
         barangayInput.value = barangayId;
         form.appendChild(barangayInput);
     }
-    
+
+    if (gender) {
+        const genderInput = document.createElement('input');
+        genderInput.type = 'hidden';
+        genderInput.name = 'gender';
+        genderInput.value = gender;
+        form.appendChild(genderInput);
+    }
+
     if (status) {
         const statusInput = document.createElement('input');
         statusInput.type = 'hidden';
         statusInput.name = 'status';
         statusInput.value = status;
         form.appendChild(statusInput);
+    }
+
+    if (is4psMember !== '') {
+        const fourPsInput = document.createElement('input');
+        fourPsInput.type = 'hidden';
+        fourPsInput.name = 'is_4ps_member';
+        fourPsInput.value = is4psMember;
+        form.appendChild(fourPsInput);
     }
     
     document.body.appendChild(form);

@@ -80,12 +80,12 @@
                                     <input type="checkbox"
                                            name="household_ids[]"
                                            value="{{ $household->id }}"
-                                           data-family-size="{{ $household->family_size }}"
+                                           data-family-size="{{ $household->total_members }}"
                                            onchange="updateSelectedCount()">
                                     <span class="select-item-check"></span>
                                     <span class="select-item-info">
                                         <span class="select-item-name">{{ $household->head_of_household }}</span>
-                                        <span class="select-item-meta">{{ $household->family_size }} members</span>
+                                        <span class="select-item-meta">{{ $household->total_members }} members</span>
                                     </span>
                                 </label>
                                 @endforeach

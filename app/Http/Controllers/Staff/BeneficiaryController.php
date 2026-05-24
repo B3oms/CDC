@@ -46,12 +46,7 @@ class BeneficiaryController extends Controller
             $query->where('is_4ps_member', $request->is_4ps_member);
         }
 
-        if ($request->status === 'verified') {
-            $query->where('is_verified', 1);
-        } elseif ($request->status === 'pending') {
-            $query->where('is_verified', 0);
-        }
-
+        
         $beneficiaries = $query->latest()->paginate(20);
 
         return view('staff.beneficiaries.index', compact(
@@ -87,6 +82,7 @@ class BeneficiaryController extends Controller
             'last_name'       => 'required|string|max:100|regex:/^[a-zA-Z\s]+$/',
             'suffix'          => 'nullable|string|max:20',
             'gender'          => 'required|in:Male,Female,Other',
+            'age'             => 'required|integer|min:1|max:120',
             'is_4ps_member'   => 'required|boolean',
             'birthdate'       => 'required|date',
             'contact_number'  => 'nullable|string|regex:/^[0-9]{11}$/',
@@ -96,6 +92,25 @@ class BeneficiaryController extends Controller
             'children_count'  => 'required|integer|min:0',
             'has_senior'      => 'required|boolean',
             'interview_notes'  => 'nullable|string',
+            // Family background validation
+            'mother_name'     => 'nullable|string|max:255',
+            'mother_age'      => 'nullable|integer|min:1|max:120',
+            'mother_sex'      => 'nullable|in:male,female',
+            'mother_birthdate'=> 'nullable|date|before:today',
+            'father_name'     => 'nullable|string|max:255',
+            'father_age'      => 'nullable|integer|min:1|max:120',
+            'father_sex'      => 'nullable|in:male,female',
+            'father_birthdate'=> 'nullable|date|before:today',
+            'spouse_name'     => 'nullable|string|max:255',
+            'spouse_age'      => 'nullable|integer|min:1|max:120',
+            'spouse_sex'      => 'nullable|in:male,female',
+            'spouse_birthdate'=> 'nullable|date|before:today',
+            'spouse_occupation'=> 'nullable|string|max:255',
+            'children'        => 'nullable|array',
+            'children.*.name' => 'nullable|string|max:255',
+            'children.*.age'  => 'nullable|integer|min:0|max:120',
+            'children.*.sex'  => 'nullable|in:male,female',
+            'children.*.birthdate'=> 'nullable|date|before:today',
         ]);
 
         // Auto-verification
@@ -114,6 +129,19 @@ class BeneficiaryController extends Controller
             default           => 'Low',
         };
 
+        // Determine status and rejection logic
+        $status = 'pending';
+        $rejectionDate = null;
+        $scheduledDeletionDate = null;
+        
+        if ($criteriaMet < 3) {
+            $status = 'rejected';
+            $rejectionDate = now()->toDateString();
+            $scheduledDeletionDate = now()->addDays(10)->toDateString();
+        } else {
+            $status = 'verified';
+        }
+
         $beneficiary->update([
             'barangay_id'        => $request->barangay_id,
             'first_name'         => $request->first_name,
@@ -121,6 +149,7 @@ class BeneficiaryController extends Controller
             'last_name'          => $request->last_name,
             'suffix'             => $request->suffix,
             'gender'             => $request->gender,
+            'age'                => $request->age,
             'is_4ps_member'      => $request->is_4ps_member,
             'birthdate'          => $request->birthdate,
             'contact_number'     => $request->contact_number,
@@ -133,10 +162,33 @@ class BeneficiaryController extends Controller
             'criteria_met'       => $criteriaMet,
             'interview_notes'    => $request->interview_notes,
             'is_verified'        => $isVerified,
+            // Rejection status fields
+            'status'             => $status,
+            'rejection_date'     => $rejectionDate,
+            'scheduled_deletion_date' => $scheduledDeletionDate,
+            // Family background fields
+            'mother_name'        => $request->mother_name,
+            'mother_age'         => $request->mother_age,
+            'mother_sex'         => $request->mother_sex,
+            'mother_birthdate'    => $request->mother_birthdate,
+            'father_name'        => $request->father_name,
+            'father_age'         => $request->father_age,
+            'father_sex'         => $request->father_sex,
+            'father_birthdate'    => $request->father_birthdate,
+            'spouse_name'        => $request->spouse_name,
+            'spouse_age'         => $request->spouse_age,
+            'spouse_sex'         => $request->spouse_sex,
+            'spouse_birthdate'    => $request->spouse_birthdate,
+            'spouse_occupation'  => $request->spouse_occupation,
+            'children'           => $request->children,
         ]);
 
+        $message = $status === 'verified'
+                ? 'Beneficiary verified and updated successfully.'
+                : 'Beneficiary rejected for not meeting verification criteria. Record will be automatically deleted after 10 days.';
+
         return redirect()->route('staff.beneficiaries.index')
-            ->with('success', 'Beneficiary updated successfully.');
+            ->with('success', $message);
     }
 
     public function destroy($id)
@@ -181,6 +233,7 @@ class BeneficiaryController extends Controller
             'last_name'       => 'required|string|max:100|regex:/^[a-zA-Z\s]+$/',
             'suffix'          => 'nullable|string|max:20',
             'gender'          => 'required|in:Male,Female,Other',
+            'age'             => 'required|integer|min:1|max:120',
             'is_4ps_member'   => 'required|boolean',
             'birthdate'       => 'required|date',
             'contact_number'  => 'nullable|string|regex:/^[0-9]{11}$/',
@@ -190,10 +243,32 @@ class BeneficiaryController extends Controller
             'children_count'  => 'required|integer|min:0',
             'has_senior'      => 'required|boolean',
             'interview_notes'  => 'nullable|string',
+            // Family background validation
+            'mother_name'     => 'nullable|string|max:255',
+            'mother_age'      => 'nullable|integer|min:1|max:120',
+            'mother_sex'      => 'nullable|in:male,female',
+            'mother_birthdate'=> 'nullable|date|before:today',
+            'father_name'     => 'nullable|string|max:255',
+            'father_age'      => 'nullable|integer|min:1|max:120',
+            'father_sex'      => 'nullable|in:male,female',
+            'father_birthdate'=> 'nullable|date|before:today',
+            'spouse_name'     => 'nullable|string|max:255',
+            'spouse_age'      => 'nullable|integer|min:1|max:120',
+            'spouse_sex'      => 'nullable|in:male,female',
+            'spouse_birthdate'=> 'nullable|date|before:today',
+            'spouse_occupation'=> 'nullable|string|max:255',
+            'children'        => 'nullable|array',
+            'children.*.name' => 'nullable|string|max:255',
+            'children.*.age'  => 'nullable|integer|min:0|max:120',
+            'children.*.sex'  => 'nullable|in:male,female',
+            'children.*.birthdate'=> 'nullable|date|before:today',
         ], [
             'first_name.required' => 'First name is required.',
             'last_name.required' => 'Last name is required.',
             'birthdate.required' => 'Birthdate is required.',
+            'age.required' => 'Age is required.',
+            'age.min' => 'Age must be at least 1.',
+            'age.max' => 'Age must not exceed 120.',
         ]);
 
         // Check 250 slot limit
@@ -222,6 +297,19 @@ class BeneficiaryController extends Controller
             default           => 'Low',
         };
 
+        // Determine status and rejection logic
+        $status = 'pending';
+        $rejectionDate = null;
+        $scheduledDeletionDate = null;
+        
+        if ($criteriaMet < 3) {
+            $status = 'rejected';
+            $rejectionDate = now()->toDateString();
+            $scheduledDeletionDate = now()->addDays(10)->toDateString();
+        } else {
+            $status = 'verified';
+        }
+
         // Generate unique ID
         $uniqueId = $this->generateUniqueId($request->barangay_id);
 
@@ -234,6 +322,7 @@ class BeneficiaryController extends Controller
                 'last_name'          => $request->last_name,
                 'suffix'             => $request->suffix,
                 'gender'             => $request->gender,
+                'age'                => $request->age,
                 'is_4ps_member'      => $request->is_4ps_member,
                 'birthdate'          => $request->birthdate,
                 'contact_number'     => $request->contact_number,
@@ -248,6 +337,25 @@ class BeneficiaryController extends Controller
                 'interviewed_by'     => auth()->id(),
                 'interviewed_at'     => now(),
                 'is_verified'        => $isVerified,
+                // Family background fields
+                'mother_name'        => $request->mother_name,
+                'mother_age'         => $request->mother_age,
+                'mother_sex'         => $request->mother_sex,
+                'mother_birthdate'    => $request->mother_birthdate,
+                'father_name'        => $request->father_name,
+                'father_age'         => $request->father_age,
+                'father_sex'         => $request->father_sex,
+                'father_birthdate'    => $request->father_birthdate,
+                'spouse_name'        => $request->spouse_name,
+                'spouse_age'         => $request->spouse_age,
+                'spouse_sex'         => $request->spouse_sex,
+                'spouse_birthdate'    => $request->spouse_birthdate,
+                'spouse_occupation'  => $request->spouse_occupation,
+                'children'           => $request->children,
+                // Rejection status fields
+                'status'             => $status,
+                'rejection_date'     => $rejectionDate,
+                'scheduled_deletion_date' => $scheduledDeletionDate,
             ]);
 
             // Create beneficiary account if verified
@@ -258,9 +366,9 @@ class BeneficiaryController extends Controller
             // Trigger notification for beneficiary addition
             NotificationService::beneficiaryAdded($beneficiary->id, auth()->id());
 
-            $message = $isVerified
+            $message = $status === 'verified'
                 ? 'Beneficiary verified and added successfully.'
-                : 'Beneficiary recorded but did not meet verification criteria.';
+                : 'Beneficiary rejected for not meeting verification criteria. Record will be automatically deleted after 10 days.';
 
             return redirect()->route('staff.beneficiaries.index')
                 ->with('success', $message);

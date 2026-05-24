@@ -10,31 +10,16 @@
             margin: 20px;
             color: #333;
         }
-        .header {
-            text-align: center;
-            border-bottom: 2px solid #185fa5;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
-        .header h1 {
-            color: #185fa5;
-            margin: 0;
-            font-size: 24px;
-        }
-        .header .subtitle {
-            color: #666;
-            font-size: 14px;
-            margin-top: 5px;
-        }
+        .top-bar { background-color: #1a3d1f; height: 5px; margin-bottom: 0; }
+        .page-header { padding: 15px 0 14px; margin-bottom: 20px; border-bottom: 1px solid #dee2e6; }
+        .header-tbl { width: 100%; border-collapse: collapse; }
+        .org-lbl { font-size: 9px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+        .rpt-badge { background-color: #1a3d1f; color: white; padding: 5px 12px; font-size: 9px; font-weight: bold; text-transform: uppercase; }
         .info-section {
             margin-bottom: 30px;
         }
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
+        .info-grid-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        .info-grid-table td { padding: 4px; vertical-align: top; width: 50%; }
         .info-item {
             padding: 10px;
             background: #f8f9fa;
@@ -112,43 +97,39 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>{{ $event->name }}</h1>
-        <div class="subtitle">Relief Event Report</div>
+    <div class="top-bar"></div>
+    <div class="page-header">
+        <table class="header-tbl">
+            <tr>
+                <td style="vertical-align: middle;">
+                    <div class="org-lbl">SPUP-CDC Disaster Response System</div>
+                    <div style="font-size: 19px; font-weight: bold; color: #1a3d1f;">{{ $event->name }}</div>
+                    <div style="font-size: 10px; color: #9ca3af; margin-top: 2px;">Relief Event Report &bull; Generated: {{ $generated_date }}</div>
+                </td>
+                <td style="text-align: right; vertical-align: top;">
+                    <span class="rpt-badge">Official Report</span>
+                </td>
+            </tr>
+        </table>
     </div>
 
     <div class="info-section">
-        <div class="info-grid">
-            <div class="info-item">
-                <strong>Event Type</strong>
-                {{ $event->calamity->name ?? 'General Relief' }}
-            </div>
-            <div class="info-item">
-                <strong>Date</strong>
-                {{ \Carbon\Carbon::parse($event->date)->format('F d, Y') }}
-            </div>
-            <div class="info-item">
-                <strong>Status</strong>
-                <span class="status-badge status-{{ strtolower($event->status) }}">
-                    {{ $event->status }}
-                </span>
-            </div>
-            <div class="info-item">
-                <strong>Venue</strong>
-                {{ $event->venue }}
-            </div>
-            <div class="info-item">
-                <strong>Created by</strong>
-                {{ $event->creator->first_name }} {{ $event->creator->last_name }}
-            </div>
-            <div class="info-item">
-                <strong>Created at</strong>
-                {{ $event->created_at->format('M d, Y h:i A') }}
-            </div>
-        </div>
-        
+        <table class="info-grid-table">
+            <tr>
+                <td><div class="info-item"><strong>Event Type</strong>{{ $event->calamity->name ?? 'General Relief' }}</div></td>
+                <td><div class="info-item"><strong>Date</strong>{{ \Carbon\Carbon::parse($event->date)->format('F d, Y') }}</div></td>
+            </tr>
+            <tr>
+                <td><div class="info-item"><strong>Status</strong><span class="status-badge status-{{ strtolower($event->status) }}">{{ $event->status }}</span></div></td>
+                <td><div class="info-item"><strong>Venue</strong>{{ $event->venue }}</div></td>
+            </tr>
+            <tr>
+                <td><div class="info-item"><strong>Created by</strong>{{ $event->creator->first_name }} {{ $event->creator->last_name }}</div></td>
+                <td><div class="info-item"><strong>Created at</strong>{{ $event->created_at->format('M d, Y h:i A') }}</div></td>
+            </tr>
+        </table>
         @if($event->description)
-        <div class="info-item" style="grid-column: 1 / -1;">
+        <div class="info-item" style="margin-bottom: 15px;">
             <strong>Description</strong>
             {{ $event->description }}
         </div>
@@ -240,8 +221,8 @@
     @endif
 
     <div class="footer">
-        <div>Report generated on {{ $generated_date }}</div>
-        <div>Relief Monitoring and Response System</div>
+        <strong style="color: #6b7280; font-size: 10px;">SPUP-CDC Disaster Response System</strong><br>
+        Relief Monitoring Report &bull; This is a system-generated document
     </div>
 </body>
 </html>

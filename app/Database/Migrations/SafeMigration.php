@@ -62,7 +62,13 @@ abstract class SafeMigration extends Migration
         $mockBlueprint = $this->createMockBlueprint();
         
         // Call the columns method to capture all column definitions
-        $this->columns($mockBlueprint);
+        try {
+            $this->columns($mockBlueprint);
+        } catch (\Exception $e) {
+            // If the columns method fails, we'll skip the safe column addition
+            error_log("SafeMigration columns method failed for table $table: " . $e->getMessage());
+            return;
+        }
         
         // Add only the columns that don't exist
         foreach ($mockBlueprint->getCapturedColumns() as $column) {
@@ -123,6 +129,12 @@ abstract class SafeMigration extends Migration
             }
             
             public function onDelete($action)
+            {
+                // This is a method that should be chained, but for our purposes we'll ignore it
+                return $this;
+            }
+            
+            public function cascadeOnDelete()
             {
                 // This is a method that should be chained, but for our purposes we'll ignore it
                 return $this;

@@ -93,7 +93,7 @@ class Calamity extends Model
             }
         }
 
-        $existingHouseholds = HouseholdRequest::count();
+        $existingHouseholds = Household::count();
 
         if ($evacuees >= 1000 || $affectedHouseholds >= 5000) {
             return 'High';

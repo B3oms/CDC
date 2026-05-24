@@ -63,7 +63,7 @@
 @section('content')
 <div class="dash-header">
     <div>
-        <h1>{{ $beneficiary->first_name }} {{ $beneficiary->last_name }}</h1>
+        <h1>{{ $beneficiary->first_name }} {{ $beneficiary->middle_name }} {{ $beneficiary->last_name }}</h1>
         <p class="sub">{{ $beneficiary->barangay->name ?? 'N/A' }}</p>
     </div>
     <div class="header-actions">
@@ -89,13 +89,119 @@
             <h3>Personal Information</h3>
             <table class="dist-table">
                 <tr><td class="meta-label">Unique ID</td><td><strong>{{ $beneficiary->unique_id ?? 'N/A' }}</strong></td></tr>
-                <tr><td class="meta-label">Name</td><td>{{ $beneficiary->first_name }} {{ $beneficiary->last_name }}</td></tr>
+                <tr><td class="meta-label">Full Name</td><td>{{ $beneficiary->first_name }} {{ $beneficiary->middle_name }} {{ $beneficiary->last_name }} {{ $beneficiary->suffix ?? '' }}</td></tr>
                 <tr><td class="meta-label">Gender</td><td>{{ $beneficiary->gender }}</td></tr>
+                <tr><td class="meta-label">Age</td><td>{{ $beneficiary->age ?? 'N/A' }} years old</td></tr>
                 <tr><td class="meta-label">Birthdate</td><td>{{ $beneficiary->birthdate ? \Carbon\Carbon::parse($beneficiary->birthdate)->format('M d, Y') : 'N/A' }}</td></tr>
                 <tr><td class="meta-label">Contact</td><td>{{ $beneficiary->contact_number ?? 'N/A' }}</td></tr>
                 <tr><td class="meta-label">Address</td><td>{{ $beneficiary->address ?? 'N/A' }}</td></tr>
                 <tr><td class="meta-label">Barangay</td><td>{{ $beneficiary->barangay->name ?? 'N/A' }}</td></tr>
             </table>
+        </div>
+
+        {{-- Family Background --}}
+        <div class="section-card">
+            <h3>Family Background</h3>
+            
+            {{-- Mother Information --}}
+            @if($beneficiary->mother_name || $beneficiary->mother_age || $beneficiary->mother_sex || $beneficiary->mother_birthdate)
+            <div style="margin-bottom: 1.5rem;">
+                <h4 style="color: #3b82f6; margin-bottom: 0.5rem;">Mother Information</h4>
+                <table class="dist-table">
+                    @if($beneficiary->mother_name)
+                    <tr><td class="meta-label">Name</td><td>{{ $beneficiary->mother_name }}</td></tr>
+                    @endif
+                    @if($beneficiary->mother_age)
+                    <tr><td class="meta-label">Age</td><td>{{ $beneficiary->mother_age }} years old</td></tr>
+                    @endif
+                    @if($beneficiary->mother_sex)
+                    <tr><td class="meta-label">Sex</td><td>{{ ucfirst($beneficiary->mother_sex) }}</td></tr>
+                    @endif
+                    @if($beneficiary->mother_birthdate)
+                    <tr><td class="meta-label">Birthdate</td><td>{{ \Carbon\Carbon::parse($beneficiary->mother_birthdate)->format('M d, Y') }}</td></tr>
+                    @endif
+                </table>
+            </div>
+            @endif
+
+            {{-- Father Information --}}
+            @if($beneficiary->father_name || $beneficiary->father_age || $beneficiary->father_sex || $beneficiary->father_birthdate)
+            <div style="margin-bottom: 1.5rem;">
+                <h4 style="color: #3b82f6; margin-bottom: 0.5rem;">Father Information</h4>
+                <table class="dist-table">
+                    @if($beneficiary->father_name)
+                    <tr><td class="meta-label">Name</td><td>{{ $beneficiary->father_name }}</td></tr>
+                    @endif
+                    @if($beneficiary->father_age)
+                    <tr><td class="meta-label">Age</td><td>{{ $beneficiary->father_age }} years old</td></tr>
+                    @endif
+                    @if($beneficiary->father_sex)
+                    <tr><td class="meta-label">Sex</td><td>{{ ucfirst($beneficiary->father_sex) }}</td></tr>
+                    @endif
+                    @if($beneficiary->father_birthdate)
+                    <tr><td class="meta-label">Birthdate</td><td>{{ \Carbon\Carbon::parse($beneficiary->father_birthdate)->format('M d, Y') }}</td></tr>
+                    @endif
+                </table>
+            </div>
+            @endif
+
+            {{-- Spouse Information --}}
+            @if($beneficiary->spouse_name || $beneficiary->spouse_age || $beneficiary->spouse_sex || $beneficiary->spouse_birthdate || $beneficiary->spouse_occupation)
+            <div style="margin-bottom: 1.5rem;">
+                <h4 style="color: #3b82f6; margin-bottom: 0.5rem;">Spouse Information</h4>
+                <table class="dist-table">
+                    @if($beneficiary->spouse_name)
+                    <tr><td class="meta-label">Name</td><td>{{ $beneficiary->spouse_name }}</td></tr>
+                    @endif
+                    @if($beneficiary->spouse_age)
+                    <tr><td class="meta-label">Age</td><td>{{ $beneficiary->spouse_age }} years old</td></tr>
+                    @endif
+                    @if($beneficiary->spouse_sex)
+                    <tr><td class="meta-label">Sex</td><td>{{ ucfirst($beneficiary->spouse_sex) }}</td></tr>
+                    @endif
+                    @if($beneficiary->spouse_birthdate)
+                    <tr><td class="meta-label">Birthdate</td><td>{{ \Carbon\Carbon::parse($beneficiary->spouse_birthdate)->format('M d, Y') }}</td></tr>
+                    @endif
+                    @if($beneficiary->spouse_occupation)
+                    <tr><td class="meta-label">Occupation</td><td>{{ $beneficiary->spouse_occupation }}</td></tr>
+                    @endif
+                </table>
+            </div>
+            @endif
+
+            {{-- Children Information --}}
+            @if($beneficiary->children && is_array($beneficiary->children) && count($beneficiary->children) > 0)
+            <div style="margin-bottom: 1.5rem;">
+                <h4 style="color: #3b82f6; margin-bottom: 0.5rem;">Children Information</h4>
+                @foreach($beneficiary->children as $index => $child)
+                <div style="margin-bottom: 1rem; padding: 0.75rem; background: #f8f9fa; border-radius: 6px;">
+                    <h5 style="color: #6b7280; margin-bottom: 0.5rem;">Child {{ $index + 1 }}</h5>
+                    <table class="dist-table" style="font-size: 0.9rem;">
+                        @if($child['name'])
+                        <tr><td class="meta-label">Name</td><td>{{ $child['name'] }}</td></tr>
+                        @endif
+                        @if($child['age'])
+                        <tr><td class="meta-label">Age</td><td>{{ $child['age'] }} years old</td></tr>
+                        @endif
+                        @if($child['sex'])
+                        <tr><td class="meta-label">Sex</td><td>{{ ucfirst($child['sex']) }}</td></tr>
+                        @endif
+                        @if($child['birthdate'])
+                        <tr><td class="meta-label">Birthdate</td><td>{{ \Carbon\Carbon::parse($child['birthdate'])->format('M d, Y') }}</td></tr>
+                        @endif
+                    </table>
+                </div>
+                @endforeach
+            </div>
+            @endif
+
+            {{-- No Family Data --}}
+            @if(!$beneficiary->mother_name && !$beneficiary->father_name && !$beneficiary->spouse_name && (!$beneficiary->children || empty($beneficiary->children)))
+            <div style="text-align: center; color: #6b7280; padding: 2rem;">
+                <i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                <p>No family background information available</p>
+            </div>
+            @endif
         </div>
 
         {{-- Verification --}}
@@ -105,10 +211,12 @@
                 <tr>
                     <td class="meta-label">Status</td>
                     <td>
-                        @if($beneficiary->is_verified)
+                        @if($beneficiary->status === 'verified')
                             <span class="relief-status-badge ongoing">Verified</span>
+                        @elseif($beneficiary->status === 'rejected')
+                            <span class="relief-status-badge expired">Rejected</span>
                         @else
-                            <span class="relief-status-badge upcoming">Not Verified</span>
+                            <span class="relief-status-badge upcoming">Pending</span>
                         @endif
                     </td>
                 </tr>
@@ -122,10 +230,26 @@
                 <tr><td class="meta-label">Has Senior</td><td>{{ $beneficiary->has_senior ? 'Yes' : 'No' }}</td></tr>
                 <tr><td class="meta-label">Interviewed by</td><td>{{ $beneficiary->interviewer?->first_name }} {{ $beneficiary->interviewer?->last_name }}</td></tr>
                 <tr><td class="meta-label">Interview Date</td><td>{{ $beneficiary->interviewed_at?->format('M d, Y h:i A') }}</td></tr>
+                @if($beneficiary->status === 'rejected')
+                <tr><td class="meta-label">Rejection Date</td><td>{{ $beneficiary->rejection_date ? \Carbon\Carbon::parse($beneficiary->rejection_date)->format('M d, Y') : 'N/A' }}</td></tr>
+                <tr><td class="meta-label">Scheduled Deletion</td><td>{{ $beneficiary->scheduled_deletion_date ? \Carbon\Carbon::parse($beneficiary->scheduled_deletion_date)->format('M d, Y') : 'N/A' }}</td></tr>
+                <tr><td class="meta-label">Days Until Deletion</td><td>
+                    @if($beneficiary->scheduled_deletion_date)
+                        {{ \Carbon\Carbon::now()->diffInDays(\Carbon\Carbon::parse($beneficiary->scheduled_deletion_date), false) }} days
+                    @else
+                        N/A
+                    @endif
+                </td></tr>
+                @endif
             </table>
             @if($beneficiary->interview_notes)
             <div style="margin-top:10px;padding:10px;background:#f1efe8;border-radius:6px;font-size:13px;">
                 <strong>Notes:</strong> {{ $beneficiary->interview_notes }}
+            </div>
+            @endif
+            @if($beneficiary->status === 'rejected')
+            <div style="margin-top:10px;padding:10px;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;font-size:13px;">
+                <strong style="color: #dc2626;">⚠️ Rejection Notice:</strong> This beneficiary did not meet the verification criteria and will be automatically deleted from the system after 10 days from the rejection date.
             </div>
             @endif
         </div>

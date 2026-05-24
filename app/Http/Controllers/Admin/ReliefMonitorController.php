@@ -17,12 +17,25 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class ReliefMonitorController extends Controller
 {
     // Show all relief events
-    public function index()
+    public function index(Request $request)
     {
-        $events = ReliefEvent::with(['eventBarangays.barangay', 'eventBarangays.municipality', 'calamity', 'creator'])
+        $query = ReliefEvent::with(['eventBarangays.barangay', 'eventBarangays.municipality', 'calamity', 'creator'])
             ->orderByRaw("FIELD(status, 'Ongoing', 'Upcoming', 'Done')")
-            ->latest()
-            ->get();
+            ->latest();
+
+        // Filter by date range
+        if ($request->date_from) {
+            $query->whereDate('date', '>=', $request->date_from);
+        }
+
+        // Filter by calamity search
+        if ($request->calamity_search) {
+            $query->whereHas('calamity', function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->calamity_search . '%');
+            })->whereNotNull('calamity_id');
+        }
+
+        $events = $query->get();
 
         // Load beneficiary counts for each event
         foreach ($events as $event) {
@@ -351,7 +364,7 @@ class ReliefMonitorController extends Controller
         $event = ReliefEvent::with([
             'eventBarangays.barangay',
             'eventBarangays.municipality',
-            'beneficiaries',
+            'beneficiaries.beneficiary',
             'creator',
             'calamity',
             'facilitators.role'

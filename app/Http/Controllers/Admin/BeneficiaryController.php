@@ -34,9 +34,13 @@ class BeneficiaryController extends Controller
             $q->where('is_4ps_member', $request->is_4ps_member);
         })
         ->when($request->status, function ($q) use ($request) {
-            $q->where('is_verified', $request->status == 'verified');
+            if ($request->status === 'verified') {
+                $q->where('is_verified', 1);
+            } elseif ($request->status === 'pending') {
+                $q->where('is_verified', 0);
+            }
         })
-        ->paginate(10);
+                ->paginate(10);
 
     return view('admin.beneficiaries.index', compact(
         'beneficiaries',
@@ -67,6 +71,12 @@ class BeneficiaryController extends Controller
                 })
                 ->when($request->barangay_id, function ($q) use ($request) {
                     $q->where('barangay_id', $request->barangay_id);
+                })
+                ->when($request->gender, function ($q) use ($request) {
+                    $q->where('gender', $request->gender);
+                })
+                ->when($request->is_4ps_member !== null && $request->is_4ps_member !== '', function ($q) use ($request) {
+                    $q->where('is_4ps_member', $request->is_4ps_member);
                 })
                 ->when($request->status, function ($q) use ($request) {
                     $q->where('is_verified', $request->status == 'verified');

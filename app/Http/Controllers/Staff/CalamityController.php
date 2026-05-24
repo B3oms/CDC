@@ -11,11 +11,17 @@ use Illuminate\Http\Request;
 
 class CalamityController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $calamities = Calamity::with(['barangays', 'creator'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = Calamity::with(['barangays', 'creator'])
+            ->orderBy('created_at', 'desc');
+
+        // Filter by date range
+        if ($request->date_from) {
+            $query->whereDate('date_occurred', '>=', $request->date_from);
+        }
+
+        $calamities = $query->get();
             
         return view('staff.calamities.index', compact('calamities'));
     }

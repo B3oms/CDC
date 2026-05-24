@@ -10,23 +10,11 @@
             color: #333;
             line-height: 1.4;
         }
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #1a3d1f;
-            padding-bottom: 20px;
-        }
-        .header h1 {
-            font-size: 20px;
-            margin: 0;
-            color: #1a3d1f;
-            font-weight: 700;
-        }
-        .header p {
-            margin: 5px 0;
-            color: #666;
-            font-size: 11px;
-        }
+        .top-bar { background-color: #1a3d1f; height: 5px; margin-bottom: 0; }
+        .page-header { padding: 15px 0 14px; margin-bottom: 20px; border-bottom: 1px solid #dee2e6; }
+        .header-tbl { width: 100%; border-collapse: collapse; }
+        .org-lbl { font-size: 9px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+        .rpt-badge { background-color: #1a3d1f; color: white; padding: 5px 12px; font-size: 9px; font-weight: bold; text-transform: uppercase; }
         .event-info {
             background-color: #f8f9fa;
             padding: 15px;
@@ -40,21 +28,9 @@
             font-size: 16px;
             font-weight: 600;
         }
-        .event-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 15px;
-        }
-        .event-detail {
-            display: flex;
-            justify-content: space-between;
-            padding: 4px 0;
-        }
-        .event-detail strong {
-            color: #1a3d1f;
-            font-weight: 600;
-        }
+        .event-detail-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+        .event-detail-table td { padding: 4px 6px; vertical-align: top; width: 50%; font-size: 11px; }
+        .event-detail-table strong { color: #1a3d1f; font-weight: 600; margin-right: 4px; }
         .barangay-section {
             margin-bottom: 25px;
         }
@@ -132,40 +108,38 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>RELIEF EVENT REPORT</h1>
-        <p>SPUP-CDC Disaster Response System</p>
-        <p>Generated: {{ $generated_date }}</p>
+    <div class="top-bar"></div>
+    <div class="page-header">
+        <table class="header-tbl">
+            <tr>
+                <td style="vertical-align: middle;">
+                    <div class="org-lbl">SPUP-CDC Disaster Response System</div>
+                    <div style="font-size: 20px; font-weight: bold; color: #1a3d1f;">RELIEF EVENT REPORT</div>
+                    <div style="font-size: 10px; color: #9ca3af; margin-top: 2px;">Generated: {{ $generated_date }}</div>
+                </td>
+                <td style="text-align: right; vertical-align: top;">
+                    <span class="rpt-badge">Official Report</span>
+                </td>
+            </tr>
+        </table>
     </div>
 
     <div class="event-info">
         <h3>{{ $event->name }}</h3>
-        <div class="event-details">
-            <div class="event-detail">
-                <strong>Date:</strong>
-                <span>{{ \Carbon\Carbon::parse($event->date)->format('F d, Y') }}</span>
-            </div>
-            <div class="event-detail">
-                <strong>Status:</strong>
-                <span>{{ $event->status }}</span>
-            </div>
-            <div class="event-detail">
-                <strong>Venue:</strong>
-                <span>{{ $event->venue }}</span>
-            </div>
-            <div class="event-detail">
-                <strong>Calamity:</strong>
-                <span>{{ $event->calamity ? $event->calamity->name : 'N/A' }}</span>
-            </div>
-            <div class="event-detail">
-                <strong>Created By:</strong>
-                <span>{{ $event->creator ? $event->creator->first_name . ' ' . $event->creator->last_name : 'N/A' }}</span>
-            </div>
-            <div class="event-detail">
-                <strong>Created Date:</strong>
-                <span>{{ \Carbon\Carbon::parse($event->created_at)->format('F d, Y') }}</span>
-            </div>
-        </div>
+        <table class="event-detail-table">
+            <tr>
+                <td><strong>Date:</strong> {{ \Carbon\Carbon::parse($event->date)->format('F d, Y') }}</td>
+                <td><strong>Status:</strong> {{ $event->status }}</td>
+            </tr>
+            <tr>
+                <td><strong>Venue:</strong> {{ $event->venue }}</td>
+                <td><strong>Calamity:</strong> {{ $event->calamity ? $event->calamity->name : 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td><strong>Created By:</strong> {{ $event->creator ? $event->creator->first_name . ' ' . $event->creator->last_name : 'N/A' }}</td>
+                <td><strong>Created Date:</strong> {{ \Carbon\Carbon::parse($event->created_at)->format('F d, Y') }}</td>
+            </tr>
+        </table>
         @if($event->description)
         <div style="margin-top: 15px;">
             <strong>Description:</strong>
@@ -201,26 +175,22 @@
     @if($event->eventBarangays->isNotEmpty())
     <div class="barangay-section">
         <h3>Beneficiary Summary</h3>
-        <div class="event-details">
-            <div class="event-detail">
-                <strong>Total Beneficiaries:</strong>
-                <span>{{ $event->eventBarangays->sum('beneficiary_count') }}</span>
-            </div>
-            <div class="event-detail">
-                <strong>Total Barangays:</strong>
-                <span>{{ $event->eventBarangays->count() }}</span>
-            </div>
-            <div class="event-detail">
-                <strong>Total Facilitators:</strong>
-                <span>{{ $event->eventBarangays->sum(function($eb) { return $eb->facilitators->count(); }) }}</span>
-            </div>
-        </div>
+        <table class="event-detail-table">
+            <tr>
+                <td><strong>Total Beneficiaries:</strong> {{ $event->eventBarangays->sum('beneficiary_count') }}</td>
+                <td><strong>Total Barangays:</strong> {{ $event->eventBarangays->count() }}</td>
+            </tr>
+            <tr>
+                <td><strong>Total Facilitators:</strong> {{ $event->eventBarangays->sum(function($eb) { return $eb->facilitators->count(); }) }}</td>
+                <td></td>
+            </tr>
+        </table>
     </div>
     @endif
 
     <div class="footer">
-        <p>This report was generated automatically by the SPUP-CDC Disaster Response System</p>
-        <p>For questions or concerns, please contact the CDC office</p>
+        <strong style="color: #6b7280; font-size: 10px;">SPUP-CDC Disaster Response System</strong><br>
+        This is a system-generated document &bull; {{ $generated_date }}
     </div>
 </body>
 </html>

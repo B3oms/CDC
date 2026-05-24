@@ -1,12 +1,13 @@
 @extends('staff.layouts.app')
 @section('title', 'Dashboard')
+@section('breadcrumb', 'Dashboard')
 
 @section('content')
 
 <div class="dash-header">
-    <h1>Hello, {{ auth()->user()->first_name }}!</h1>
+    <h1>Welcome back, {{ auth()->user()->first_name }}!</h1>
 
-    <a href="{{ route('admin.calamity.index') }}"
+    <a href="{{ route('staff.calamities.index') }}"
         class="calamity-meter {{ $activeCalamity ? 'active' : 'none' }}"
         style="text-decoration:none;">
         <div class="cal-label">Calamity Meter ↗</div>
@@ -27,83 +28,72 @@
 </div>
 @endif
 
-{{-- ===== STATS ROW ===== --}}
-<div class="stats-row">
+{{-- Stats Row --}}
+<div class="stats-row" style="margin-bottom:1.5rem;">
     <div class="stat-card">
         <div class="stat-num">{{ $barangayCount }}</div>
-        <div class="stat-label">Barangays</div>
+        <div class="stat-label"><i class="fas fa-map"></i> Barangays</div>
     </div>
     <div class="stat-card">
         <div class="stat-num">{{ $municipalityCount }}</div>
-        <div class="stat-label">Municipalities</div>
+        <div class="stat-label"><i class="fas fa-city"></i> Municipalities</div>
     </div>
     <div class="stat-card">
-        <div class="stat-num upcoming-num">{{ $upcomingEvents->count() }}</div>
-        <div class="stat-label">Upcoming Events</div>
+        <div class="stat-num" style="color:#185fa5;">{{ $upcomingEvents->count() }}</div>
+        <div class="stat-label"><i class="fas fa-calendar-alt"></i> Upcoming Events</div>
     </div>
     <div class="stat-card">
-        <div class="stat-num completed-num">{{ $completedEvents->count() }}</div>
-        <div class="stat-label">Completed Events</div>
+        <div class="stat-num" style="color:#3b6d11;">{{ $completedEvents->count() }}</div>
+        <div class="stat-label"><i class="fas fa-check-circle"></i> Completed Events</div>
     </div>
 </div>
 
-{{-- ===== CHARTS SECTION ===== --}}
-<div class="charts-section">
-
-    {{-- Charts side by side --}}
-    <div class="charts-row">
-        {{-- Monthly Chart --}}
-        <div class="chart-card">
-            <div class="chart-title">Monthly Trend</div>
-            <div class="chart-wrap">
-                <canvas id="chart-monthly"></canvas>
-            </div>
-            <div class="chart-actions">
-                <x-pdf-export-dropdown
-                    dropdown-id="pdfOptions-monthly"
-                    paper-size-id="paperSize-monthly"
-                    orientation-id="orientation-monthly"
-                    export-onclick="exportChartPdf('monthly')" />
-            </div>
+{{-- Charts Row --}}
+<div class="charts-row">
+    <div class="chart-card">
+        <div class="chart-title">MONTHLY TREND</div>
+        <canvas id="chart-monthly" style="width:100%; max-height:220px;"></canvas>
+        <div class="chart-actions">
+            <x-pdf-export-dropdown
+                dropdown-id="pdfOptions-monthly"
+                paper-size-id="paperSize-monthly"
+                orientation-id="orientation-monthly"
+                export-onclick="exportChartPdf('monthly')" />
         </div>
-
-        {{-- Yearly Trend --}}
-        @forelse($yearlyData as $year => $months)
-        <div class="chart-card">
-            <div class="chart-title">Yearly Trend</div>
-            <div class="chart-wrap">
-                <canvas id="chart-yearly-trend"
-                    data-labels="{{ json_encode($yearlyTrendLabels) }}"
-                    data-values="{{ json_encode($yearlyTrendValues) }}">
-                </canvas>
-            </div>
-            <div class="chart-actions">
-                <x-pdf-export-dropdown
-                    dropdown-id="pdfOptions-yearly"
-                    paper-size-id="paperSize-yearly"
-                    orientation-id="orientation-yearly"
-                    export-onclick="exportChartPdf('yearly')" />
-            </div>
-        </div>
-        @empty
-        <div class="chart-card empty-chart">
-            <div class="chart-title">No relief data yet</div>
-            <p>Create relief events to see charts.</p>
-        </div>
-        @endforelse
     </div>
 
-</div>{{-- /.charts-section --}}
+    @forelse($yearlyData as $year => $months)
+    <div class="chart-card">
+        <div class="chart-title">YEARLY TREND</div>
+        <canvas id="chart-yearly-trend"
+            data-labels="{{ json_encode($yearlyTrendLabels) }}"
+            data-values="{{ json_encode($yearlyTrendValues) }}"
+            style="width:100%; max-height:220px;">
+        </canvas>
+        <div class="chart-actions">
+            <x-pdf-export-dropdown
+                dropdown-id="pdfOptions-yearly"
+                paper-size-id="paperSize-yearly"
+                orientation-id="orientation-yearly"
+                export-onclick="exportChartPdf('yearly')" />
+        </div>
+    </div>
+    @empty
+    <div class="chart-card">
+        <div class="chart-title">No relief data yet</div>
+        <p style="font-size:12px;color:#888;margin-top:8px;">Create relief events to see charts.</p>
+    </div>
+    @endforelse
+</div>
 
-{{-- ===== EVENTS SECTION ===== --}}
-<div class="events-section">
+{{-- Bottom Section: Events --}}
+<div class="bottom-grid">
 
-    {{-- Upcoming & Ongoing Events --}}
     @if($upcomingEvents->count())
-    <div class="section-card events-card">
-        <h3><i class="fas fa-calendar-alt"></i> Upcoming & Ongoing Relief Events</h3>
-        <div class="scrollable-table">
-            <table class="dist-table">
+    <div class="db-section-card">
+        <h3 class="db-section-title">Upcoming &amp; Ongoing Relief Events</h3>
+        <div class="db-table-scroll">
+            <table class="db-table">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -116,7 +106,7 @@
                     @foreach($upcomingEvents as $event)
                     <tr>
                         <td>
-                            <a href="{{ route('admin.relief.show', $event->id) }}" class="table-link">
+                            <a href="{{ route('admin.relief.show', $event->id) }}" class="db-link">
                                 {{ $event->name }}
                             </a>
                         </td>
@@ -139,12 +129,11 @@
     </div>
     @endif
 
-    {{-- Completed Events --}}
     @if($completedEvents->count())
-    <div class="section-card">
-        <h3><i class="fas fa-check-circle"></i> Completed Relief Events</h3>
-        <div class="scrollable-table">
-            <table class="dist-table">
+    <div class="db-section-card">
+        <h3 class="db-section-title">Completed Relief Events</h3>
+        <div class="db-table-scroll">
+            <table class="db-table">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -153,10 +142,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($completedEvents->take(5) as $event)
+                    @foreach($completedEvents as $event)
                     <tr>
                         <td>
-                            <a href="{{ route('admin.relief.show', $event->id) }}" class="table-link">
+                            <a href="{{ route('admin.relief.show', $event->id) }}" class="db-link">
                                 {{ $event->name }}
                             </a>
                         </td>
@@ -174,9 +163,13 @@
     </div>
     @endif
 
-</div>{{-- /.events-section --}}
+</div>
 
 @endsection
+
+@push('styles')
+@include('partials.dashboard-styles')
+@endpush
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -185,7 +178,6 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    // Monthly Chart
     const monthlyCtx = document.getElementById('chart-monthly');
     if (monthlyCtx) {
         const monthlyRaw = @json($monthlyData);
@@ -194,6 +186,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const found = monthlyRaw.find(m => m.month === i + 1);
             return found ? found.total : 0;
         });
+
         new Chart(monthlyCtx, {
             type: 'bar',
             data: {
@@ -209,7 +202,6 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true,
                 plugins: { legend: { display: false } },
                 scales: {
                     y: { beginAtZero: true, ticks: { precision: 0 } },
@@ -219,12 +211,12 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Yearly Trend Chart
-    const yearlyCanvas = document.getElementById('chart-yearly-trend');
-    if (yearlyCanvas && yearlyCanvas.dataset.labels) {
-        const yearLabels = JSON.parse(yearlyCanvas.dataset.labels);
-        const yearValues = JSON.parse(yearlyCanvas.dataset.values);
-        new Chart(yearlyCanvas, {
+    const yearlyTrendCanvas = document.getElementById('chart-yearly-trend');
+    if (yearlyTrendCanvas && yearlyTrendCanvas.dataset.labels && yearlyTrendCanvas.dataset.values) {
+        const yearLabels = JSON.parse(yearlyTrendCanvas.dataset.labels);
+        const yearValues = JSON.parse(yearlyTrendCanvas.dataset.values);
+
+        new Chart(yearlyTrendCanvas, {
             type: 'line',
             data: {
                 labels: yearLabels,
@@ -241,7 +233,6 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true,
                 plugins: { legend: { display: false } },
                 scales: {
                     y: { beginAtZero: true, ticks: { precision: 0 } },
@@ -256,513 +247,29 @@ function exportChartPdf(chartType) {
     const paperSize = document.getElementById(`paperSize-${chartType}`).value;
     const orientation = document.getElementById(`orientation-${chartType}`).value;
     const url = `{{ route('staff.dashboard.chart.pdf', ['type' => '__type__']) }}`.replace('__type__', chartType);
-    
-    // Create a hidden form to submit for download
+
     const form = document.createElement('form');
     form.method = 'GET';
     form.action = url;
     form.style.display = 'none';
-    
+
     const paperSizeInput = document.createElement('input');
     paperSizeInput.type = 'hidden';
     paperSizeInput.name = 'paper_size';
     paperSizeInput.value = paperSize;
     form.appendChild(paperSizeInput);
-    
+
     const orientationInput = document.createElement('input');
     orientationInput.type = 'hidden';
     orientationInput.name = 'orientation';
     orientationInput.value = orientation;
     form.appendChild(orientationInput);
-    
+
     document.body.appendChild(form);
     form.submit();
     document.body.removeChild(form);
-    
-    // Close dropdown after submission
+
     closePdfDropdown(`pdfOptions-${chartType}`);
 }
 </script>
-@endpush
-
-@push('styles')
-<style>
-/* ============================================
-   CSS VARIABLES
-   ============================================ */
-:root {
-    --primary:       #1a3d1f;
-    --primary-light: #2d6a35;
-    --bg:            #ffffff;
-    --white:         #ffffff;
-    --border:        #000000;
-    --text:          #2c2c2a;
-    --muted:         #2c2c2a;
-    --blue:          #185fa5;
-    --green:         #3b6d11;
-    --amber:         #ef9f27;
-    --red:           #e24b4a;
-
-    --radius-sm: 6px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    --shadow:    0 2px 6px rgba(0,0,0,.08);
-    --shadow-md: 0 4px 14px rgba(0,0,0,.12);
-}
-
-/* ============================================
-   HEADER
-   ============================================ */
-.dash-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.dash-greeting h1 {
-    font-size: clamp(1.25rem, 4vw, 1.875rem);
-    font-weight: 700;
-    color: var(--primary);
-    margin: 0 0 0.25rem;
-    line-height: 1.2;
-}
-
-.dash-date {
-    font-size: 0.8rem;
-    color: var(--muted);
-    margin: 0;
-}
-
-/* ============================================
-   CALAMITY METER
-   ============================================ */
-.calamity-meter {
-    background: transparent;
-    border: 1px solid var(--amber);
-    border-radius: var(--radius-md);
-    padding: 8px 14px;
-    text-align: right;
-    min-width: 130px;
-    flex-shrink: 0;
-}
-
-.cal-label {
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: .8px;
-    color: #b8860b;
-    margin-bottom: 2px;
-    font-weight: 500;
-}
-
-.cal-name {
-    font-size: 11px;
-    font-weight: 600;
-    color: #633806;
-    line-height: 1.3;
-}
-
-.cal-badge {
-    display: inline-block;
-    background: var(--red);
-    color: #fff;
-    font-size: 8px;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-weight: 500;
-    margin-top: 3px;
-}
-
-.calamity-meter.none { background: transparent; border-color: #639922; }
-.calamity-meter.none .cal-label { color: #3b6d11; }
-.calamity-meter.none .cal-name  { color: #27500a; }
-
-/* ============================================
-   STATS ROW
-   ============================================ */
-.stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.stat-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 1.25rem 1.5rem;
-    box-shadow: var(--shadow);
-    transition: box-shadow .2s;
-    text-align: center;
-}
-
-.stat-card:hover { box-shadow: var(--shadow-md); }
-
-.stat-num {
-    font-size: clamp(1.5rem, 4vw, 2rem);
-    font-weight: 700;
-    color: var(--primary);
-    line-height: 1;
-    margin-bottom: 0.5rem;
-    text-align: center;
-    display: block;
-}
-
-.upcoming-num  { color: var(--blue); }
-.completed-num { color: var(--green); }
-
-.stat-label {
-    font-size: 0.72rem;
-    color: var(--muted);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: .4px;
-    text-align: center;
-    margin: 0 auto;
-    display: block;
-}
-
-/* ============================================
-   CHARTS SECTION
-   ============================================ */
-.charts-section {
-    margin-bottom: 1.5rem;
-}
-
-/* ============================================
-   EVENTS SECTION
-   ============================================ */
-.events-section {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-}
-
-/* ============================================
-   CHARTS ROW — side by side
-   ============================================ */
-.charts-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.25rem;
-}
-
-/* ============================================
-   CHART CARDS
-   ============================================ */
-.chart-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 1.25rem;
-    box-shadow: var(--shadow);
-}
-
-.chart-title {
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: var(--text);
-    text-transform: uppercase;
-    letter-spacing: .6px;
-    margin-bottom: 0.875rem;
-    text-align: center;
-}
-
-/* Constrain canvas height so charts don't blow up */
-.chart-wrap {
-    position: relative;
-    width: 100%;
-}
-
-.chart-wrap canvas {
-    display: block;
-    width: 100% !important;
-    max-height: 180px;
-}
-
-.empty-chart p {
-    font-size: 0.8rem;
-    color: var(--muted);
-    margin: 0.5rem 0 0;
-    text-align: center;
-}
-
-/* ============================================
-   SECTION CARDS
-   ============================================ */
-.section-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 1.25rem;
-    box-shadow: var(--shadow);
-}
-
-.section-card h3 {
-    margin: 0 0 1rem;
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.section-card h3 i {
-    color: var(--primary);
-    font-size: 0.85rem;
-}
-
-.events-card {
-    flex: 1;
-}
-
-/* ============================================
-   SCROLLABLE TABLE
-   ============================================ */
-.scrollable-table {
-    overflow-x: auto;
-    overflow-y: auto;
-    max-height: 280px;
-    border-radius: var(--radius-sm);
-    border: 1px solid #000000;
-    -webkit-overflow-scrolling: touch;
-}
-
-.dist-table {
-    width: 100%;
-    min-width: 380px;   /* prevents squish on small screens */
-    border-collapse: collapse;
-    font-size: 0.82rem;
-}
-
-.dist-table thead {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-}
-
-.dist-table th {
-    background: transparent;
-    color: var(--text);
-    font-weight: 600;
-    text-align: left;
-    padding: 0.6rem 0.75rem;
-    border-bottom: 2px solid var(--border);
-    white-space: nowrap;
-}
-
-.dist-table td {
-    padding: 0.6rem 0.75rem;
-    border-bottom: 1px solid transparent;
-    vertical-align: top;
-    color: var(--text);
-}
-
-.dist-table tr:last-child td { border-bottom: none; }
-
-.table-link {
-    color: var(--blue);
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.table-link:hover { text-decoration: underline; }
-
-/* ============================================
-   STATUS BADGES
-   ============================================ */
-.relief-status-badge {
-    display: inline-block;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .3px;
-    white-space: nowrap;
-}
-
-.relief-status-badge.upcoming  { background: transparent; color: var(--amber); border: 1px solid var(--amber); }
-.relief-status-badge.ongoing   { background: transparent; color: var(--blue); border: 1px solid var(--blue); }
-.relief-status-badge.completed { background: transparent; color: var(--green); border: 1px solid var(--green); }
-
-/* ============================================
-   RESPONSIVE — Tablet (≤ 1024px)
-   ============================================ */
-@media (max-width: 1024px) {
-    .stats-row {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .charts-row {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* ============================================
-   RESPONSIVE — Mobile (≤ 640px)
-   ============================================ */
-@media (max-width: 640px) {
-    .dash-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .calamity-meter {
-        align-self: stretch;
-        text-align: left;
-        min-width: unset;
-    }
-
-    .stats-row {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
-    }
-
-    .stat-card {
-        padding: 1rem;
-    }
-
-    .charts-row {
-        grid-template-columns: 1fr;
-    }
-
-    .chart-card,
-    .section-card {
-        padding: 1rem;
-    }
-
-    .chart-wrap canvas {
-        max-height: 150px;
-    }
-
-    .scrollable-table {
-        max-height: 220px;
-    }
-}
-
-/* ============================================
-   RESPONSIVE — Small phones (≤ 400px)
-   ============================================ */
-@media (max-width: 400px) {
-    .stats-row {
-        grid-template-columns: 1fr 1fr;
-        gap: 0.625rem;
-    }
-
-    .stat-card {
-        padding: 0.875rem 0.75rem;
-    }
-
-    .stat-num {
-        font-size: 1.375rem;
-    }
-
-    .stat-label {
-        font-size: 0.65rem;
-    }
-
-    .chart-card,
-    .section-card {
-        padding: 0.875rem;
-    }
-
-    .chart-wrap canvas {
-        max-height: 130px;
-    }
-}
-
-/* ─── Calamity Meter (Original Staff Style) ─────────────────────────────────── */
-.calamity-meter {
-    background: #faeeda;
-    border: 1px solid #ef9f27;
-    border-radius: 6px;
-    padding: 8px 12px;
-    text-align: right;
-    min-width: 140px;
-    font-size: 0.85rem;
-}
-
-.calamity-meter .cal-label {
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    color: #b8860b;
-    margin-bottom: 2px;
-    font-weight: 500;
-}
-
-.calamity-meter .cal-name {
-    font-size: 11px;
-    font-weight: 600;
-    color: #633806;
-    line-height: 1.2;
-}
-
-.calamity-meter .cal-badge {
-    display: inline-block;
-    background: #e24b4a;
-    color: #fff;
-    font-size: 8px;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-weight: 500;
-    margin-top: 2px;
-}
-
-.calamity-meter.none {
-    background: #eaf3de;
-    border-color: #639922;
-}
-
-.calamity-meter.none .cal-label { color: #3b6d11; }
-.calamity-meter.none .cal-name  { color: #27500a; }
-
-/* ─── Badge Intensity ─────────────────────────────────────── */
-.badge-intensity {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    margin-left: 8px;
-}
-
-.badge-intensity.low {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.badge-intensity.medium {
-    background: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeaa7;
-}
-
-.badge-intensity.high {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.badge-intensity.critical {
-    background: #d1ecf1;
-    color: #0c5460;
-    border: 1px solid #bee5eb;
-}
-
-.badge-intensity.unknown {
-    background: #e2e3e5;
-    color: #383d41;
-    border: 1px solid #d6d8db;
-}
-
-</style>
 @endpush

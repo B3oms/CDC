@@ -9,18 +9,24 @@ use App\Models\Barangay;
 use App\Models\Municipality;
 use App\Models\EvacuationCenter;
 use App\Models\EvacuationReport;
-use App\Models\HouseholdRequest;
+use App\Models\Household;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class CalamityController extends Controller
 {
     // Show calamity index
-    public function index()
+    public function index(Request $request)
     {
-        $calamities = Calamity::with(['barangays', 'creator'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = Calamity::with(['barangays', 'creator'])
+            ->orderBy('created_at', 'desc');
+
+        // Filter by date range
+        if ($request->date_from) {
+            $query->whereDate('date_occurred', '>=', $request->date_from);
+        }
+
+        $calamities = $query->get();
         
         // Use staff layout if user is staff, otherwise use admin layout
         $view = auth()->user()->role->name === 'Staff' ? 'staff.calamity.index' : 'admin.calamity.index';
@@ -126,6 +132,66 @@ class CalamityController extends Controller
         }
     }
 
+    // Get household details for a specific barangay in a calamity
+    public function getHouseholds($calamityId, $barangayId)
+    {
+        try {
+            $calamity = Calamity::findOrFail($calamityId);
+            $barangay = Barangay::findOrFail($barangayId);
+            
+            // Get the evacuation report for this barangay
+            $report = EvacuationReport::where('calamity_id', $calamityId)
+                ->where('barangay_id', $barangayId)
+                ->first();
+                
+            if (!$report || !$report->household_ids) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'No households found for this barangay'
+                ]);
+            }
+            
+            // Get household details
+            $householdIds = is_array($report->household_ids) 
+                ? $report->household_ids 
+                : (json_decode($report->household_ids, true) ?: []);
+                
+            $households = Household::whereIn('id', $householdIds)
+                ->get(['id', 'head_of_household', 'contact_number']);
+                
+            $householdData = $households->map(function($household) {
+                try {
+                    return [
+                        'head_name' => $household->head_of_household,
+                        'member_count' => $household->total_members ?? 0,
+                        'household_code' => 'HH-' . str_pad($household->id, 4, '0', STR_PAD_LEFT),
+                        'contact_number' => $household->contact_number ?: 'N/A'
+                    ];
+                } catch (\Exception $e) {
+                    return [
+                        'head_name' => $household->head_of_household ?? 'Error',
+                        'member_count' => 0,
+                        'household_code' => 'HH-' . str_pad($household->id, 4, '0', STR_PAD_LEFT),
+                        'contact_number' => 'N/A'
+                    ];
+                }
+            });
+            
+            return response()->json([
+                'success' => true,
+                'barangay_name' => $barangay->name,
+                'total_households' => $households->count(),
+                'households' => $householdData
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to fetch household data: ' . $e->getMessage()
+            ]);
+        }
+    }
+
     // Show final report
     public function report($id)
     {
@@ -147,68 +213,7 @@ class CalamityController extends Controller
         return view('admin.calamity.report', compact('calamity', 'rankings'));
     }
 
-    // Fetch household data for AJAX requests
-    public function getHouseholds($calamityId, $barangayId)
-    {
-        try {
-            $barangay = Barangay::findOrFail($barangayId);
-            
-            // Get the evacuation report for this calamity + barangay
-            $report = EvacuationReport::where('calamity_id', $calamityId)
-                ->where('barangay_id', $barangayId)
-                ->first();
-            
-            // Get the household IDs that were submitted in the portal
-            $submittedIds = [];
-            if ($report) {
-                try {
-                    // Check if household_ids column exists and is accessible
-                    if (isset($report->household_ids)) {
-                        // Manually decode JSON since cast might not be working for existing records
-                        $householdIdsData = $report->household_ids;
-                        if (is_string($householdIdsData)) {
-                            $submittedIds = json_decode($householdIdsData, true) ?: [];
-                        } elseif (is_array($householdIdsData)) {
-                            $submittedIds = $householdIdsData;
-                        } else {
-                            $submittedIds = [];
-                        }
-                    }
-                } catch (\Exception $e) {
-                    $submittedIds = [];
-                }
-            }
-            
-            // Fetch only the households that were actually inputted in the portal
-            $households = collect();
-            if (!empty($submittedIds)) {
-                $households = HouseholdRequest::whereIn('id', $submittedIds)
-                    ->orderBy('head_of_household')
-                    ->get(['id', 'head_of_household', 'family_size', 'contact_number']);
-            }
-
-            return response()->json([
-                'success' => true,
-                'barangay_name' => $barangay->name,
-                'total_households' => $households->count(),
-                'households' => $households->map(function($household) {
-                    return [
-                        'head_name' => $household->head_of_household,
-                        'member_count' => $household->family_size,
-                        'household_code' => 'HH-' . str_pad($household->id, 4, '0', STR_PAD_LEFT),
-                        'contact_number' => $household->contact_number
-                    ];
-                })
-            ]);
-            
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'error' => 'Failed to fetch household data: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
+    
     // Delete a calamity and all related data
     public function destroy($id)
     {
@@ -256,48 +261,10 @@ class CalamityController extends Controller
                 ->with('barangay')
                 ->get();
 
-            // Get household data for each barangay
-            $barangayHouseholds = [];
-            foreach ($calamity->barangays as $barangay) {
-                // Get the evacuation report for this calamity + barangay
-                $report = EvacuationReport::where('calamity_id', $id)
-                    ->where('barangay_id', $barangay->id)
-                    ->first();
-
-                $households = [];
-                if ($report) {
-                    try {
-                        // Get the household IDs that were submitted in the portal
-                        $submittedIds = [];
-                        if (isset($report->household_ids)) {
-                            $householdIdsData = $report->household_ids;
-                            if (is_string($householdIdsData)) {
-                                $submittedIds = json_decode($householdIdsData, true) ?: [];
-                            } elseif (is_array($householdIdsData)) {
-                                $submittedIds = $householdIdsData;
-                            }
-                        }
-
-                        if (!empty($submittedIds)) {
-                            // Get household details for submitted IDs
-                            $households = \App\Models\HouseholdRequest::whereIn('id', $submittedIds)
-                                ->where('barangay_id', $barangay->id)
-                                ->orderBy('head_of_household')
-                                ->get(['id', 'head_of_household', 'family_size', 'contact_number']);
-                        }
-                    } catch (\Exception $e) {
-                        $households = [];
-                    }
-                }
-
-                $barangayHouseholds[$barangay->id] = $households;
-            }
-
             // Prepare data for PDF
             $pdfData = [
                 'calamity' => $calamity,
                 'rankings' => $rankings,
-                'barangayHouseholds' => $barangayHouseholds,
                 'generated_date' => now()->format('F d, Y - h:i A')
             ];
 

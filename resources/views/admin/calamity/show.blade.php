@@ -270,7 +270,11 @@ function toggleHouseholds(barangayId) {
     
     // Fetch household data via AJAX
     const calamityId = {{ $calamity->id }};
-    fetch(`/admin/calamity/households/${calamityId}/${barangayId}`)
+    const isStaff = '{{ auth()->user()->role->name }}' === 'Staff';
+    const route = isStaff 
+        ? `/staff/calamities/households/${calamityId}/${barangayId}`
+        : `/admin/calamity/households/${calamityId}/${barangayId}`;
+    fetch(route)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -289,7 +293,7 @@ function toggleHouseholds(barangayId) {
             tbody.innerHTML = '';
             
             if (data.households.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#888;">No households registered</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#888;">No households found in this evacuation report</td></tr>';
                 return;
             }
             

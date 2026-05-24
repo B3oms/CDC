@@ -73,94 +73,41 @@ class DashboardController extends Controller
      */
     public function getNotifications()
     {
-        $notifications = [];
-        $unreadCount = 0;
-
-        try {
-            // Get upcoming relief events (next 7 days) - most reliable data
-            $upcomingEvents = ReliefEvent::where('status', 'Upcoming')
-                ->where('date', '<=', now()->addDays(7))
-                ->where('date', '>=', now())
-                ->count();
-
-            if ($upcomingEvents > 0) {
-                $notifications[] = [
-                    'id' => 'relief-events-' . now()->timestamp,
-                    'title' => 'Upcoming relief events',
-                    'text' => "{$upcomingEvents} relief event(s) scheduled for next 7 days",
-                    'time' => 'Scheduled',
-                    'unread' => false,
-                    'icon' => 'fas fa-hands-helping',
-                    'color' => '#3b82f6',
-                    'url' => route('staff.relief.index')
-                ];
-            }
-
-            // Get recent relief events (last 24 hours) - fallback notification
-            $recentEvents = ReliefEvent::where('created_at', '>=', now()->subDay())
-                ->count();
-
-            if ($recentEvents > 0) {
-                $notifications[] = [
-                    'id' => 'recent-events-' . now()->timestamp,
-                    'title' => 'Recent relief activity',
-                    'text' => "{$recentEvents} relief event(s) created in the last 24 hours",
-                    'time' => 'Today',
-                    'unread' => true,
-                    'icon' => 'fas fa-calendar',
-                    'color' => '#10b981',
-                    'url' => route('staff.relief.index')
-                ];
-                $unreadCount++;
-            }
-
-            // Get total relief events as general info
-            $totalEvents = ReliefEvent::count();
-            if ($totalEvents > 0) {
-                $notifications[] = [
-                    'id' => 'total-events-' . now()->timestamp,
-                    'title' => 'Total relief operations',
-                    'text' => "Currently tracking {$totalEvents} relief event(s) in the system",
-                    'time' => 'System',
-                    'unread' => false,
-                    'icon' => 'fas fa-chart-line',
-                    'color' => '#6b7280',
-                    'url' => route('staff.relief.index')
-                ];
-            }
-
-            // Add a welcome notification if no others exist
-            if (empty($notifications)) {
-                $notifications[] = [
-                    'id' => 'welcome-' . now()->timestamp,
-                    'title' => 'Welcome to Staff Dashboard',
-                    'text' => 'You can create relief events and manage operations from here',
-                    'time' => 'Info',
-                    'unread' => false,
-                    'icon' => 'fas fa-info-circle',
-                    'color' => '#3b82f6',
-                    'url' => route('staff.relief.create')
-                ];
-            }
-
-        } catch (\Exception $e) {
-            // Fallback notification if database queries fail
-            $notifications[] = [
-                'id' => 'system-' . now()->timestamp,
-                'title' => 'Staff Dashboard',
-                'text' => 'Manage relief operations and track events',
-                'time' => 'System',
-                'unread' => false,
-                'icon' => 'fas fa-hands-helping',
-                'color' => '#1a3d1f',
-                'url' => route('staff.relief.index')
-            ];
-        }
+        $notifications = \App\Services\NotificationService::getRecentNotifications(auth()->id(), 10);
+        $unreadCount   = \App\Services\NotificationService::getUnreadCount(auth()->id());
 
         return response()->json([
-            'notifications' => $notifications,
-            'unread_count' => $unreadCount
+            'notifications' => $notifications->map(function ($n) {
+                return [
+                    'id'    => $n->id,
+                    'title' => $n->title,
+                    'text'  => $n->message,
+                    'type'  => $n->type,
+                    'icon'  => $n->icon,
+                    'color' => $n->color,
+                    'unread'=> !$n->read,
+                    'time'  => $n->created_at->diffForHumans(),
+                    'url'   => $this->resolveStaffUrl($n->type),
+                ];
+            }),
+            'unread_count' => $unreadCount,
         ]);
+    }
+
+    private function resolveStaffUrl(string $type): string
+    {
+        try {
+            return match($type) {
+                'beneficiary_addition'      => route('staff.beneficiaries.index'),
+                'event_creation'            => route('staff.relief.index'),
+                'recommendation_submitted'  => route('staff.recommended.index'),
+                'location_request_approved',
+                'location_request_rejected' => route('staff.location-requests.index'),
+                default                     => '#',
+            };
+        } catch (\Exception $e) {
+            return '#';
+        }
     }
 
     /**
@@ -168,9 +115,17 @@ class DashboardController extends Controller
      */
     public function markNotificationRead($notificationId)
     {
-        // For now, just return success since we don't have a notifications table
-        // In a real implementation, you would update a notifications table
-        return response()->json(['success' => true]);
+        $notification = \App\Models\Notification::where('user_id', auth()->id())
+            ->find($notificationId);
+
+        if ($notification) {
+            $notification->markAsRead();
+        }
+
+        return response()->json([
+            'success' => true,
+            'unread_count' => \App\Services\NotificationService::getUnreadCount(auth()->id()),
+        ]);
     }
 
     /**
@@ -178,9 +133,9 @@ class DashboardController extends Controller
      */
     public function markAllNotificationsRead()
     {
-        // For now, just return success since we don't have a notifications table
-        // In a real implementation, you would update all notifications for the user
-        return response()->json(['success' => true]);
+        \App\Services\NotificationService::markAllAsRead(auth()->id());
+
+        return response()->json(['success' => true, 'unread_count' => 0]);
     }
 
     /**

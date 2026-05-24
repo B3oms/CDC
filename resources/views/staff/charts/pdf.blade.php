@@ -12,25 +12,10 @@
             line-height: 1.4;
         }
         
-        .header {
-            text-align: center;
-            border-bottom: 2px solid #185fa5;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-        }
-        
-        .header h1 {
-            color: #185fa5;
-            margin: 0;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        
-        .header .subtitle {
-            color: #666;
-            font-size: 11px;
-            margin-top: 5px;
-        }
+        .top-bar { background-color: #1a3d1f; height: 5px; margin-bottom: 16px; }
+        .header-tbl { width: 100%; border-collapse: collapse; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #dee2e6; }
+        .org-name { font-size: 9px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+        .rpt-badge { background-color: #1a3d1f; color: white; padding: 5px 12px; font-size: 9px; font-weight: bold; text-transform: uppercase; }
         
         .chart-section {
             margin-bottom: 25px;
@@ -45,12 +30,7 @@
             margin-bottom: 15px;
         }
         
-        .chart-title {
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-align: center;
-        }
+        .chart-title { font-size: 12px; font-weight: bold; color: #1a3d1f; background-color: #f0f7f0; border-left: 4px solid #1a3d1f; padding: 6px 10px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.3px; }
         
         .chart-bars {
             width: 100%;
@@ -97,13 +77,7 @@
             page-break-inside: avoid;
         }
         
-        .interpretation-section h2 {
-            color: #185fa5;
-            margin-top: 0;
-            margin-bottom: 12px;
-            font-size: 14px;
-            font-weight: bold;
-        }
+        .interpretation-section h2 { color: #1a3d1f; margin-top: 0; margin-bottom: 12px; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.3px; }
         
         .interpretation-item {
             margin-bottom: 12px;
@@ -116,13 +90,7 @@
             font-weight: bold;
         }
         
-        .interpretation-item p {
-            margin: 0;
-            padding: 8px;
-            background: white;
-            border-left: 3px solid #185fa5;
-            font-size: 11px;
-        }
+        .interpretation-item p { margin: 0; padding: 8px; background: white; border-left: 3px solid #1a3d1f; font-size: 11px; }
         
         .recommendations {
             background: #e8f5e8;
@@ -150,14 +118,7 @@
             font-size: 11px;
         }
         
-        .footer {
-            margin-top: 30px;
-            padding-top: 15px;
-            border-top: 1px solid #ddd;
-            text-align: center;
-            color: #666;
-            font-size: 10px;
-        }
+        .footer { margin-top: 30px; padding-top: 10px; border-top: 2px solid #dee2e6; text-align: center; color: #9ca3af; font-size: 9px; }
         
         .data-table {
             width: 100%;
@@ -173,18 +134,23 @@
             text-align: center;
         }
         
-        .data-table th {
-            background: #185fa5;
-            color: white;
-            font-weight: bold;
-        }
+        .data-table th { background-color: #1a3d1f; color: white; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>{{ $title }}</h1>
-        <div class="subtitle">Generated on {{ now()->format('F d, Y H:i:s') }}</div>
-    </div>
+    <div class="top-bar"></div>
+    <table class="header-tbl">
+        <tr>
+            <td style="vertical-align: middle;">
+                <div class="org-name">SPUP-CDC Disaster Response System</div>
+                <div style="font-size: 19px; font-weight: bold; color: #1a3d1f;">{{ $title }}</div>
+                <div style="font-size: 10px; color: #9ca3af; margin-top: 2px;">Chart Analysis Report &bull; Generated: {{ now()->format('F d, Y H:i:s') }}</div>
+            </td>
+            <td style="text-align: right; vertical-align: top;">
+                <span class="rpt-badge">Official Report</span>
+            </td>
+        </tr>
+    </table>
 
     <div class="chart-section">
         <div class="chart-title">Chart Visualization</div>
@@ -290,8 +256,8 @@
     </div>
 
     <div class="footer">
-        <p>SPUP-CDC Relief Distribution Management System</p>
-        <p>Chart Analysis Report - {{ $title }}</p>
+        <strong style="color: #6b7280; font-size: 10px;">SPUP-CDC Disaster Response System</strong><br>
+        Chart Analysis Report &bull; This is a system-generated document
     </div>
 </body>
 </html>

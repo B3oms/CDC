@@ -1,5 +1,5 @@
 <div class="dash-header">
-    <h1>Calamities</h1>
+    <h1>Calamity Meter</h1>
     <div style="display:flex;gap:10px;align-items:center;">
         <x-back-button href="{{ route('staff.dashboard') }}" label="Back" />
         @if(auth()->user()->role->name !== 'Staff')

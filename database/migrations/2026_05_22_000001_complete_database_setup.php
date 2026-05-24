@@ -31,9 +31,7 @@ return new class extends Migration
             'barangay_requests',
             'location_requests',
             'notifications',
-            'household_requests',
-            'household_members',
-        ];
+                    ];
 
         foreach ($requiredTables as $table) {
             if (!Schema::hasTable($table)) {
@@ -168,26 +166,7 @@ return new class extends Migration
                     $table->timestamps();
                     break;
 
-                case 'household_requests':
-                    $table->foreignId('requested_by')->constrained('users')->onDelete('cascade');
-                    $table->string('household_head');
-                    $table->string('contact_number')->nullable();
-                    $table->integer('family_members');
-                    $table->string('age_group');
-                    $table->string('sex');
-                    $table->string('status')->default('pending');
-                    $table->timestamps();
-                    break;
-
-                case 'household_members':
-                    $table->foreignId('household_request_id')->constrained('household_requests')->onDelete('cascade');
-                    $table->string('name');
-                    $table->string('relationship');
-                    $table->integer('age');
-                    $table->string('sex');
-                    $table->timestamps();
-                    break;
-            }
+                            }
         });
     }
 

@@ -56,15 +56,7 @@
                 </select>
             </div>
 
-            <div class="filter-group">
-                <label class="filter-label">Status</label>
-                <select name="status" class="filter-select" onchange="this.form.submit()">
-                    <option value="">All</option>
-                    <option value="verified" {{ request('status') == 'verified' ? 'selected' : '' }}>Verified</option>
-                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                </select>
-            </div>
-
+            
             <div class="filter-group">
                 <label class="filter-label">Vulnerability</label>
                 <select name="vulnerability_level" class="filter-select" onchange="this.form.submit()">

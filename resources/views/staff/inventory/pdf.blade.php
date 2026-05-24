@@ -94,55 +94,69 @@
             padding: 10px;
         }
         .summary-section {
-            margin-top: 40px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f0f7f0;
+            border: 1px solid #c9d7c9;
+            border-top: 3px solid #1a3d1f;
         }
         .summary-title {
-            font-size: 16px;
+            font-size: 13px;
             font-weight: bold;
-            margin-bottom: 15px;
-            text-align: center;
+            color: #1a3d1f;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-        }
+        .summary-grid-table { width: 100%; border-collapse: collapse; }
+        .summary-grid-table td { padding: 5px; vertical-align: top; }
         .summary-item {
             text-align: center;
-            padding: 10px;
+            padding: 10px 8px;
             background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            border: 1px solid #d1d5db;
         }
         .summary-label {
-            font-size: 11px;
-            color: #666;
-            margin-bottom: 5px;
+            font-size: 9px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 4px;
         }
         .summary-value {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
-            color: #2c3e50;
+            color: #1a3d1f;
         }
+        .top-bar { background-color: #1a3d1f; height: 5px; margin-bottom: 16px; }
+        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #dee2e6; }
+        .org-name { font-size: 9px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+        .report-badge { background-color: #1a3d1f; color: white; padding: 5px 12px; font-size: 9px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .summary-grid-table { width: 100%; border-collapse: collapse; }
         .footer {
             margin-top: 30px;
             text-align: center;
-            font-size: 10px;
-            color: #999;
-            border-top: 1px solid #ddd;
+            font-size: 9px;
+            color: #9ca3af;
+            border-top: 2px solid #dee2e6;
             padding-top: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>INVENTORY REPORT</h1>
-        <p>Organized by Category</p>
-        <p>Generated on: {{ $generated_date }}</p>
-    </div>
+    <div class="top-bar"></div>
+    <table class="header-table">
+        <tr>
+            <td style="vertical-align: middle;">
+                <div class="org-name">SPUP-CDC Disaster Response System</div>
+                <div style="font-size: 20px; font-weight: bold; color: #1a3d1f;">INVENTORY REPORT</div>
+                <div style="font-size: 10px; color: #9ca3af; margin-top: 3px;">Generated: {{ $generated_date }}</div>
+            </td>
+            <td style="text-align: right; vertical-align: top;">
+                <span class="report-badge">Official Report</span>
+            </td>
+        </tr>
+    </table>
 
     @php
         $totalCategories = 0;
@@ -228,14 +242,14 @@
                                             <td>
                                                 @if($item->inventory)
                                                     @if($item->inventory->quantity <= 10)
-                                                        <span style="color: #e74c3c; font-weight: bold;">⚠️ LOW STOCK</span>
+                                                        <span style="color: #dc2626; font-weight: bold; font-size: 10px;">LOW STOCK</span>
                                                     @elseif($item->inventory->quantity <= 50)
-                                                        <span style="color: #f39c12; font-weight: bold;">⚡ MEDIUM</span>
+                                                        <span style="color: #d97706; font-weight: bold; font-size: 10px;">MEDIUM</span>
                                                     @else
-                                                        <span style="color: #27ae60; font-weight: bold;">✓ IN STOCK</span>
+                                                        <span style="color: #059669; font-weight: bold; font-size: 10px;">IN STOCK</span>
                                                     @endif
                                                 @else
-                                                    <span style="color: #e74c3c; font-weight: bold;">❌ OUT OF STOCK</span>
+                                                    <span style="color: #dc2626; font-weight: bold; font-size: 10px;">OUT OF STOCK</span>
                                                 @endif
                                             </td>
                                         </tr>
@@ -250,38 +264,24 @@
     @endforeach
 
     <div class="summary-section">
-        <div class="summary-title">INVENTORY SUMMARY</div>
-        <div class="summary-grid">
-            <div class="summary-item">
-                <div class="summary-label">Total Categories</div>
-                <div class="summary-value">{{ $totalCategories }}</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-label">Total Subcategories</div>
-                <div class="summary-value">{{ $totalSubcategories }}</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-label">Total Items</div>
-                <div class="summary-value">{{ $totalItems }}</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-label">Low Stock Items</div>
-                <div class="summary-value">{{ $lowStockCount }}</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-label">Out of Stock</div>
-                <div class="summary-value">{{ $outOfStockCount }}</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-label">Well Stocked</div>
-                <div class="summary-value">{{ $wellStockedCount }}</div>
-            </div>
-        </div>
+        <div class="summary-title">Inventory Summary</div>
+        <table class="summary-grid-table">
+            <tr>
+                <td style="width: 33%;"><div class="summary-item"><div class="summary-value">{{ $totalCategories }}</div><div class="summary-label">Total Categories</div></div></td>
+                <td style="width: 33%;"><div class="summary-item"><div class="summary-value">{{ $totalSubcategories }}</div><div class="summary-label">Total Subcategories</div></div></td>
+                <td style="width: 33%;"><div class="summary-item"><div class="summary-value">{{ $totalItems }}</div><div class="summary-label">Total Items</div></div></td>
+            </tr>
+            <tr>
+                <td><div class="summary-item"><div class="summary-value" style="color: #dc2626;">{{ $lowStockCount }}</div><div class="summary-label">Low Stock Items</div></div></td>
+                <td><div class="summary-item"><div class="summary-value" style="color: #dc2626;">{{ $outOfStockCount }}</div><div class="summary-label">Out of Stock</div></div></td>
+                <td><div class="summary-item"><div class="summary-value" style="color: #059669;">{{ $wellStockedCount }}</div><div class="summary-label">Well Stocked</div></div></td>
+            </tr>
+        </table>
     </div>
 
     <div class="footer">
-        <p>This report was automatically generated by the SPUP-CDC Relief System</p>
-        <p>Page 1 of 1</p>
+        <strong style="color: #6b7280; font-size: 10px;">SPUP-CDC Disaster Response System</strong><br>
+        This is a system-generated document &bull; {{ $generated_date }}
     </div>
 </body>
 </html>

@@ -10,11 +10,12 @@
             color: #333;
             line-height: 1.4;
         }
+        .top-bar { background-color: #1a3d1f; height: 5px; margin-bottom: 16px; }
+        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #dee2e6; }
+        .org-name { font-size: 9px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+        .report-badge { background-color: #1a3d1f; color: white; padding: 5px 12px; font-size: 9px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
         .header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #1a3d1f;
-            padding-bottom: 20px;
+            margin-bottom: 0;
         }
         .header h1 {
             font-size: 20px;
@@ -23,33 +24,32 @@
             font-weight: 700;
         }
         .header p {
-            margin: 5px 0;
-            color: #666;
-            font-size: 11px;
+            margin: 3px 0 0 0;
+            color: #9ca3af;
+            font-size: 10px;
         }
         .summary-section {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
             margin-bottom: 20px;
-            border-left: 4px solid #1a3d1f;
         }
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-        }
+        .summary-grid-table { width: 100%; border-collapse: collapse; }
+        .summary-grid-table td { padding: 5px; vertical-align: top; }
         .summary-item {
             text-align: center;
+            background-color: #f0f7f0;
+            border: 1px solid #c9d7c9;
+            border-top: 3px solid #1a3d1f;
+            padding: 12px 8px;
         }
         .summary-number {
-            font-size: 18px;
+            font-size: 22px;
             font-weight: bold;
             color: #1a3d1f;
         }
         .summary-label {
-            font-size: 11px;
-            color: #666;
+            font-size: 9px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
             margin-top: 3px;
         }
         table {
@@ -108,31 +108,29 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>BENEFICIARIES REPORT</h1>
-        <p>SPUP-CDC Disaster Response System</p>
-        <p>Generated: {{ $generated_date ?? now()->format('F d, Y h:i A') }}</p>
-    </div>
+    <div class="top-bar"></div>
+    <table class="header-table">
+        <tr>
+            <td style="vertical-align: middle;">
+                <div class="org-name">SPUP-CDC Disaster Response System</div>
+                <h1 style="font-size: 20px; font-weight: bold; color: #1a3d1f; margin: 0;">BENEFICIARIES REPORT</h1>
+                <p style="margin: 3px 0 0 0; color: #9ca3af; font-size: 10px;">Generated: {{ $generated_date ?? now()->format('F d, Y h:i A') }}</p>
+            </td>
+            <td style="text-align: right; vertical-align: top;">
+                <span class="report-badge">Official Report</span>
+            </td>
+        </tr>
+    </table>
 
     <div class="summary-section">
-        <div class="summary-grid">
-            <div class="summary-item">
-                <div class="summary-number">{{ $beneficiaries->count() }}</div>
-                <div class="summary-label">Total Beneficiaries</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-number">{{ $beneficiaries->where('is_verified', true)->count() }}</div>
-                <div class="summary-label">Verified</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-number">{{ $beneficiaries->where('is_verified', false)->count() }}</div>
-                <div class="summary-label">Pending Verification</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-number">{{ $beneficiaries->avg('family_size') ? number_format($beneficiaries->avg('family_size'), 1) : 0 }}</div>
-                <div class="summary-label">Avg Family Size</div>
-            </div>
-        </div>
+        <table class="summary-grid-table">
+            <tr>
+                <td style="width: 25%;"><div class="summary-item"><div class="summary-number">{{ $beneficiaries->count() }}</div><div class="summary-label">Total Beneficiaries</div></div></td>
+                <td style="width: 25%;"><div class="summary-item"><div class="summary-number">{{ $beneficiaries->where('is_verified', true)->count() }}</div><div class="summary-label">Verified</div></div></td>
+                <td style="width: 25%;"><div class="summary-item"><div class="summary-number">{{ $beneficiaries->where('is_verified', false)->count() }}</div><div class="summary-label">Pending Verification</div></div></td>
+                <td style="width: 25%;"><div class="summary-item"><div class="summary-number">{{ $beneficiaries->avg('family_size') ? number_format($beneficiaries->avg('family_size'), 1) : 0 }}</div><div class="summary-label">Avg Family Size</div></div></td>
+            </tr>
+        </table>
     </div>
 
     @if($beneficiaries->isNotEmpty())

@@ -42,11 +42,9 @@
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="logo">
-            <div class="logo-circle"></div>
-            @php $role = auth()->user()->role->name ?? 'Staff'; @endphp
-            <a href="{{ $role === 'Staff' ? route('staff.dashboard') : ($role === 'Barangay Partner' ? route('barangay.dashboard') : route('admin.dashboard')) }}"
-                style="color:#fff;text-decoration:none;">
-                SPUP-CDC
+            <a href="{{ route('staff.dashboard') }}" style="color:#fff;text-decoration:none;display:flex;align-items:center;gap:10px;">
+                <img src="{{ asset('images/images-5.jpeg') }}" alt="SPUP-CDC Logo" style="height:40px;width:auto;border-radius:50%;object-fit:cover;">
+                <span>SPUP-CDC</span>
             </a>
         </div>
         
@@ -82,11 +80,7 @@
                 class="{{ request()->routeIs('staff.recommended.*') ? 'active' : '' }}">
                 <i class="fas fa-star"></i> Recommended
             </a>
-            <a href="{{ route('staff.household_requests.index') }}"
-                class="{{ request()->routeIs('staff.household_requests.*') ? 'active' : '' }}">
-                <i class="fas fa-clipboard-list"></i> Household Requests
-            </a>
-            {{-- Debug: Current route is {{ request()->route()->getName() }} --}}
+                        {{-- Debug: Current route is {{ request()->route()->getName() }} --}}
 {{-- Debug: Relief monitor route match: {{ request()->routeIs('staff.relief.*') ? 'YES' : 'NO' }} --}}
 {{-- Debug: Inventory route match: {{ request()->routeIs('staff.inventory.*') ? 'YES' : 'NO' }} --}}
         </nav>

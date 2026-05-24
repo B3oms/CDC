@@ -7,7 +7,7 @@ use App\Models\Calamity;
 use App\Models\EvacuationCenter;
 use App\Models\EvacuationReport;
 use App\Models\CalamityPartner;
-use App\Models\HouseholdRequest;
+use App\Models\Household;
 use Illuminate\Http\Request;
 
 class EvacuationController extends Controller
@@ -36,8 +36,8 @@ class EvacuationController extends Controller
 
         // Get approved households for this barangay
         try {
-            $households = HouseholdRequest::where('barangay_id', $barangayId)
-                ->where('status', 'approved')
+            $households = Household::where('barangay_id', $barangayId)
+                ->where('status', 'active')
                 ->orderBy('head_of_household')
                 ->get();
         } catch (\Exception $e) {
@@ -86,7 +86,7 @@ class EvacuationController extends Controller
             'calamity_id'         => 'required|exists:calamities,id',
             'evacuation_center_id'=> 'required|exists:evacuation_centers,id',
             'household_ids'       => 'required|array',
-            'household_ids.*'     => 'exists:household_requests,id',
+            'household_ids.*'     => 'exists:households,id',
         ]);
 
         $barangayId = auth()->user()->barangay_id;
@@ -116,8 +116,10 @@ class EvacuationController extends Controller
         // Calculate total evacuee count by summing family sizes of all accumulated households
         $totalEvacueeCount = 0;
         if (!empty($allHouseholdIds)) {
-            $households = HouseholdRequest::whereIn('id', $allHouseholdIds)->get(['family_size']);
-            $totalEvacueeCount = $households->sum('family_size');
+            $households = Household::whereIn('id', $allHouseholdIds)->get();
+            $totalEvacueeCount = $households->sum(function($household) {
+                return $household->total_members; // Use the total_members attribute from the Household model
+            });
         }
 
         // Update scoring calculation without severity level

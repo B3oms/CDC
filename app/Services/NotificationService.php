@@ -4,11 +4,9 @@ namespace App\Services;
 
 use App\Models\Notification;
 use App\Models\User;
-use App\Models\Portal;
 use App\Models\Barangay;
-use App\Models\Inventory;
+use App\Models\Item;
 use App\Models\Beneficiary;
-use App\Models\Event;
 use App\Models\LocationRequest;
 
 class NotificationService
@@ -46,15 +44,17 @@ class NotificationService
         $barangay = Barangay::find($barangayId);
         if (!$barangay) return;
 
-        // Notify admin users
-        $adminUsers = User::where('role_id', 1)->get();
-        
-        foreach ($adminUsers as $admin) {
+        // Notify admin and staff users
+        $usersToNotify = User::whereHas('role', function ($q) {
+            $q->whereIn('name', ['Admin', 'Staff']);
+        })->get();
+
+        foreach ($usersToNotify as $user) {
             Notification::createNotification(
-                $admin->id,
-                'barangay_report',
-                'New Report Submitted',
-                "A new report has been submitted from {$barangay->name}",
+                $user->id,
+                'recommendation_submitted',
+                'New Recommendation Submitted',
+                "A new beneficiary recommendation has been submitted from {$barangay->name}",
                 'barangay',
                 $barangay->id
             );
@@ -64,24 +64,26 @@ class NotificationService
     /**
      * Create notification when inventory is added
      */
-    public static function inventoryAdded($inventoryId, $addedByUserId): void
+    public static function inventoryAdded($itemId, $addedByUserId): void
     {
-        $inventory = Inventory::find($inventoryId);
-        if (!$inventory) return;
+        $item = Item::find($itemId);
+        if (!$item) return;
 
         // Notify admin users
-        $adminUsers = User::where('role_id', 1)->get();
-        
+        $adminUsers = User::whereHas('role', function ($q) {
+            $q->where('name', 'Admin');
+        })->get();
+
         foreach ($adminUsers as $admin) {
-            if ($admin->id === $addedByUserId) continue; // Don't notify the user who added it
-            
+            if ($admin->id === $addedByUserId) continue;
+
             Notification::createNotification(
                 $admin->id,
                 'inventory_addition',
-                'New Inventory Added',
-                "New inventory '{$inventory->name}' has been added",
+                'New Item Added to Inventory',
+                "New item '{$item->name}' has been added to inventory",
                 'inventory',
-                $inventory->id
+                $item->id
             );
         }
     }
@@ -94,17 +96,21 @@ class NotificationService
         $beneficiary = Beneficiary::find($beneficiaryId);
         if (!$beneficiary) return;
 
+        $name = trim("{$beneficiary->first_name} {$beneficiary->last_name}");
+
         // Notify admin users
-        $adminUsers = User::where('role_id', 1)->get();
-        
+        $adminUsers = User::whereHas('role', function ($q) {
+            $q->where('name', 'Admin');
+        })->get();
+
         foreach ($adminUsers as $admin) {
-            if ($admin->id === $addedByUserId) continue; // Don't notify the user who added it
-            
+            if ($admin->id === $addedByUserId) continue;
+
             Notification::createNotification(
                 $admin->id,
                 'beneficiary_addition',
                 'New Beneficiary Added',
-                "New beneficiary '{$beneficiary->name}' has been added",
+                "New beneficiary '{$name}' has been added",
                 'beneficiary',
                 $beneficiary->id
             );
@@ -119,17 +125,19 @@ class NotificationService
         $event = \App\Models\ReliefEvent::find($eventId);
         if (!$event) return;
 
-        // Notify admin users
-        $adminUsers = User::where('role_id', 1)->get();
-        
-        foreach ($adminUsers as $admin) {
-            if ($admin->id === $createdByUserId) continue; // Don't notify the user who created it
-            
+        // Notify admin and staff users
+        $usersToNotify = User::whereHas('role', function ($q) {
+            $q->whereIn('name', ['Admin', 'Staff']);
+        })->get();
+
+        foreach ($usersToNotify as $user) {
+            if ($user->id === $createdByUserId) continue;
+
             Notification::createNotification(
-                $admin->id,
+                $user->id,
                 'event_creation',
-                'New Event Created',
-                "New event '{$event->name}' has been created",
+                'New Relief Event Created',
+                "Relief event '{$event->name}' has been created",
                 'event',
                 $event->id
             );

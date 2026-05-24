@@ -17,6 +17,7 @@ class Beneficiary extends Model
         'last_name',
         'suffix',
         'gender',
+        'age',
         'is_4ps_member',
         'birthdate',
         'contact_number',
@@ -34,6 +35,24 @@ class Beneficiary extends Model
         'is_indigenous',
         'is_pwd',
         'pwd_type',
+        // Family background fields
+        'mother_name',
+        'mother_age',
+        'mother_sex',
+        'mother_birthdate',
+        'father_name',
+        'father_age',
+        'father_sex',
+        'father_birthdate',
+        'spouse_name',
+        'spouse_age',
+        'spouse_sex',
+        'spouse_birthdate',
+        'spouse_occupation',
+        'children',
+        'status',
+        'rejection_date',
+        'scheduled_deletion_date',
     ];
 
     protected $casts = [
@@ -42,6 +61,9 @@ class Beneficiary extends Model
         'interviewed_at' => 'datetime',
         'is_indigenous'  => 'boolean',
         'is_pwd'         => 'boolean',
+        'children'       => 'array',
+        'rejection_date' => 'date',
+        'scheduled_deletion_date' => 'date',
     ];
 
     protected static function boot()

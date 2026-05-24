@@ -16,6 +16,53 @@
     letter-spacing: 0.05em;
     display: inline-block;
 }
+
+/* Scrollable Table */
+.table-card {
+    position: relative;
+}
+
+.table-responsive {
+    max-height: 70vh;
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.table-responsive table {
+    margin-bottom: 0;
+}
+
+.table-responsive thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #f8f9fa;
+}
+
+.table-responsive thead th {
+    border-bottom: 2px solid #e5e7eb;
+    background: #f8f9fa;
+}
+
+/* Custom scrollbar */
+.table-responsive::-webkit-scrollbar {
+    width: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
 </style>
 @endpush
 
@@ -47,7 +94,7 @@
 
             <div class="filter-group">
                 <label class="filter-label">Barangay</label>
-                <select name="barangay_id" id="barangay" class="filter-select" {{ request('municipality_id') ? '' : 'disabled' }}>
+                <select name="barangay_id" id="barangay" class="filter-select" onchange="document.getElementById('filterForm').submit()" {{ request('municipality_id') ? '' : 'disabled' }}>
                     <option value="">All Barangays</option>
                     @foreach($barangays as $b)
                         <option value="{{ $b->id }}" {{ request('barangay_id') == $b->id ? 'selected' : '' }}>{{ $b->name }}</option>
@@ -74,15 +121,7 @@
                 </select>
             </div>
 
-            <div class="filter-group">
-                <label class="filter-label">Status</label>
-                <select name="status" class="filter-select" onchange="document.getElementById('filterForm').submit()">
-                    <option value="">All</option>
-                    <option value="verified" {{ request('status') == 'verified' ? 'selected' : '' }}>Verified</option>
-                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                </select>
-            </div>
-
+            
             <div class="filter-actions">
                 <x-pdf-export-dropdown align="left" export-onclick="exportPdf()" />
                 <a href="{{ route('staff.beneficiaries.index') }}" class="btn-filter-reset">

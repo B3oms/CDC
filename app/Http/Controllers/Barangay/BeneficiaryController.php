@@ -10,16 +10,10 @@ class BeneficiaryController extends Controller
 {
     public function index(Request $request)
     {
-        // Get beneficiaries for the logged-in user's barangay only
+        // Get beneficiaries for the logged-in user's barangay only, excluding rejected ones
         $query = Beneficiary::where('barangay_id', auth()->user()->barangay_id)
+            ->where('status', '!=', 'rejected') // Exclude rejected beneficiaries
             ->with('barangay');
-
-        // Filter by verification status
-        if ($request->status === 'verified') {
-            $query->where('is_verified', 1);
-        } elseif ($request->status === 'pending') {
-            $query->where('is_verified', 0);
-        }
 
         // Filter by gender
         if ($request->gender) {
@@ -31,21 +25,21 @@ class BeneficiaryController extends Controller
             $query->where('is_4ps_member', $request->is_4ps_member);
         }
 
-        // Filter by vulnerability level
+        // Filter by vulnerability level (only for verified beneficiaries)
         if ($request->vulnerability_level) {
             $query->where('vulnerability_level', $request->vulnerability_level);
         }
 
         $beneficiaries = $query->latest()->paginate(20);
 
-        // Get statistics for the barangay
+        // Get statistics for the barangay (excluding rejected beneficiaries)
         $stats = [
-            'total' => Beneficiary::where('barangay_id', auth()->user()->barangay_id)->count(),
-            'verified' => Beneficiary::where('barangay_id', auth()->user()->barangay_id)->where('is_verified', 1)->count(),
-            'pending' => Beneficiary::where('barangay_id', auth()->user()->barangay_id)->where('is_verified', 0)->count(),
-            'high_vulnerability' => Beneficiary::where('barangay_id', auth()->user()->barangay_id)->where('vulnerability_level', 'High')->where('is_verified', 1)->count(),
-            'medium_vulnerability' => Beneficiary::where('barangay_id', auth()->user()->barangay_id)->where('vulnerability_level', 'Medium')->where('is_verified', 1)->count(),
-            'low_vulnerability' => Beneficiary::where('barangay_id', auth()->user()->barangay_id)->where('vulnerability_level', 'Low')->where('is_verified', 1)->count(),
+            'total' => Beneficiary::where('barangay_id', auth()->user()->barangay_id)->where('status', '!=', 'rejected')->count(),
+            'verified' => Beneficiary::where('barangay_id', auth()->user()->barangay_id)->where('status', 'verified')->count(),
+            'pending' => Beneficiary::where('barangay_id', auth()->user()->barangay_id)->where('status', 'pending')->count(),
+            'high_vulnerability' => Beneficiary::where('barangay_id', auth()->user()->barangay_id)->where('vulnerability_level', 'High')->where('status', 'verified')->count(),
+            'medium_vulnerability' => Beneficiary::where('barangay_id', auth()->user()->barangay_id)->where('vulnerability_level', 'Medium')->where('status', 'verified')->count(),
+            'low_vulnerability' => Beneficiary::where('barangay_id', auth()->user()->barangay_id)->where('vulnerability_level', 'Low')->where('status', 'verified')->count(),
         ];
 
         return view('barangay.beneficiaries.index', compact('beneficiaries', 'stats'));
@@ -53,8 +47,9 @@ class BeneficiaryController extends Controller
 
     public function show($id)
     {
-        // Only allow viewing beneficiaries from the same barangay
+        // Only allow viewing beneficiaries from the same barangay, excluding rejected ones
         $beneficiary = Beneficiary::where('barangay_id', auth()->user()->barangay_id)
+            ->where('status', '!=', 'rejected') // Exclude rejected beneficiaries
             ->with([
                 'barangay', 
                 'interviewer',

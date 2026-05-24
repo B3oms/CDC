@@ -100,39 +100,42 @@
         .summary-section {
             margin-top: 30px;
             padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #1a3d1f;
+            background-color: #f0f7f0;
+            border: 1px solid #c9d7c9;
+            border-top: 3px solid #1a3d1f;
         }
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-        }
+        .summary-grid-table { width: 100%; border-collapse: collapse; }
+        .summary-grid-table td { padding: 5px; vertical-align: top; }
         .summary-item {
             text-align: center;
-            padding: 10px;
-            background-color: #fff;
-            border-radius: 5px;
-            border: 1px solid #ddd;
+            padding: 10px 8px;
+            background-color: white;
+            border: 1px solid #d1d5db;
         }
         .summary-number {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
             color: #1a3d1f;
         }
         .summary-label {
-            font-size: 11px;
-            color: #666;
-            margin-top: 5px;
+            font-size: 9px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-top: 4px;
         }
+        .top-bar { background-color: #1a3d1f; height: 5px; margin-bottom: 16px; }
+        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #dee2e6; }
+        .org-name { font-size: 9px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+        .report-badge { background-color: #1a3d1f; color: white; padding: 5px 12px; font-size: 9px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .summary-grid-table { width: 100%; border-collapse: collapse; }
         .footer {
             margin-top: 30px;
             text-align: center;
-            color: #666;
-            font-size: 10px;
-            border-top: 1px solid #ddd;
-            padding-top: 15px;
+            color: #9ca3af;
+            font-size: 9px;
+            border-top: 2px solid #dee2e6;
+            padding-top: 10px;
         }
         .no-data {
             text-align: center;
@@ -144,11 +147,19 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>INVENTORY REPORT</h1>
-        <p>SPUP-CDC Disaster Response System</p>
-        <p>Generated: {{ $generated_date }}</p>
-    </div>
+    <div class="top-bar"></div>
+    <table class="header-table">
+        <tr>
+            <td style="vertical-align: middle;">
+                <div class="org-name">SPUP-CDC Disaster Response System</div>
+                <div style="font-size: 20px; font-weight: bold; color: #1a3d1f;">INVENTORY REPORT</div>
+                <div style="font-size: 10px; color: #9ca3af; margin-top: 3px;">Generated: {{ $generated_date }}</div>
+            </td>
+            <td style="text-align: right; vertical-align: top;">
+                <span class="report-badge">Official Report</span>
+            </td>
+        </tr>
+    </table>
 
     @foreach($categories as $category)
     <div class="category-section">
@@ -208,38 +219,24 @@
     @endforeach
 
     <div class="summary-section">
-        <h3>Inventory Summary</h3>
-        <div class="summary-grid">
-            <div class="summary-item">
-                <div class="summary-number">{{ $totalCategories }}</div>
-                <div class="summary-label">Total Categories</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-number">{{ $totalSubcategories }}</div>
-                <div class="summary-label">Total Subcategories</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-number">{{ $totalItems }}</div>
-                <div class="summary-label">Total Items</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-number">{{ $lowStockItems }}</div>
-                <div class="summary-label">Low Stock Items</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-number">{{ $expiringItems }}</div>
-                <div class="summary-label">Expiring Items (30 days)</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-number">{{ $totalQuantity }}</div>
-                <div class="summary-label">Total Quantity</div>
-            </div>
-        </div>
+        <div style="font-size: 12px; font-weight: bold; color: #1a3d1f; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.3px;">Inventory Summary</div>
+        <table class="summary-grid-table">
+            <tr>
+                <td style="width: 33%;"><div class="summary-item"><div class="summary-number">{{ $totalCategories }}</div><div class="summary-label">Total Categories</div></div></td>
+                <td style="width: 33%;"><div class="summary-item"><div class="summary-number">{{ $totalSubcategories }}</div><div class="summary-label">Total Subcategories</div></div></td>
+                <td style="width: 33%;"><div class="summary-item"><div class="summary-number">{{ $totalItems }}</div><div class="summary-label">Total Items</div></div></td>
+            </tr>
+            <tr>
+                <td><div class="summary-item"><div class="summary-number" style="color: #dc2626;">{{ $lowStockItems }}</div><div class="summary-label">Low Stock Items</div></div></td>
+                <td><div class="summary-item"><div class="summary-number" style="color: #d97706;">{{ $expiringItems }}</div><div class="summary-label">Expiring Items (30 days)</div></div></td>
+                <td><div class="summary-item"><div class="summary-number">{{ $totalQuantity }}</div><div class="summary-label">Total Quantity</div></div></td>
+            </tr>
+        </table>
     </div>
 
     <div class="footer">
-        <p>This report was generated automatically by the SPUP-CDC Disaster Response System</p>
-        <p>For questions or concerns, please contact the CDC office</p>
+        <strong style="color: #6b7280; font-size: 10px;">SPUP-CDC Disaster Response System</strong><br>
+        This is a system-generated document &bull; {{ $generated_date }}
     </div>
 </body>
 </html>
