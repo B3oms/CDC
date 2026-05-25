@@ -123,13 +123,11 @@ class LocationRequestController extends Controller
         }
     }
 
-    public function reject(Request $request, LocationRequest $locationRequest)
+    public function reject(Request $request, $id)
     {
-        if (!$locationRequest->canBeRejected()) {
-            return back()->with('error', 'This request cannot be rejected.');
-        }
-
         try {
+            $locationRequest = LocationRequest::findOrFail($id);
+
             DB::beginTransaction();
 
             // Update request status
@@ -139,8 +137,12 @@ class LocationRequestController extends Controller
                 'rejection_reason' => $request->input('rejection_reason'),
             ]);
 
-            // Trigger notification for rejection
-            NotificationService::locationRequestRejected($locationRequest->id, Auth::id(), $request->input('rejection_reason'));
+            // Trigger notification for rejection (optional - don't fail if notification fails)
+            try {
+                NotificationService::locationRequestRejected($locationRequest->id, Auth::id(), $request->input('rejection_reason'));
+            } catch (\Exception $notificationException) {
+                \Log::warning('Notification failed but rejection succeeded: ' . $notificationException->getMessage());
+            }
 
             DB::commit();
 
@@ -148,7 +150,8 @@ class LocationRequestController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Failed to reject location request. Please try again.');
+            \Log::error('Location request rejection failed: ' . $e->getMessage());
+            return back()->with('error', 'Failed to reject location request. Error: ' . $e->getMessage());
         }
     }
 
