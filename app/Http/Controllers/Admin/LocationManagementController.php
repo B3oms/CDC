@@ -425,6 +425,8 @@ class LocationManagementController extends Controller
     public function destroy($id)
     {
         try {
+            DB::beginTransaction();
+            
             $locationRequest = DB::table('location_requests')->where('id', $id)->first();
             
             if (!$locationRequest) {
@@ -434,12 +436,16 @@ class LocationManagementController extends Controller
             // Delete actual location record if approved
             if ($locationRequest->status === 'approved') {
                 if ($locationRequest->type === 'municipality') {
+                    // Delete by name and province to be more specific
                     DB::table('municipalities')
                         ->where('name', $locationRequest->name)
+                        ->where('province', $locationRequest->region ?? 'Unknown')
                         ->delete();
                 } elseif ($locationRequest->type === 'barangay') {
+                    // Delete by name and municipality_id to be more specific
                     DB::table('barangays')
                         ->where('name', $locationRequest->name)
+                        ->where('municipality_id', $locationRequest->municipality_id)
                         ->delete();
                 }
             }
@@ -447,11 +453,14 @@ class LocationManagementController extends Controller
             // Delete request
             DB::table('location_requests')->where('id', $id)->delete();
             
+            DB::commit();
             return redirect()->back()->with('success', 'Location deleted successfully!');
             
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Destroy error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Failed to delete location');
+            Log::error('Destroy error trace: ' . $e->getTraceAsString());
+            return redirect()->back()->with('error', 'Failed to delete location: ' . $e->getMessage());
         }
     }
     
