@@ -427,34 +427,63 @@ class LocationManagementController extends Controller
         try {
             DB::beginTransaction();
             
+            // First check if it's a location request
             $locationRequest = DB::table('location_requests')->where('id', $id)->first();
             
-            if (!$locationRequest) {
-                return redirect()->back()->with('error', 'Location not found');
-            }
-            
-            // Delete actual location record if approved
-            if ($locationRequest->status === 'approved') {
-                if ($locationRequest->type === 'municipality') {
-                    // Delete by name and province to be more specific
-                    DB::table('municipalities')
-                        ->where('name', $locationRequest->name)
-                        ->where('province', $locationRequest->region ?? 'Unknown')
-                        ->delete();
-                } elseif ($locationRequest->type === 'barangay') {
-                    // Delete by name and municipality_id to be more specific
-                    DB::table('barangays')
-                        ->where('name', $locationRequest->name)
-                        ->where('municipality_id', $locationRequest->municipality_id)
-                        ->delete();
+            if ($locationRequest) {
+                // Delete actual location record if approved
+                if ($locationRequest->status === 'approved') {
+                    if ($locationRequest->type === 'municipality') {
+                        // Delete by name and province to be more specific
+                        DB::table('municipalities')
+                            ->where('name', $locationRequest->name)
+                            ->where('province', $locationRequest->region ?? 'Unknown')
+                            ->delete();
+                    } elseif ($locationRequest->type === 'barangay') {
+                        // Delete by name and municipality_id to be more specific
+                        DB::table('barangays')
+                            ->where('name', $locationRequest->name)
+                            ->where('municipality_id', $locationRequest->municipality_id)
+                            ->delete();
+                    }
                 }
+                
+                // Delete request
+                DB::table('location_requests')->where('id', $id)->delete();
+                
+                DB::commit();
+                return redirect()->back()->with('success', 'Location request deleted successfully!');
             }
             
-            // Delete request
-            DB::table('location_requests')->where('id', $id)->delete();
+            // If not a location request, check if it's a direct municipality
+            $municipality = DB::table('municipalities')->where('id', $id)->first();
+            if ($municipality) {
+                // Check if municipality has barangays
+                $barangayCount = DB::table('barangays')->where('municipality_id', $id)->count();
+                if ($barangayCount > 0) {
+                    DB::rollBack();
+                    return redirect()->back()->with('error', 'Cannot delete municipality: It has ' . $barangayCount . ' barangay(s) assigned. Delete barangays first.');
+                }
+                
+                // Delete the municipality
+                DB::table('municipalities')->where('id', $id)->delete();
+                
+                DB::commit();
+                return redirect()->back()->with('success', 'Municipality deleted successfully!');
+            }
             
-            DB::commit();
-            return redirect()->back()->with('success', 'Location deleted successfully!');
+            // If not a municipality, check if it's a barangay
+            $barangay = DB::table('barangays')->where('id', $id)->first();
+            if ($barangay) {
+                // Delete the barangay
+                DB::table('barangays')->where('id', $id)->delete();
+                
+                DB::commit();
+                return redirect()->back()->with('success', 'Barangay deleted successfully!');
+            }
+            
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Location not found');
             
         } catch (\Exception $e) {
             DB::rollBack();
