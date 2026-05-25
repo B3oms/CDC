@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\RecommendedBeneficiary;
 use App\Models\Beneficiary;
 use App\Models\Barangay;
+use App\Models\Municipality;
 use Illuminate\Http\Request;
 
 class RecommendedController extends Controller
@@ -37,12 +38,14 @@ class RecommendedController extends Controller
     // Convert recommended to full beneficiary interview
     public function convert($id)
     {
-        $recommended = RecommendedBeneficiary::findOrFail($id);
-        $barangays   = Barangay::all();
+        $recommended    = RecommendedBeneficiary::findOrFail($id);
+        $barangays      = Barangay::all();
+        $municipalities = Municipality::with('barangays')->get();
 
         return view('staff.beneficiaries.create', [
-            'barangays'   => $barangays,
-            'prefill'     => $recommended,
+            'barangays'      => $barangays,
+            'municipalities' => $municipalities,
+            'prefill'        => $recommended,
         ]);
     }
 

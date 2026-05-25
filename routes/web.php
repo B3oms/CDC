@@ -107,6 +107,7 @@ Route::prefix('admin')->name('admin.')->middleware(['isAdmin'])->group(function 
     Route::post('staff/{id}/reset-password', [StaffController::class, 'resetPassword'])->name('staff.resetPassword');
     Route::post('staff/{id}/deactivate',     [StaffController::class, 'deactivate'])->name('staff.deactivate');
     Route::post('staff/{id}/activate',       [StaffController::class, 'activate'])->name('staff.activate');
+    Route::post('staff/{id}/update-status', [StaffController::class, 'updateStatus'])->name('staff.updateStatus');
 });
 
 // ──────────────────────────────────────────────────────────
