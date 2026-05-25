@@ -87,14 +87,14 @@ class DashboardController extends Controller
                     'color' => $n->color,
                     'unread'=> !$n->read,
                     'time'  => $n->created_at->diffForHumans(),
-                    'url'   => $this->resolveStaffUrl($n->type),
+                    'url'   => $this->resolveStaffUrl($n->type, $n->related_id),
                 ];
             }),
             'unread_count' => $unreadCount,
         ]);
     }
 
-    private function resolveStaffUrl(string $type): string
+    private function resolveStaffUrl(string $type, ?int $relatedId = null): string
     {
         try {
             return match($type) {
@@ -103,6 +103,10 @@ class DashboardController extends Controller
                 'recommendation_submitted'  => route('staff.recommended.index'),
                 'location_request_approved',
                 'location_request_rejected' => route('staff.location-requests.index'),
+                'calamity_created'          => $relatedId ? route('staff.calamities.show', $relatedId) : '#',
+                'inventory_updated',
+                'stock_low',
+                'expiry_soon'               => route('staff.inventory.index'),
                 default                     => '#',
             };
         } catch (\Exception $e) {

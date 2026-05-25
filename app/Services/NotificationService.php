@@ -98,16 +98,16 @@ class NotificationService
 
         $name = trim("{$beneficiary->first_name} {$beneficiary->last_name}");
 
-        // Notify admin users
-        $adminUsers = User::whereHas('role', function ($q) {
-            $q->where('name', 'Admin');
+        // Notify admin and staff users
+        $usersToNotify = User::whereHas('role', function ($q) {
+            $q->whereIn('name', ['Admin', 'Staff']);
         })->get();
 
-        foreach ($adminUsers as $admin) {
-            if ($admin->id === $addedByUserId) continue;
+        foreach ($usersToNotify as $user) {
+            if ($user->id === $addedByUserId) continue;
 
             Notification::createNotification(
-                $admin->id,
+                $user->id,
                 'beneficiary_addition',
                 'New Beneficiary Added',
                 "New beneficiary '{$name}' has been added",
@@ -122,7 +122,7 @@ class NotificationService
      */
     public static function eventCreated($eventId, $createdByUserId): void
     {
-        $event = \App\Models\ReliefEvent::find($eventId);
+        $event = \App\Models\ReliefEvent::with('eventBarangays')->find($eventId);
         if (!$event) return;
 
         // Notify admin and staff users
@@ -141,6 +141,28 @@ class NotificationService
                 'event',
                 $event->id
             );
+        }
+
+        // Notify barangay partner users whose barangay is included in this event
+        $barangayIds = $event->eventBarangays->pluck('barangay_id')->filter()->unique();
+
+        if ($barangayIds->isNotEmpty()) {
+            $barangayUsers = User::whereHas('role', function ($q) {
+                    $q->where('name', 'Barangay Partner');
+                })
+                ->whereIn('barangay_id', $barangayIds)
+                ->get();
+
+            foreach ($barangayUsers as $user) {
+                Notification::createNotification(
+                    $user->id,
+                    'event_creation',
+                    'Relief Event for Your Barangay',
+                    "Your barangay has been included in relief event '{$event->name}'",
+                    'event',
+                    $event->id
+                );
+            }
         }
     }
 
@@ -185,6 +207,181 @@ class NotificationService
             'location_request',
             $locationRequest->id
         );
+    }
+
+    /**
+     * Create notification when a recommendation is converted to a beneficiary
+     */
+    public static function recommendationConverted($recommendedId): void
+    {
+        $recommended = \App\Models\RecommendedBeneficiary::find($recommendedId);
+        if (!$recommended) return;
+
+        $name = trim("{$recommended->first_name} {$recommended->last_name}");
+
+        Notification::createNotification(
+            $recommended->submitted_by,
+            'recommendation_converted',
+            'Recommendation Accepted',
+            "Your recommended beneficiary '{$name}' has been accepted and verified.",
+            'recommended_beneficiary',
+            $recommended->id
+        );
+    }
+
+    /**
+     * Create notification when a recommendation is rejected
+     */
+    public static function recommendationRejected($recommendedId): void
+    {
+        $recommended = \App\Models\RecommendedBeneficiary::find($recommendedId);
+        if (!$recommended) return;
+
+        $name = trim("{$recommended->first_name} {$recommended->last_name}");
+
+        Notification::createNotification(
+            $recommended->submitted_by,
+            'recommendation_rejected',
+            'Recommendation Rejected',
+            "Your recommended beneficiary '{$name}' has been rejected.",
+            'recommended_beneficiary',
+            $recommended->id
+        );
+    }
+
+    /**
+     * Create notification when a calamity event is opened for specific barangays
+     */
+    public static function calamityOpened($calamityId, $createdByUserId): void
+    {
+        $calamity = \App\Models\Calamity::with('barangays')->find($calamityId);
+        if (!$calamity) return;
+
+        $barangayIds = $calamity->barangays->pluck('id')->filter()->unique();
+        if ($barangayIds->isEmpty()) return;
+
+        $barangayUsers = User::whereHas('role', function ($q) {
+                $q->where('name', 'Barangay Partner');
+            })
+            ->whereIn('barangay_id', $barangayIds)
+            ->get();
+
+        foreach ($barangayUsers as $user) {
+            Notification::createNotification(
+                $user->id,
+                'calamity_opened',
+                'Calamity Event in Your Barangay',
+                "A calamity event '{$calamity->name}' has been opened for your barangay.",
+                'calamity',
+                $calamity->id
+            );
+        }
+    }
+
+    /**
+     * Create notification when a calamity event is created
+     */
+    public static function calamityCreated($calamityId, $createdByUserId): void
+    {
+        $calamity = \App\Models\Calamity::find($calamityId);
+        if (!$calamity) return;
+
+        // Notify admin and other staff users
+        $usersToNotify = User::whereHas('role', function ($q) {
+                $q->whereIn('name', ['Admin', 'Staff']);
+            })
+            ->where('id', '!=', $createdByUserId)
+            ->get();
+
+        foreach ($usersToNotify as $user) {
+            Notification::createNotification(
+                $user->id,
+                'calamity_created',
+                'New Calamity Event Created',
+                "A new calamity event '{$calamity->name}' has been created.",
+                'calamity',
+                $calamity->id
+            );
+        }
+    }
+
+    /**
+     * Create notification when inventory is updated
+     */
+    public static function inventoryUpdated($itemId, $updatedByUserId): void
+    {
+        $item = Item::find($itemId);
+        if (!$item) return;
+
+        // Notify admin and other staff users
+        $usersToNotify = User::whereHas('role', function ($q) {
+                $q->whereIn('name', ['Admin', 'Staff']);
+            })
+            ->where('id', '!=', $updatedByUserId)
+            ->get();
+
+        foreach ($usersToNotify as $user) {
+            Notification::createNotification(
+                $user->id,
+                'inventory_updated',
+                'Inventory Updated',
+                "Inventory item '{$item->name}' has been updated.",
+                'inventory',
+                $item->id
+            );
+        }
+    }
+
+    /**
+     * Create notification when item is out of stock
+     */
+    public static function stockLow($itemId, $threshold = 10): void
+    {
+        $item = Item::find($itemId);
+        if (!$item) return;
+
+        // Notify admin and staff users
+        $usersToNotify = User::whereHas('role', function ($q) {
+                $q->whereIn('name', ['Admin', 'Staff']);
+            })
+            ->get();
+
+        foreach ($usersToNotify as $user) {
+            Notification::createNotification(
+                $user->id,
+                'stock_low',
+                'Item Out of Stock',
+                "Item '{$item->name}' is out of stock or below threshold.",
+                'inventory',
+                $item->id
+            );
+        }
+    }
+
+    /**
+     * Create notification when item is about to expire
+     */
+    public static function expirySoon($itemId, $daysLeft = 7): void
+    {
+        $item = Item::find($itemId);
+        if (!$item) return;
+
+        // Notify admin and staff users
+        $usersToNotify = User::whereHas('role', function ($q) {
+                $q->whereIn('name', ['Admin', 'Staff']);
+            })
+            ->get();
+
+        foreach ($usersToNotify as $user) {
+            Notification::createNotification(
+                $user->id,
+                'expiry_soon',
+                'Item Expiring Soon',
+                "Item '{$item->name}' expires in {$daysLeft} days.",
+                'inventory',
+                $item->id
+            );
+        }
     }
 
     /**

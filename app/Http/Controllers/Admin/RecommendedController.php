@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\RecommendedBeneficiary;
 use App\Models\Barangay;
 use App\Models\Municipality;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class RecommendedController extends Controller
@@ -54,7 +55,8 @@ class RecommendedController extends Controller
     {
         $recommended = RecommendedBeneficiary::findOrFail($id);
         $recommended->update(['status' => 'rejected']);
-        
+        NotificationService::recommendationRejected($recommended->id);
+
         return back()->with('success', 'Recommendation rejected successfully.');
     }
 
@@ -79,7 +81,8 @@ class RecommendedController extends Controller
         
         // Update recommendation status
         $recommended->update(['status' => 'converted']);
-        
+        NotificationService::recommendationConverted($recommended->id);
+
         return redirect()->route('admin.beneficiaries.show', $beneficiary->id)
             ->with('success', 'Recommendation converted to beneficiary successfully.');
     }

@@ -366,6 +366,15 @@ class BeneficiaryController extends Controller
             // Trigger notification for beneficiary addition
             NotificationService::beneficiaryAdded($beneficiary->id, auth()->id());
 
+            // If converted from a recommendation, mark it and notify the barangay partner
+            if ($request->recommended_id) {
+                $recommended = \App\Models\RecommendedBeneficiary::find($request->recommended_id);
+                if ($recommended) {
+                    $recommended->update(['status' => 'Converted']);
+                    NotificationService::recommendationConverted($recommended->id);
+                }
+            }
+
             $message = $status === 'verified'
                 ? 'Beneficiary verified and added successfully.'
                 : 'Beneficiary rejected for not meeting verification criteria. Record will be automatically deleted after 10 days.';

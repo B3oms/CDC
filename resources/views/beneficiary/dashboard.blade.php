@@ -67,7 +67,7 @@
     background: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 12px;
-    padding: 1.5rem;
+    padding: 1rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -78,20 +78,20 @@
 }
 
 .stat-icon {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     background: #1a6b2a;
     color: white;
-    border-radius: 12px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
-    margin-bottom: 1rem;
+    font-size: 18px;
+    margin-bottom: 0.75rem;
 }
 
 .stat-value {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: #1f2937;
     margin-bottom: 0.25rem;
@@ -99,7 +99,7 @@
 
 .stat-label {
     color: #6b7280;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     font-weight: 500;
 }
 
@@ -253,7 +253,7 @@
         </div>
         <div class="beneficiary-info">
             <div class="beneficiary-name">{{ $beneficiary->first_name }} {{ $beneficiary->last_name }}</div>
-            <div class="beneficiary-id">ID: {{ $beneficiary->user->unique_id ?? 'N/A' }}</div>
+            <div class="beneficiary-id">ID: {{ $beneficiary->unique_id ?? 'N/A' }}</div>
         </div>
     </div>
 

@@ -289,6 +289,21 @@ class InventoryController extends Controller
                 'quantity'        => $request->quantity,
                 'expiration_date' => $request->expiration_date,
             ]);
+
+            // Check for low stock (10 or less)
+            if ($request->quantity <= 10) {
+                NotificationService::stockLow($item->id);
+            }
+
+            // Check for expiring items (within 7 days)
+            if ($request->expiration_date) {
+                $expirationDate = \Carbon\Carbon::parse($request->expiration_date);
+                if ($expirationDate->diffInDays(now()) <= 7 && $expirationDate->isFuture()) {
+                    NotificationService::expirySoon($item->id, $expirationDate->diffInDays(now()));
+                }
+            }
+
+            NotificationService::inventoryUpdated($item->id, auth()->id());
         } else {
             Inventory::create([
                 'item_id'         => $item->id,

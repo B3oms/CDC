@@ -46,6 +46,10 @@ class NotificationController extends Controller
                 'recommendation_submitted'  => route('admin.recommended.index'),
                 'location_request_approved',
                 'location_request_rejected' => route('admin.location-requests.index'),
+                'calamity_created'          => $relatedId ? route('admin.calamity.show', $relatedId) : '#',
+                'inventory_updated',
+                'stock_low',
+                'expiry_soon'               => route('admin.inventory.index'),
                 default                     => '#',
             };
         } catch (\Exception $e) {

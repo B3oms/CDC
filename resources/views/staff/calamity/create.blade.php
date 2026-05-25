@@ -54,12 +54,6 @@
 </style>
 
 <div class="cr-wrap">
-  <div class="cr-top-header">
-    <div class="cr-header-left">
-      <h1>Add Calamity Event</h1>
-    </div>
-  </div>
-
   @if($errors->any())
     <div class="cr-error">
         <ul>@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
@@ -96,7 +90,7 @@
         <div class="cr-row cr-row-half" style="margin-bottom:0">
           <div class="cr-field">
             <label>Date occurred <span class="cr-req">*</span></label>
-            <input type="date" name="date_occurred" value="{{ old('date_occurred') }}" required>
+            <input type="date" name="date_occurred" value="{{ old('date_occurred') }}" placeholder="Select date" required>
           </div>
         </div>
       </div>

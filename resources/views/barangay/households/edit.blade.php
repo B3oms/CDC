@@ -27,7 +27,7 @@
                         <div class="form-group">
                             <label for="head_of_household">Name of Head of Household *</label>
                             <input type="text" id="head_of_household" name="head_of_household" 
-                                   class="form-control" required value="{{ old('head_of_household', $household->head_of_household) }}">
+                                   class="form-control" required value="{{ old('head_of_household', $household->head_of_household) }}" placeholder="Enter full name">
                             @error('head_of_household')
                                 <span class="error-message">{{ $message }}</span>
                             @enderror
@@ -36,7 +36,7 @@
                         <div class="form-group">
                             <label for="age">Age *</label>
                             <input type="number" id="age" name="age" 
-                                   class="form-control" required min="1" max="120" value="{{ old('age', $household->age) }}">
+                                   class="form-control" required min="1" max="120" value="{{ old('age', $household->age) }}" placeholder="Enter age">
                             @error('age')
                                 <span class="error-message">{{ $message }}</span>
                             @enderror
@@ -59,7 +59,7 @@
                         <div class="form-group">
                             <label for="birthdate">Birthdate *</label>
                             <input type="date" id="birthdate" name="birthdate" 
-                                   class="form-control" required value="{{ old('birthdate', $household->birthdate->format('Y-m-d')) }}">
+                                   class="form-control" required value="{{ old('birthdate', $household->birthdate->format('Y-m-d')) }}" placeholder="Select birthdate">
                             @error('birthdate')
                                 <span class="error-message">{{ $message }}</span>
                             @enderror
@@ -72,7 +72,7 @@
                             <input type="tel" id="contact_number" name="contact_number" 
                                    class="form-control" value="{{ old('contact_number', $household->contact_number) }}"
                                    placeholder="09XXXXXXXXX" maxlength="11"
-                                   pattern="[0-9]{11}" title="Contact number must be exactly 11 digits">
+                                   pattern="[0-9]{11}">
                             @error('contact_number')
                                 <span class="error-message">{{ $message }}</span>
                             @enderror
@@ -97,7 +97,7 @@
                     <div class="form-group">
                         <label for="address">Address *</label>
                         <textarea id="address" name="address" class="form-control" 
-                                  rows="3" required>{{ old('address', $household->address) }}</textarea>
+                                  rows="3" required placeholder="Enter full address">{{ old('address', $household->address) }}</textarea>
                         @error('address')
                             <span class="error-message">{{ $message }}</span>
                         @enderror
@@ -118,12 +118,12 @@
                                     <div class="form-group">
                                         <label>Name *</label>
                                         <input type="text" name="members[{{ $index }}][name]" class="form-control" required
-                                               value="{{ old("members.$index.name", $member->name) }}">
+                                               value="{{ old("members.$index.name", $member->name) }}" placeholder="Enter name">
                                     </div>
                                     <div class="form-group">
                                         <label>Age *</label>
                                         <input type="number" name="members[{{ $index }}][age]" class="form-control" required min="1" max="120"
-                                               value="{{ old("members.$index.age", $member->age) }}">
+                                               value="{{ old("members.$index.age", $member->age) }}" placeholder="Enter age">
                                     </div>
                                 </div>
                                 <div class="form-row">
@@ -411,11 +411,11 @@ function addMember() {
         <div class="form-row">
             <div class="form-group">
                 <label>Name *</label>
-                <input type="text" name="members[${memberIndex}][name]" class="form-control" required>
+                <input type="text" name="members[${memberIndex}][name]" class="form-control" required placeholder="Enter name">
             </div>
             <div class="form-group">
                 <label>Age *</label>
-                <input type="number" name="members[${memberIndex}][age]" class="form-control" required min="1" max="120">
+                <input type="number" name="members[${memberIndex}][age]" class="form-control" required min="1" max="120" placeholder="Enter age">
             </div>
         </div>
         <div class="form-row">
@@ -498,7 +498,7 @@ document.addEventListener('DOMContentLoaded', function() {
         contactNumberInput.addEventListener('blur', function(e) {
             const value = e.target.value;
             if (value && value.length !== 11) {
-                e.target.setCustomValidity('Contact number must be exactly 11 digits');
+                e.target.setCustomValidity('');
             } else {
                 e.target.setCustomValidity('');
             }

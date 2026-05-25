@@ -11,6 +11,7 @@ use App\Models\Municipality;
 use App\Models\Barangay;
 use App\Models\Beneficiary;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -124,7 +125,7 @@ class ReliefMonitorController extends Controller
             'venue'           => 'required|string|max:255',
             'barangay_ids'    => 'required|array|min:1',
             'barangay_ids.*'  => 'exists:barangays,id',
-            'calamity_id'     => 'nullable|exists:calamities,id',
+            'calamity_type'   => 'nullable|string|max:100',
             'intensity'        => 'nullable|in:low,medium,high,critical',
             'facilitator_ids' => 'nullable|array',
             'facilitator_ids.*' => 'exists:users,id',
@@ -134,12 +135,13 @@ class ReliefMonitorController extends Controller
         ]);
 
         $event = ReliefEvent::create([
-            'name'        => $request->name,
-            'date'        => $request->date,
-            'venue'       => $request->venue,
-            'status'      => 'Upcoming',
-            'calamity_id' => $request->calamity_id ?? null,
-            'created_by'  => auth()->id(),
+            'name'          => $request->name,
+            'date'          => $request->date,
+            'venue'         => $request->venue,
+            'status'        => 'Upcoming',
+            'calamity_id'   => null,
+            'calamity_type' => $request->calamity_type ?? null,
+            'created_by'    => auth()->id(),
         ]);
 
         // Attach barangays and auto-pull verified beneficiaries
@@ -205,6 +207,8 @@ class ReliefMonitorController extends Controller
                 }
             }
         }
+
+        NotificationService::eventCreated($event->id, auth()->id());
 
         return redirect()->route('admin.relief.show', $event->id)
             ->with('success', 'Relief event created successfully.');

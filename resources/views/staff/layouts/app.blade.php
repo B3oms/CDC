@@ -166,6 +166,11 @@
                         <a href="{{ route('staff.relief.create') }}" class="quick-action-item">
                             <i class="fas fa-hand-holding-heart"></i> Relief Event
                         </a>
+                        @if(Route::has('calamities.create'))
+                        <a href="{{ route('calamities.create') }}" class="quick-action-item">
+                            <i class="fas fa-bolt"></i> Calamity Meter
+                        </a>
+                        @endif
                         <a href="#" class="quick-action-item" onclick="alert('Inventory management coming soon!')">
                             <i class="fas fa-box"></i> Inventory
                         </a>

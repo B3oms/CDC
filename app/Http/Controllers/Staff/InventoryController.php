@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\Item;
 use App\Models\Inventory;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use PDF;
@@ -240,6 +241,21 @@ class InventoryController extends Controller
                 'quantity' => $validated['quantity'],
                 'expiration_date' => $validated['expiration_date'] ?? null,
             ]);
+
+            // Check for low stock (10 or less)
+            if ($validated['quantity'] <= 10) {
+                NotificationService::stockLow($item->id);
+            }
+
+            // Check for expiring items (within 7 days)
+            if ($validated['expiration_date']) {
+                $expirationDate = \Carbon\Carbon::parse($validated['expiration_date']);
+                if ($expirationDate->diffInDays(now()) <= 7 && $expirationDate->isFuture()) {
+                    NotificationService::expirySoon($item->id, $expirationDate->diffInDays(now()));
+                }
+            }
+
+            NotificationService::inventoryUpdated($item->id, auth()->id());
         }
 
         return redirect()->route('staff.inventory.subcategory.show', $item->subcategory_id)

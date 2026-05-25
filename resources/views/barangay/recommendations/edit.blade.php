@@ -18,19 +18,19 @@
                 <h3>Personal Information</h3>
                 <div class="form-group">
                     <label>Full Name *</label>
-                    <input type="text" name="full_name" required value="{{ old('full_name', $recommendation->full_name) }}">
+                    <input type="text" name="full_name" required value="{{ old('full_name', $recommendation->full_name) }}" placeholder="Enter full name">
                 </div>
                 <div class="form-group">
                     <label>Contact Number</label>
-                    <input type="text" name="contact_number" value="{{ old('contact_number', $recommendation->contact_number) }}">
+                    <input type="text" name="contact_number" value="{{ old('contact_number', $recommendation->contact_number) }}" placeholder="09XXXXXXXXX">
                 </div>
                 <div class="form-group">
                     <label>Address *</label>
-                    <textarea name="address" required rows="3">{{ old('address', $recommendation->address) }}</textarea>
+                    <textarea name="address" required rows="3" placeholder="Enter full address">{{ old('address', $recommendation->address) }}</textarea>
                 </div>
                 <div class="form-group">
                     <label>Age *</label>
-                    <input type="number" name="age" required min="1" max="120" value="{{ old('age', $recommendation->age) }}">
+                    <input type="number" name="age" required min="1" max="120" value="{{ old('age', $recommendation->age) }}" placeholder="Enter age">
                 </div>
                 <div class="form-group">
                     <label>Gender *</label>
@@ -42,7 +42,7 @@
                 </div>
                 <div class="form-group">
                     <label>Family Size *</label>
-                    <input type="number" name="family_size" required min="1" value="{{ old('family_size', $recommendation->family_size) }}">
+                    <input type="number" name="family_size" required min="1" value="{{ old('family_size', $recommendation->family_size) }}" placeholder="Enter family size">
                 </div>
             </div>
 
@@ -50,7 +50,7 @@
                 <h3>Economic Information</h3>
                 <div class="form-group">
                     <label>Monthly Income *</label>
-                    <input type="number" name="monthly_income" required min="0" value="{{ old('monthly_income', $recommendation->monthly_income) }}">
+                    <input type="number" name="monthly_income" required min="0" value="{{ old('monthly_income', $recommendation->monthly_income) }}" placeholder="Enter monthly income">
                 </div>
                 <div class="form-group">
                     <label>Income Level *</label>
@@ -77,7 +77,7 @@
                 </div>
                 <div class="form-group">
                     <label>Children Count</label>
-                    <input type="number" name="children_count" min="0" value="{{ old('children_count', $recommendation->children_count) }}">
+                    <input type="number" name="children_count" min="0" value="{{ old('children_count', $recommendation->children_count) }}" placeholder="Enter number of children">
                 </div>
             </div>
         </div>

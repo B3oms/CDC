@@ -125,6 +125,7 @@
     <strong>Pre-filled from Recommendation:</strong>
     {{ $prefill->first_name }} {{ $prefill->last_name }} — {{ $prefill->barangay->name }}
 </div>
+<input type="hidden" name="recommended_id" value="{{ $recommended_id ?? $prefill->id }}">
 @endif
 
 <div class="form-card">
@@ -148,21 +149,21 @@
                 <div class="form-group">
                     <label>First Name</label>
                     <input type="text" name="first_name"
-                        value="{{ old('first_name', $prefill->first_name ?? '') }}" required
+                        value="{{ old('first_name', $prefill->first_name ?? '') }}" placeholder="Enter first name" required
                         oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
                         onkeypress="return (event.charCode >= 65 && event.charCode <= 90) || (event.charCode >= 97 && event.charCode <= 122) || event.charCode === 32">
                 </div>
                 <div class="form-group">
                     <label>Middle Name (Optional)</label>
                     <input type="text" name="middle_name"
-                        value="{{ old('middle_name', $prefill->middle_name ?? '') }}"
+                        value="{{ old('middle_name', $prefill->middle_name ?? '') }}" placeholder="Enter middle name"
                         oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
                         onkeypress="return (event.charCode >= 65 && event.charCode <= 90) || (event.charCode >= 97 && event.charCode <= 122) || event.charCode === 32">
                 </div>
                 <div class="form-group">
                     <label>Last Name</label>
                     <input type="text" name="last_name"
-                        value="{{ old('last_name', $prefill->last_name ?? '') }}" required
+                        value="{{ old('last_name', $prefill->last_name ?? '') }}" placeholder="Enter last name" required
                         oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
                         onkeypress="return (event.charCode >= 65 && event.charCode <= 90) || (event.charCode >= 97 && event.charCode <= 122) || event.charCode === 32">
                 </div>
@@ -195,7 +196,7 @@
                 </div>
                 <div class="form-group">
                     <label>Birthdate</label>
-                    <input type="date" name="birthdate" value="{{ old('birthdate') }}" required>
+                    <input type="date" name="birthdate" value="{{ old('birthdate') }}" placeholder="Select birthdate" required>
                 </div>
                 <div class="form-group">
                     <label>Contact Number</label>
@@ -204,7 +205,6 @@
                         placeholder="09XXXXXXXXX" maxlength="11" pattern="[0-9]{11}"
                         oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11)"
                         onkeypress="return event.charCode >= 48 && event.charCode <= 57">
-                    <small style="color: #666; font-size: 12px;">Must be exactly 11 digits (numbers only)</small>
                 </div>
                 <div class="form-group">
                     <label>Region</label>

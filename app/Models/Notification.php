@@ -104,6 +104,11 @@ class Notification extends Model
             'recommendation_submitted'  => 'fas fa-hand-point-up',
             'recommendation_converted'  => 'fas fa-user-check',
             'recommendation_rejected'   => 'fas fa-user-times',
+            'calamity_opened'           => 'fas fa-bolt',
+            'calamity_created'          => 'fas fa-bolt',
+            'inventory_updated'         => 'fas fa-boxes',
+            'stock_low'                 => 'fas fa-exclamation-circle',
+            'expiry_soon'               => 'fas fa-clock',
         ];
 
         return $icons[$this->type] ?? 'fas fa-bell';
@@ -125,6 +130,11 @@ class Notification extends Model
             'recommendation_submitted'  => '#f59e0b',
             'recommendation_converted'  => '#059669',
             'recommendation_rejected'   => '#dc2626',
+            'calamity_opened'           => '#ef4444',
+            'calamity_created'          => '#f59e0b',
+            'inventory_updated'         => '#3b82f6',
+            'stock_low'                 => '#ef4444',
+            'expiry_soon'               => '#f97316',
         ];
 
         return $colors[$this->type] ?? '#6b7280';

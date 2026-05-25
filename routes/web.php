@@ -24,6 +24,7 @@ use App\Http\Controllers\Staff\LocationRequestController as StaffLocationRequest
 use App\Http\Controllers\Staff\CalamityController as StaffCalamityController;
 use App\Http\Controllers\Barangay\BeneficiaryController as BarangayBeneficiaryController;
 use App\Http\Controllers\Barangay\HouseholdController as BarangayHouseholdController;
+use App\Http\Controllers\Barangay\ReliefEventController as BarangayReliefEventController;
 use App\Http\Controllers\Barangay\ProfileController as BarangayProfileController;
 use App\Http\Controllers\Beneficiary\DashboardController as BeneficiaryDashboardController;
 
@@ -318,6 +319,9 @@ Route::prefix('barangay')->name('barangay.')->middleware(['isBarangay'])->group(
     Route::get('profile/edit',                 [BarangayProfileController::class, 'edit'])->name('profile.edit');
     Route::put('profile',                     [BarangayProfileController::class, 'update'])->name('profile.update');
     Route::put('profile/password',             [BarangayProfileController::class, 'updatePassword'])->name('profile.updatePassword');
+
+    // Relief Events (read-only, scoped to their barangay)
+    Route::get('relief-events', [BarangayReliefEventController::class, 'index'])->name('relief-events.index');
 
     // Notifications
     Route::get('notifications',               [BarangayNotificationController::class, 'index'])->name('notifications.index');

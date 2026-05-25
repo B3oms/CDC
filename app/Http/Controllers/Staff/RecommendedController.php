@@ -7,6 +7,7 @@ use App\Models\RecommendedBeneficiary;
 use App\Models\Beneficiary;
 use App\Models\Barangay;
 use App\Models\Municipality;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class RecommendedController extends Controller
@@ -46,6 +47,7 @@ class RecommendedController extends Controller
             'barangays'      => $barangays,
             'municipalities' => $municipalities,
             'prefill'        => $recommended,
+            'recommended_id' => $recommended->id,
         ]);
     }
 
@@ -56,6 +58,7 @@ class RecommendedController extends Controller
             'status' => 'Rejected',
             'updated_at' => now() // Update the timestamp to track when rejection happened
         ]);
+        NotificationService::recommendationRejected($recommended->id);
 
         return back()->with('success', 'Recommendation rejected. Will be removed from list after 10 days.');
     }

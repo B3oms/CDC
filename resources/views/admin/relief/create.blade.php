@@ -189,20 +189,15 @@
         <div class="cr-row cr-row-half" style="margin-bottom:0">
           <div class="cr-field">
             <label>Calamity type</label>
-            <select name="calamity_id">
-              <option value="">Select type</option>
-              @if(isset($calamities))
-                <optgroup label="Natural Calamities">
-                  @foreach($calamities->where('type', 'natural') as $calamity)
-                  <option value="{{ $calamity->id }}" {{ old('calamity_id')==$calamity->id?'selected':'' }}>{{ $calamity->name }}</option>
-                  @endforeach
-                </optgroup>
-                <optgroup label="Human-Made Calamities">
-                  @foreach($calamities->where('type', 'human_made') as $calamity)
-                  <option value="{{ $calamity->id }}" {{ old('calamity_id')==$calamity->id?'selected':'' }}>{{ $calamity->name }}</option>
-                  @endforeach
-                </optgroup>
-              @endif
+            <select name="calamity_type">
+              <option value="">None / Not applicable</option>
+              <option value="Typhoon"            {{ old('calamity_type') == 'Typhoon'            ? 'selected' : '' }}>Typhoon</option>
+              <option value="Flood"              {{ old('calamity_type') == 'Flood'              ? 'selected' : '' }}>Flood</option>
+              <option value="Earthquake"         {{ old('calamity_type') == 'Earthquake'         ? 'selected' : '' }}>Earthquake</option>
+              <option value="Landslide"          {{ old('calamity_type') == 'Landslide'          ? 'selected' : '' }}>Landslide</option>
+              <option value="Volcanic Eruption"  {{ old('calamity_type') == 'Volcanic Eruption'  ? 'selected' : '' }}>Volcanic Eruption</option>
+              <option value="Fire"               {{ old('calamity_type') == 'Fire'               ? 'selected' : '' }}>Fire</option>
+              <option value="Industrial Accident" {{ old('calamity_type') == 'Industrial Accident' ? 'selected' : '' }}>Industrial Accident</option>
             </select>
           </div>
         </div>

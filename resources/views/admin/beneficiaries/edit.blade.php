@@ -278,21 +278,21 @@
                 <div class="form-group">
                     <label>First Name</label>
                     <input type="text" name="first_name"
-                        value="{{ old('first_name', $beneficiary->first_name) }}" required
+                        value="{{ old('first_name', $beneficiary->first_name) }}" placeholder="Enter first name" required
                         oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
                         onkeypress="return (event.charCode >= 65 && event.charCode <= 90) || (event.charCode >= 97 && event.charCode <= 122) || event.charCode === 32">
                 </div>
                 <div class="form-group">
                     <label>Middle Name (Optional)</label>
                     <input type="text" name="middle_name"
-                        value="{{ old('middle_name', $beneficiary->middle_name) }}"
+                        value="{{ old('middle_name', $beneficiary->middle_name) }}" placeholder="Enter middle name"
                         oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
                         onkeypress="return (event.charCode >= 65 && event.charCode <= 90) || (event.charCode >= 97 && event.charCode <= 122) || event.charCode === 32">
                 </div>
                 <div class="form-group">
                     <label>Last Name</label>
                     <input type="text" name="last_name"
-                        value="{{ old('last_name', $beneficiary->last_name) }}" required
+                        value="{{ old('last_name', $beneficiary->last_name) }}" placeholder="Enter last name" required
                         oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
                         onkeypress="return (event.charCode >= 65 && event.charCode <= 90) || (event.charCode >= 97 && event.charCode <= 122) || event.charCode === 32">
                 </div>
@@ -319,7 +319,7 @@
                 <div class="form-group">
                     <label>Birthdate</label>
                     <input type="date" name="birthdate"
-                        value="{{ old('birthdate', $beneficiary->birthdate) }}" required>
+                        value="{{ old('birthdate', $beneficiary->birthdate) }}" placeholder="Select birthdate" required>
                 </div>
             </div>
         </div>
@@ -400,7 +400,7 @@
                     <div class="form-group">
                         <label>Mother's Birthdate</label>
                         <input type="date" name="mother_birthdate" value="{{ old('mother_birthdate', $beneficiary->mother_birthdate) }}" 
-                               max="{{ now()->format('Y-m-d') }}">
+                               max="{{ now()->format('Y-m-d') }}" placeholder="Select birthdate">
                     </div>
                 </div>
             </div>
@@ -432,7 +432,7 @@
                     <div class="form-group">
                         <label>Father's Birthdate</label>
                         <input type="date" name="father_birthdate" value="{{ old('father_birthdate', $beneficiary->father_birthdate) }}" 
-                               max="{{ now()->format('Y-m-d') }}">
+                               max="{{ now()->format('Y-m-d') }}" placeholder="Select birthdate">
                     </div>
                 </div>
             </div>
@@ -464,7 +464,7 @@
                     <div class="form-group">
                         <label>Spouse's Birthdate</label>
                         <input type="date" name="spouse_birthdate" value="{{ old('spouse_birthdate', $beneficiary->spouse_birthdate) }}" 
-                               max="{{ now()->format('Y-m-d') }}">
+                               max="{{ now()->format('Y-m-d') }}" placeholder="Select birthdate">
                     </div>
                     <div class="form-group">
                         <label>Spouse's Occupation</label>
@@ -495,19 +495,19 @@
                 <div class="form-group">
                     <label>Family Size</label>
                     <input type="number" name="family_size"
-                        value="{{ old('family_size', $beneficiary->family_size) }}" required
+                        value="{{ old('family_size', $beneficiary->family_size) }}" placeholder="Enter family size" required
                         min="1" max="20">
                 </div>
                 <div class="form-group">
                     <label>Number of Children (0-17 years)</label>
                     <input type="number" name="children_count"
-                        value="{{ old('children_count', $beneficiary->children_count) }}" required
+                        value="{{ old('children_count', $beneficiary->children_count) }}" placeholder="Enter number of children" required
                         min="0" max="20">
                 </div>
                 <div class="form-group">
                     <label>Monthly Income</label>
                     <input type="number" name="monthly_income"
-                        value="{{ old('monthly_income', $beneficiary->monthly_income) }}" required
+                        value="{{ old('monthly_income', $beneficiary->monthly_income) }}" placeholder="Enter monthly income" required
                         min="0" step="100">
                 </div>
                 <div class="form-group">
@@ -623,7 +623,7 @@ function addChild(name = '', age = '', sex = '', birthdate = '') {
             </div>
             <div class="form-group">
                 <label>Child's Birthdate</label>
-                <input type="date" name="children[${childCount}][birthdate]" value="${birthdate}" max="{{ now()->format('Y-m-d') }}">
+                <input type="date" name="children[${childCount}][birthdate]" value="${birthdate}" max="{{ now()->format('Y-m-d') }}" placeholder="Select birthdate">
             </div>
         </div>
     `;

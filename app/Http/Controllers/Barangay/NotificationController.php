@@ -10,10 +10,25 @@ use Illuminate\Http\JsonResponse;
 
 class NotificationController extends Controller
 {
+    private const BARANGAY_TYPES = [
+        'recommendation_converted',
+        'recommendation_rejected',
+        'event_creation',
+        'calamity_opened',
+    ];
+
     public function index(Request $request): JsonResponse
     {
-        $notifications = NotificationService::getRecentNotifications(auth()->id(), 10);
-        $unreadCount   = NotificationService::getUnreadCount(auth()->id());
+        $notifications = \App\Models\Notification::where('user_id', auth()->id())
+            ->whereIn('type', self::BARANGAY_TYPES)
+            ->latest()
+            ->limit(10)
+            ->get();
+
+        $unreadCount = \App\Models\Notification::where('user_id', auth()->id())
+            ->whereIn('type', self::BARANGAY_TYPES)
+            ->where('read', false)
+            ->count();
 
         return response()->json([
             'notifications' => $notifications->map(function ($notification) {
@@ -40,7 +55,8 @@ class NotificationController extends Controller
                 'recommendation_submitted',
                 'recommendation_converted',
                 'recommendation_rejected'   => route('barangay.recommendations.index'),
-                'event_creation'            => route('barangay.dashboard'),
+                'event_creation'            => route('barangay.relief-events.index'),
+                'calamity_opened'           => route('barangay.dashboard'),
                 default                     => '#',
             };
         } catch (\Exception $e) {
@@ -55,15 +71,23 @@ class NotificationController extends Controller
 
         $notification->markAsRead();
 
+        $unreadCount = Notification::where('user_id', auth()->id())
+            ->whereIn('type', self::BARANGAY_TYPES)
+            ->where('read', false)
+            ->count();
+
         return response()->json([
             'success'      => true,
-            'unread_count' => NotificationService::getUnreadCount(auth()->id()),
+            'unread_count' => $unreadCount,
         ]);
     }
 
     public function markAllAsRead(): JsonResponse
     {
-        NotificationService::markAllAsRead(auth()->id());
+        Notification::where('user_id', auth()->id())
+            ->whereIn('type', self::BARANGAY_TYPES)
+            ->where('read', false)
+            ->update(['read' => true]);
 
         return response()->json(['success' => true, 'unread_count' => 0]);
     }

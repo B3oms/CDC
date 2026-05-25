@@ -42,8 +42,8 @@
                 <tr><td class="label">Date</td><td>{{ is_string($event->date) ? date('M d, Y', strtotime($event->date)) : \Carbon\Carbon::parse($event->date)->format('M d, Y') }}</td></tr>
                 <tr><td class="label">Venue</td><td>{{ $event->venue }}</td></tr>
                 <tr><td class="label">Status</td><td><span class="relief-status-badge {{ strtolower($event->status) }}">{{ $event->status }}</span></td></tr>
-                @if($event->calamity)
-                <tr><td class="label">Calamity</td><td>{{ $event->calamity->name }}</td></tr>
+                @if($event->calamity_type)
+                <tr><td class="label">Calamity Type</td><td>{{ $event->calamity_type }}</td></tr>
                 @endif
             </table>
         </div>

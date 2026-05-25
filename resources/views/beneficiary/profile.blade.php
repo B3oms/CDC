@@ -244,7 +244,7 @@
             <div class="info-group">
                 <div class="info-label">Beneficiary ID</div>
                 <div class="info-value">
-                    {{ $beneficiary->user->unique_id ?? 'N/A' }}
+                    {{ $beneficiary->unique_id ?? 'N/A' }}
                 </div>
             </div>
 

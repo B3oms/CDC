@@ -10,6 +10,7 @@ use App\Models\Municipality;
 use App\Models\EvacuationCenter;
 use App\Models\EvacuationReport;
 use App\Models\Household;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -82,6 +83,9 @@ class CalamityController extends Controller
                 'barangay_id' => $barangayId,
             ]);
         }
+
+        NotificationService::calamityOpened($calamity->id, auth()->id());
+        NotificationService::calamityCreated($calamity->id, auth()->id());
 
         // Use staff route if user is staff, otherwise use admin route
         $route = auth()->user()->role->name === 'Staff' ? 'staff.calamities.show' : 'admin.calamity.show';

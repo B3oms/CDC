@@ -61,7 +61,7 @@
                     <td data-label="#">{{ $recommended->firstItem() + $i }}</td>
                     <td data-label="Name">
                         <div class="name-cell">
-                            <strong>{{ $r->first_name }} {{ $r->last_name }}</strong>
+                            <strong>{{ $r->first_name }} {{ $r->middle_name ? $r->middle_name . ' ' : '' }}{{ $r->last_name }}{{ $r->suffix ? ', ' . $r->suffix : '' }}</strong>
                         </div>
                     </td>
                     <td data-label="Barangay">{{ $r->barangay->name }}</td>

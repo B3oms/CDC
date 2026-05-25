@@ -19,7 +19,7 @@
             <div class="form-group">
                 <label for="head_of_household">Name of Head of Household *</label>
                 <input type="text" id="head_of_household" name="head_of_household" 
-                       required value="{{ old('head_of_household') }}">
+                       required value="{{ old('head_of_household') }}" placeholder="Enter full name">
                 @error('head_of_household')
                     <span class="error-message">{{ $message }}</span>
                 @enderror
@@ -28,7 +28,7 @@
             <div class="form-group">
                 <label for="age">Age *</label>
                 <input type="number" id="age" name="age" 
-                       required min="1" max="120" value="{{ old('age') }}">
+                       required min="1" max="120" value="{{ old('age') }}" placeholder="Enter age">
                 @error('age')
                     <span class="error-message">{{ $message }}</span>
                 @enderror
@@ -51,7 +51,7 @@
             <div class="form-group">
                 <label for="birthdate">Birthdate *</label>
                 <input type="date" id="birthdate" name="birthdate" 
-                       required value="{{ old('birthdate') }}">
+                       required value="{{ old('birthdate') }}" placeholder="Select birthdate">
                 @error('birthdate')
                     <span class="error-message">{{ $message }}</span>
                 @enderror
@@ -64,7 +64,7 @@
                 <input type="tel" id="contact_number" name="contact_number" 
                        value="{{ old('contact_number') }}"
                        placeholder="09XXXXXXXXX" maxlength="11"
-                       pattern="[0-9]{11}" title="Contact number must be exactly 11 digits">
+                       pattern="[0-9]{11}">
                 @error('contact_number')
                     <span class="error-message">{{ $message }}</span>
                 @enderror
@@ -88,7 +88,7 @@
         <div class="form-group">
             <label for="address">Address *</label>
             <textarea id="address" name="address" 
-                      rows="3" required>{{ old('address') }}</textarea>
+                      rows="3" required placeholder="Enter full address">{{ old('address') }}</textarea>
             @error('address')
                 <span class="error-message">{{ $message }}</span>
             @enderror
@@ -107,11 +107,11 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Name *</label>
-                        <input type="text" name="members[0][name]" required>
+                        <input type="text" name="members[0][name]" required placeholder="Enter name">
                     </div>
                     <div class="form-group">
                         <label>Age *</label>
-                        <input type="number" name="members[0][age]" required min="1" max="120">
+                        <input type="number" name="members[0][age]" required min="1" max="120" placeholder="Enter age">
                     </div>
                 </div>
                 <div class="form-row">
@@ -485,7 +485,7 @@ document.addEventListener('DOMContentLoaded', function() {
         contactNumberInput.addEventListener('blur', function(e) {
             const value = e.target.value;
             if (value && value.length !== 11) {
-                e.target.setCustomValidity('Contact number must be exactly 11 digits');
+                e.target.setCustomValidity('');
             } else {
                 e.target.setCustomValidity('');
             }

@@ -163,17 +163,13 @@ class ReliefController extends Controller
     // Store relief event
     public function store(Request $request)
     {
-        if (in_array($request->calamity_id, ['natural', 'human_made'], true)) {
-            $request->merge(['calamity_id' => null]);
-        }
-
         $request->validate([
             'name'            => 'required|string|max:150',
             'date'            => 'required|date',
             'venue'           => 'required|string|max:255',
             'barangay_ids'    => 'required|array|min:1',
             'barangay_ids.*'  => 'exists:barangays,id',
-            'calamity_id'     => 'nullable|exists:calamities,id',
+            'calamity_type'   => 'nullable|string|max:100',
             'intensity'        => 'nullable|in:low,medium,high,critical',
             'facilitator_ids' => 'nullable|array',
             'facilitator_ids.*' => 'exists:users,id',
@@ -183,12 +179,13 @@ class ReliefController extends Controller
         ]);
 
         $event = ReliefEvent::create([
-            'name'        => $request->name,
-            'date'        => $request->date,
-            'venue'       => $request->venue,
-            'status'      => 'Upcoming',
-            'calamity_id' => $request->calamity_id ?? null,
-            'created_by'  => auth()->id(),
+            'name'          => $request->name,
+            'date'          => $request->date,
+            'venue'         => $request->venue,
+            'status'        => 'Upcoming',
+            'calamity_id'   => null,
+            'calamity_type' => $request->calamity_type ?? null,
+            'created_by'    => auth()->id(),
         ]);
 
         // Attach barangays and auto-pull verified beneficiaries

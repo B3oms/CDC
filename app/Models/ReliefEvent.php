@@ -14,6 +14,7 @@ class ReliefEvent extends Model
         'venue',
         'status',
         'calamity_id',
+        'calamity_type',
         'created_by',
     ];
 

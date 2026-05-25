@@ -42,6 +42,10 @@
                     class="{{ request()->routeIs('barangay.beneficiaries.*') ? 'active' : '' }}">
                     <i class="fas fa-users"></i> Beneficiaries
                 </a>
+                <a href="{{ route('barangay.relief-events.index') }}"
+                    class="{{ request()->routeIs('barangay.relief-events.*') ? 'active' : '' }}">
+                    <i class="fas fa-hands-helping"></i> Relief Events
+                </a>
 
             @elseif($role === 'Staff')
                 <a href="{{ route('staff.dashboard') }}"
@@ -167,9 +171,14 @@
                             <i class="fas fa-hand-holding-heart"></i> Relief Monitor
                         </a>
                         @endif
-                        @if(Route::has('admin.locations.create'))
-                        <a href="{{ route('admin.locations.create') }}" class="quick-action-item">
-                            <i class="fas fa-map-marker-alt"></i> Barangay Partner
+                        @if(Route::has('admin.calamity.create'))
+                        <a href="{{ route('admin.calamity.create') }}" class="quick-action-item">
+                            <i class="fas fa-bolt"></i> Calamity Meter
+                        </a>
+                        @endif
+                        @if(Route::has('admin.staff.create'))
+                        <a href="{{ route('admin.staff.create') }}" class="quick-action-item">
+                            <i class="fas fa-user-tie"></i> Staff
                         </a>
                         @endif
                         @if(Route::has('admin.inventory.category.create'))
@@ -214,7 +223,7 @@ function toggleNotifications() {
     const isOpen = dropdown.classList.contains('show');
     
     if (!isOpen) {
-        loadNotifications();
+        loadNotifications(false);
     }
     
     dropdown.classList.toggle('show');
@@ -235,25 +244,49 @@ function toggleNotifications() {
     $notifReadAllUrl= $notifRole === 'Barangay Partner' ? route('barangay.notifications.readAll') : route('admin.notifications.readAll');
 @endphp
 
-// Load real-time notifications
-function loadNotifications() {
+// Load notifications (shows spinner only when dropdown is open)
+function loadNotifications(silent = false) {
     const notificationList = document.getElementById('notificationList');
     
+    if (!silent) {
+        notificationList.innerHTML = `
+            <div class="notification-loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading notifications...</p>
+            </div>
+        `;
+    }
+
     fetch('{{ $notifIndexUrl }}')
         .then(response => response.json())
         .then(data => {
+            const prevCount = parseInt(document.getElementById('notificationBadge').textContent) || 0;
             updateNotificationBadge(data.unread_count);
-            displayNotifications(data.notifications);
+            if (!silent || document.getElementById('notificationDropdown').classList.contains('show')) {
+                displayNotifications(data.notifications);
+            }
+            if (silent && data.unread_count > prevCount) {
+                animateBell();
+            }
         })
         .catch(error => {
-            console.error('Error loading notifications:', error);
-            notificationList.innerHTML = `
-                <div class="notification-empty">
-                    <i class="fas fa-exclamation-triangle" style="color: #ef4444; font-size: 2rem; margin-bottom: 0.5rem;"></i>
-                    <p style="color: #ef4444; margin: 0;">Error loading notifications</p>
-                </div>
-            `;
+            if (!silent) {
+                console.error('Error loading notifications:', error);
+                notificationList.innerHTML = `
+                    <div class="notification-empty">
+                        <i class="fas fa-exclamation-triangle" style="color: #ef4444; font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                        <p style="color: #ef4444; margin: 0;">Error loading notifications</p>
+                    </div>
+                `;
+            }
         });
+}
+
+// Animate bell when new notification arrives
+function animateBell() {
+    const btn = document.querySelector('.notification-btn');
+    btn.classList.add('bell-ring');
+    setTimeout(() => btn.classList.remove('bell-ring'), 1000);
 }
 
 // Display notifications in the dropdown
@@ -352,12 +385,11 @@ function markAllNotificationsRead() {
     });
 }
 
-// Auto-refresh notifications every 30 seconds
-setInterval(() => {
-    if (!document.getElementById('notificationDropdown').classList.contains('show')) {
-        loadNotifications();
-    }
-}, 30000);
+// Load badge count immediately on page load
+document.addEventListener('DOMContentLoaded', () => loadNotifications(true));
+
+// Poll silently every 10 seconds
+setInterval(() => loadNotifications(true), 10000);
 
 
 // Toggle Quick Actions
@@ -399,6 +431,20 @@ document.querySelector('.mark-all-read')?.addEventListener('click', function() {
 .notification-loading p {
     margin: 0;
     font-size: 0.875rem;
+}
+
+@keyframes bell-ring {
+    0%   { transform: rotate(0);    }
+    15%  { transform: rotate(15deg); }
+    30%  { transform: rotate(-13deg); }
+    45%  { transform: rotate(11deg); }
+    60%  { transform: rotate(-9deg); }
+    75%  { transform: rotate(7deg); }
+    100% { transform: rotate(0);    }
+}
+.notification-btn.bell-ring i {
+    animation: bell-ring 0.6s ease;
+    display: inline-block;
 }
 
 /* Notification unread — uses design-system brand colors */
