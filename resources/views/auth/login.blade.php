@@ -45,7 +45,7 @@
                 <div class="login-subtitle">Select your role to continue</div>
             </div>
 
-            <form method="POST" action="{{ route('login.post') }}" id="loginForm">
+            <form method="POST" action="{{ route('login.post') }}" id="loginForm" onsubmit="return validateLoginForm()">
                 @csrf
                 <input type="hidden" name="user_role" id="user_role" required>
 
@@ -133,6 +133,38 @@
 </div>
 
 <script>
+function validateLoginForm() {
+    const userRole = document.getElementById('user_role').value;
+    
+    if (!userRole) {
+        alert('Please select a role to continue.');
+        return false;
+    }
+    
+    if (userRole === 'beneficiary') {
+        const uniqueId = document.getElementById('unique_id').value;
+        if (!uniqueId.trim()) {
+            alert('Please enter your Unique ID.');
+            return false;
+        }
+    } else {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        if (!email.trim()) {
+            alert('Please enter your email address.');
+            return false;
+        }
+        
+        if (!password.trim()) {
+            alert('Please enter your password.');
+            return false;
+        }
+    }
+    
+    return true;
+}
+
 function selectRole(role) {
     document.getElementById('user_role').value = role;
 

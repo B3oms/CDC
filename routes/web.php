@@ -31,8 +31,12 @@ use App\Http\Controllers\Beneficiary\DashboardController as BeneficiaryDashboard
 // Auth Routes
 // ──────────────────────────────────────────────────────────
 Route::get('/',        [LoginController::class, 'showLogin'])->name('login');
+Route::get('/login',   [LoginController::class, 'showLogin']);
 Route::post('/login',  [LoginController::class, 'login'])->name('login.post');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::get('/logout', function() {
+    return redirect('/')->with('error', 'Logout must be performed through the logout button in the application.');
+});
 Route::get('/admin/beneficiaries/pdf', [BeneficiaryController::class, 'downloadPDF'])
     ->name('admin.beneficiaries.pdf');
 // ──────────────────────────────────────────────────────────
@@ -326,9 +330,4 @@ Route::prefix('beneficiary')->name('beneficiary.')->middleware(['isBeneficiary']
     Route::get('dashboard',        [BeneficiaryDashboardController::class, 'index'])->name('dashboard');
     Route::get('profile',          [BeneficiaryDashboardController::class, 'profile'])->name('profile');
     Route::get('relief-history',   [BeneficiaryDashboardController::class, 'reliefHistory'])->name('relief-history');
-    
-    // Interview Form
-    Route::get('interview',        [Beneficiary\InterviewController::class, 'create'])->name('interview.create');
-    Route::post('interview',       [Beneficiary\InterviewController::class, 'store'])->name('interview.store');
-    Route::get('interview/show',   [Beneficiary\InterviewController::class, 'show'])->name('interview.show');
 });
