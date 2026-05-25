@@ -133,6 +133,10 @@ class LocationRequestController extends Controller
         try {
             $locationRequest = LocationRequest::findOrFail($id);
 
+            if (!$locationRequest->canBeRejected()) {
+                return back()->with('error', 'This request cannot be rejected. Current status: ' . $locationRequest->status);
+            }
+
             DB::beginTransaction();
 
             // Update request status

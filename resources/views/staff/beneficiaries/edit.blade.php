@@ -358,21 +358,17 @@
                     </div>
                     <div class="form-group">
                         <label>Mother's Age</label>
-                        <input type="number" name="mother_age" value="{{ old('mother_age', $beneficiary->mother_age) }}" 
+                        <input type="number" name="mother_age" value="{{ old('mother_age', $beneficiary->mother_age) }}"
                                min="1" max="120" placeholder="Enter age">
                     </div>
                     <div class="form-group">
-                        <label>Mother's Sex</label>
-                        <select name="mother_sex">
-                            <option value="">-- Select --</option>
-                            <option value="female" {{ old('mother_sex', $beneficiary->mother_sex) == 'female' ? 'selected' : '' }}>Female</option>
-                            <option value="male" {{ old('mother_sex', $beneficiary->mother_sex) == 'male' ? 'selected' : '' }}>Male</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
                         <label>Mother's Birthdate</label>
-                        <input type="date" name="mother_birthdate" value="{{ old('mother_birthdate', $beneficiary->mother_birthdate) }}" 
-                               max="{{ now()->format('Y-m-d') }}" placeholder="Select birthdate">
+                        <input type="date" name="mother_birthdate" value="{{ old('mother_birthdate', $beneficiary->mother_birthdate) }}"
+                               placeholder="Select birthdate">
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
+                        <input type="checkbox" name="mother_deceased" id="mother_deceased" {{ old('mother_deceased', $beneficiary->mother_deceased) ? 'checked' : '' }}>
+                        <label for="mother_deceased" style="margin: 0; cursor: pointer;">Deceased</label>
                     </div>
                 </div>
             </div>
@@ -390,21 +386,17 @@
                     </div>
                     <div class="form-group">
                         <label>Father's Age</label>
-                        <input type="number" name="father_age" value="{{ old('father_age', $beneficiary->father_age) }}" 
+                        <input type="number" name="father_age" value="{{ old('father_age', $beneficiary->father_age) }}"
                                min="1" max="120" placeholder="Enter age">
                     </div>
                     <div class="form-group">
-                        <label>Father's Sex</label>
-                        <select name="father_sex">
-                            <option value="">-- Select --</option>
-                            <option value="male" {{ old('father_sex', $beneficiary->father_sex) == 'male' ? 'selected' : '' }}>Male</option>
-                            <option value="female" {{ old('father_sex', $beneficiary->father_sex) == 'female' ? 'selected' : '' }}>Female</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
                         <label>Father's Birthdate</label>
-                        <input type="date" name="father_birthdate" value="{{ old('father_birthdate', $beneficiary->father_birthdate) }}" 
-                               max="{{ now()->format('Y-m-d') }}" placeholder="Select birthdate">
+                        <input type="date" name="father_birthdate" value="{{ old('father_birthdate', $beneficiary->father_birthdate) }}"
+                               placeholder="Select birthdate">
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
+                        <input type="checkbox" name="father_deceased" id="father_deceased" {{ old('father_deceased', $beneficiary->father_deceased) ? 'checked' : '' }}>
+                        <label for="father_deceased" style="margin: 0; cursor: pointer;">Deceased</label>
                     </div>
                 </div>
             </div>

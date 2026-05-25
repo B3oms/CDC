@@ -231,14 +231,19 @@ class LocationManagementController extends Controller
         $validated = $request->validate([
             'rejection_reason' => 'required|string|max:255'
         ]);
-        
+
         try {
             DB::beginTransaction();
-            
+
             $locationRequest = DB::table('location_requests')->where('id', $id)->first();
-            
+
             if (!$locationRequest) {
                 return redirect()->back()->with('error', 'Request not found');
+            }
+
+            // Check if request can be rejected (only pending requests)
+            if ($locationRequest->status !== 'pending') {
+                return redirect()->back()->with('error', 'This request cannot be rejected. Current status: ' . $locationRequest->status);
             }
             
             // Update request status
