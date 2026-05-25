@@ -350,6 +350,12 @@
                     <input type="date" name="birthdate"
                         value="{{ old('birthdate', $beneficiary->birthdate) }}" placeholder="Select birthdate" required>
                 </div>
+                <div class="form-group">
+                    <label>Occupation</label>
+                    <input type="text" name="occupation"
+                        value="{{ old('occupation', $beneficiary->occupation) }}"
+                        placeholder="Enter occupation">
+                </div>
             </div>
         </div>
 
@@ -402,70 +408,6 @@
         <div class="interview-section">
             <div class="interview-section-title">Family Background</div>
             
-            {{-- Mother Information --}}
-            <div class="family-member-card">
-                <div class="member-header">
-                    <h4>Mother Information</h4>
-                </div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Mother's Name</label>
-                        <input type="text" name="mother_name" value="{{ old('mother_name', $beneficiary->mother_name) }}" 
-                               placeholder="Enter mother's full name">
-                    </div>
-                    <div class="form-group">
-                        <label>Mother's Age</label>
-                        <input type="number" name="mother_age" value="{{ old('mother_age', $beneficiary->mother_age) }}"
-                               min="1" max="120" placeholder="Enter age">
-                    </div>
-                    <div class="form-group">
-                        <label>Mother's Birthdate</label>
-                        <input type="date" name="mother_birthdate" value="{{ old('mother_birthdate', $beneficiary->mother_birthdate) }}"
-                               placeholder="Select birthdate">
-                    </div>
-                    <div class="form-group">
-                        <div class="checkbox-wrapper">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="mother_deceased" id="mother_deceased" value="1" {{ old('mother_deceased', $beneficiary->mother_deceased) ? 'checked' : '' }}>
-                                <span class="checkbox-text">Deceased</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Father Information --}}
-            <div class="family-member-card">
-                <div class="member-header">
-                    <h4>Father Information</h4>
-                </div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Father's Name</label>
-                        <input type="text" name="father_name" value="{{ old('father_name', $beneficiary->father_name) }}" 
-                               placeholder="Enter father's full name">
-                    </div>
-                    <div class="form-group">
-                        <label>Father's Age</label>
-                        <input type="number" name="father_age" value="{{ old('father_age', $beneficiary->father_age) }}"
-                               min="1" max="120" placeholder="Enter age">
-                    </div>
-                    <div class="form-group">
-                        <label>Father's Birthdate</label>
-                        <input type="date" name="father_birthdate" value="{{ old('father_birthdate', $beneficiary->father_birthdate) }}"
-                               placeholder="Select birthdate">
-                    </div>
-                    <div class="form-group">
-                        <div class="checkbox-wrapper">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="father_deceased" id="father_deceased" value="1" {{ old('father_deceased', $beneficiary->father_deceased) ? 'checked' : '' }}>
-                                <span class="checkbox-text">Deceased</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             {{-- Spouse Information --}}
             <div class="family-member-card">
                 <div class="member-header">
@@ -545,6 +487,23 @@
                         <option value="">Select Option</option>
                         <option value="1" {{ old('is_4ps_member', $beneficiary->is_4ps_member) == '1' ? 'selected' : '' }}>Yes</option>
                         <option value="0" {{ old('is_4ps_member', $beneficiary->is_4ps_member) == '0' ? 'selected' : '' }}>No</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Indigenous Group</label>
+                    <select name="indigenous_group">
+                        <option value="">-- Select --</option>
+                        <option value="Ifugao" {{ old('indigenous_group', $beneficiary->indigenous_group) == 'Ifugao' ? 'selected' : '' }}>Ifugao</option>
+                        <option value="Kalinga" {{ old('indigenous_group', $beneficiary->indigenous_group) == 'Kalinga' ? 'selected' : '' }}>Kalinga</option>
+                        <option value="Itawes" {{ old('indigenous_group', $beneficiary->indigenous_group) == 'Itawes' ? 'selected' : '' }}>Itawes/Itawit</option>
+                        <option value="Ybanag" {{ old('indigenous_group', $beneficiary->indigenous_group) == 'Ybanag' ? 'selected' : '' }}>Ybanag/Ibanag</option>
+                        <option value="Gaddang" {{ old('indigenous_group', $beneficiary->indigenous_group) == 'Gaddang' ? 'selected' : '' }}>Gaddang</option>
+                        <option value="Isneg" {{ old('indigenous_group', $beneficiary->indigenous_group) == 'Isneg' ? 'selected' : '' }}>Isneg</option>
+                        <option value="Malaweg" {{ old('indigenous_group', $beneficiary->indigenous_group) == 'Malaweg' ? 'selected' : '' }}>Malaweg</option>
+                        <option value="Yogad" {{ old('indigenous_group', $beneficiary->indigenous_group) == 'Yogad' ? 'selected' : '' }}>Yogad</option>
+                        <option value="Atta" {{ old('indigenous_group', $beneficiary->indigenous_group) == 'Atta' ? 'selected' : '' }}>Atta</option>
+                        <option value="Aeta" {{ old('indigenous_group', $beneficiary->indigenous_group) == 'Aeta' ? 'selected' : '' }}>Aeta</option>
+                        <option value="None" {{ old('indigenous_group', $beneficiary->indigenous_group) == 'None' ? 'selected' : '' }}>None</option>
                     </select>
                 </div>
                 <div class="form-group">

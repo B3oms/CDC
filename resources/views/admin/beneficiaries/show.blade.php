@@ -114,47 +114,6 @@
         <div class="section-card">
             <h3>Family Background</h3>
             
-            {{-- Mother Information --}}
-            @if($beneficiary->mother_name || $beneficiary->mother_age || $beneficiary->mother_sex || $beneficiary->mother_birthdate)
-            <div style="margin-bottom: 1.5rem;">
-                <h4 style="color: #3b82f6; margin-bottom: 0.5rem;">Mother Information</h4>
-                <table class="dist-table">
-                    @if($beneficiary->mother_name)
-                    <tr><td class="meta-label">Name</td><td>{{ $beneficiary->mother_name }}</td></tr>
-                    @endif
-                    @if($beneficiary->mother_age)
-                    <tr><td class="meta-label">Age</td><td>{{ $beneficiary->mother_age }} years old</td></tr>
-                    @endif
-                    @if($beneficiary->mother_sex)
-                    <tr><td class="meta-label">Sex</td><td>{{ ucfirst($beneficiary->mother_sex) }}</td></tr>
-                    @endif
-                    @if($beneficiary->mother_birthdate)
-                    <tr><td class="meta-label">Birthdate</td><td>{{ \Carbon\Carbon::parse($beneficiary->mother_birthdate)->format('M d, Y') }}</td></tr>
-                    @endif
-                </table>
-            </div>
-            @endif
-
-            {{-- Father Information --}}
-            @if($beneficiary->father_name || $beneficiary->father_age || $beneficiary->father_sex || $beneficiary->father_birthdate)
-            <div style="margin-bottom: 1.5rem;">
-                <h4 style="color: #3b82f6; margin-bottom: 0.5rem;">Father Information</h4>
-                <table class="dist-table">
-                    @if($beneficiary->father_name)
-                    <tr><td class="meta-label">Name</td><td>{{ $beneficiary->father_name }}</td></tr>
-                    @endif
-                    @if($beneficiary->father_age)
-                    <tr><td class="meta-label">Age</td><td>{{ $beneficiary->father_age }} years old</td></tr>
-                    @endif
-                    @if($beneficiary->father_sex)
-                    <tr><td class="meta-label">Sex</td><td>{{ ucfirst($beneficiary->father_sex) }}</td></tr>
-                    @endif
-                    @if($beneficiary->father_birthdate)
-                    <tr><td class="meta-label">Birthdate</td><td>{{ \Carbon\Carbon::parse($beneficiary->father_birthdate)->format('M d, Y') }}</td></tr>
-                    @endif
-                </table>
-            </div>
-            @endif
 
             {{-- Spouse Information --}}
             @if($beneficiary->spouse_name || $beneficiary->spouse_age || $beneficiary->spouse_sex || $beneficiary->spouse_birthdate || $beneficiary->spouse_occupation)
@@ -207,7 +166,7 @@
             @endif
 
             {{-- No Family Data --}}
-            @if(!$beneficiary->mother_name && !$beneficiary->father_name && !$beneficiary->spouse_name && (!$beneficiary->children || empty($beneficiary->children)))
+            @if(!$beneficiary->spouse_name && (!$beneficiary->children || empty($beneficiary->children)))
             <div style="text-align: center; color: #6b7280; padding: 2rem;">
                 <i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
                 <p>No family background information available</p>
