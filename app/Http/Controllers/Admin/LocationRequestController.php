@@ -59,11 +59,16 @@ class LocationRequestController extends Controller
     }
 
 
-    public function show(LocationRequest $locationRequest)
+    public function show($id)
     {
-        $locationRequest->load(['requester', 'municipality', 'approver']);
-        
-        return view('admin.location-requests.show', compact('locationRequest'));
+        try {
+            $locationRequest = LocationRequest::with(['requester', 'municipality', 'approver'])->findOrFail($id);
+            
+            return view('admin.locations.show', compact('locationRequest'));
+        } catch (\Exception $e) {
+            \Log::error('Location request show failed: ' . $e->getMessage());
+            return redirect()->route('admin.locations.index')->with('error', 'Location request not found.');
+        }
     }
 
     public function approve($id)
