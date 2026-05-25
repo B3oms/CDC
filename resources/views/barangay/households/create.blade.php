@@ -3,200 +3,176 @@
 @section('title', 'Create Household')
 
 @section('content')
-<div class="household-create-page">
-    <div class="page-header">
-        <div>
-            <h1>Create Household</h1>
-            <p>Add a new household to your barangay</p>
+<div class="dash-header">
+    <h1>Create Household</h1>
+    <x-back-button href="{{ route('barangay.households.index') }}" label="Back" />
+</div>
+
+<div class="form-card">
+    <form method="POST" action="{{ route('barangay.households.store') }}" id="householdForm">
+        @csrf
+        <!-- Head of Household Information -->
+        <div class="interview-section">
+            <div class="interview-section-title">Head of Household Information</div>
+                    
+                    <div class="form-row">
+            <div class="form-group">
+                <label for="head_of_household">Name of Head of Household *</label>
+                <input type="text" id="head_of_household" name="head_of_household" 
+                       required value="{{ old('head_of_household') }}">
+                @error('head_of_household')
+                    <span class="error-message">{{ $message }}</span>
+                @enderror
+            </div>
+            
+            <div class="form-group">
+                <label for="age">Age *</label>
+                <input type="number" id="age" name="age" 
+                       required min="1" max="120" value="{{ old('age') }}">
+                @error('age')
+                    <span class="error-message">{{ $message }}</span>
+                @enderror
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="sex">Sex *</label>
+                <select id="sex" name="sex" required>
+                    <option value="">Select Sex</option>
+                    <option value="male" {{ old('sex') == 'male' ? 'selected' : '' }}>Male</option>
+                    <option value="female" {{ old('sex') == 'female' ? 'selected' : '' }}>Female</option>
+                </select>
+                @error('sex')
+                    <span class="error-message">{{ $message }}</span>
+                @enderror
+            </div>
+            
+            <div class="form-group">
+                <label for="birthdate">Birthdate *</label>
+                <input type="date" id="birthdate" name="birthdate" 
+                       required value="{{ old('birthdate') }}">
+                @error('birthdate')
+                    <span class="error-message">{{ $message }}</span>
+                @enderror
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="contact_number">Contact Number</label>
+                <input type="tel" id="contact_number" name="contact_number" 
+                       value="{{ old('contact_number') }}"
+                       placeholder="09XXXXXXXXX" maxlength="11"
+                       pattern="[0-9]{11}" title="Contact number must be exactly 11 digits">
+                @error('contact_number')
+                    <span class="error-message">{{ $message }}</span>
+                @enderror
+            </div>
+            
+            <div class="form-group">
+                <label for="is_cdc_beneficiary">CDC Beneficiary</label>
+                <div class="checkbox-wrapper">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="is_cdc_beneficiary" name="is_cdc_beneficiary" 
+                               value="1" {{ old('is_cdc_beneficiary') ? 'checked' : '' }}>
+                        <span class="checkbox-text">Already a CDC Beneficiary</span>
+                    </label>
+                </div>
+                @error('is_cdc_beneficiary')
+                    <span class="error-message">{{ $message }}</span>
+                @enderror
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="address">Address *</label>
+            <textarea id="address" name="address" 
+                      rows="3" required>{{ old('address') }}</textarea>
+            @error('address')
+                <span class="error-message">{{ $message }}</span>
+            @enderror
         </div>
     </div>
 
-    <div class="form-container">
-        <form method="POST" action="{{ route('barangay.households.store') }}" id="householdForm">
-            @csrf
-            <div class="form-grid">
-                <!-- Head of Household Information -->
-                <div class="form-section">
-                    <h3>Head of Household Information</h3>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="head_of_household">Name of Head of Household *</label>
-                            <input type="text" id="head_of_household" name="head_of_household" 
-                                   class="form-control" required value="{{ old('head_of_household') }}">
-                            @error('head_of_household')
-                                <span class="error-message">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="age">Age *</label>
-                            <input type="number" id="age" name="age" 
-                                   class="form-control" required min="1" max="120" value="{{ old('age') }}">
-                            @error('age')
-                                <span class="error-message">{{ $message }}</span>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="sex">Sex *</label>
-                            <select id="sex" name="sex" class="form-control" required>
-                                <option value="">Select Sex</option>
-                                <option value="male" {{ old('sex') == 'male' ? 'selected' : '' }}>Male</option>
-                                <option value="female" {{ old('sex') == 'female' ? 'selected' : '' }}>Female</option>
-                            </select>
-                            @error('sex')
-                                <span class="error-message">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="birthdate">Birthdate *</label>
-                            <input type="date" id="birthdate" name="birthdate" 
-                                   class="form-control" required value="{{ old('birthdate') }}">
-                            @error('birthdate')
-                                <span class="error-message">{{ $message }}</span>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="contact_number">Contact Number</label>
-                            <input type="tel" id="contact_number" name="contact_number" 
-                                   class="form-control" value="{{ old('contact_number') }}"
-                                   placeholder="09XXXXXXXXX" maxlength="11"
-                                   pattern="[0-9]{11}" title="Contact number must be exactly 11 digits">
-                            @error('contact_number')
-                                <span class="error-message">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="is_cdc_beneficiary">CDC Beneficiary</label>
-                            <div class="checkbox-group">
-                                <label class="checkbox-label">
-                                    <input type="checkbox" id="is_cdc_beneficiary" name="is_cdc_beneficiary" 
-                                           value="1" {{ old('is_cdc_beneficiary') ? 'checked' : '' }}>
-                                    <span class="checkmark"></span>
-                                    Already a CDC Beneficiary
-                                </label>
-                            </div>
-                            @error('is_cdc_beneficiary')
-                                <span class="error-message">{{ $message }}</span>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="address">Address *</label>
-                        <textarea id="address" name="address" class="form-control" 
-                                  rows="3" required>{{ old('address') }}</textarea>
-                        @error('address')
-                            <span class="error-message">{{ $message }}</span>
-                        @enderror
-                    </div>
-                </div>
-
-                <!-- Family Members -->
-                <div class="form-section">
-                    <h3>Family Members</h3>
+    <!-- Family Members -->
+    <div class="interview-section">
+        <div class="interview-section-title">Family Members</div>
                     <div id="membersContainer">
-                        <div class="member-item" data-member-index="0">
-                            <div class="member-header">
-                                <span>Member 1</span>
-                                <button type="button" class="btn-remove-member" onclick="removeMember(this)">×</button>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Name *</label>
-                                    <input type="text" name="members[0][name]" class="form-control" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Age *</label>
-                                    <input type="number" name="members[0][age]" class="form-control" required min="1" max="120">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Sex *</label>
-                                    <select name="members[0][sex]" class="form-control" required>
-                                        <option value="">Select Sex</option>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Relationship to Head *</label>
-                                    <input type="text" name="members[0][relationship_to_head]" class="form-control" required
-                                           placeholder="e.g., Wife, Son, Daughter, Mother">
-                                </div>
-                            </div>
-                        </div>
+            <div class="family-member-card" data-member-index="0">
+                <div class="member-header">
+                    <h4>Member 1</h4>
+                    <button type="button" class="btn-remove-child" onclick="removeMember(this)">×</button>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Name *</label>
+                        <input type="text" name="members[0][name]" required>
                     </div>
-                    
-                    <button type="button" class="btn-add-member" onclick="addMember()">
-                        <i class="fas fa-plus"></i> Add Family Member
-                    </button>
+                    <div class="form-group">
+                        <label>Age *</label>
+                        <input type="number" name="members[0][age]" required min="1" max="120">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Sex *</label>
+                        <select name="members[0][sex]" required>
+                            <option value="">Select Sex</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Relationship to Head *</label>
+                        <input type="text" name="members[0][relationship_to_head]" required
+                               placeholder="e.g., Wife, Son, Daughter, Mother">
+                    </div>
                 </div>
             </div>
-
-            <div class="form-actions">
-                <a href="{{ route('barangay.households.index') }}" class="btn btn-cancel">Cancel</a>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Create Household
-                </button>
-            </div>
-        </form>
+        </div>
+        
+        <button type="button" class="btn-add-child" onclick="addMember()">
+            <i class="fas fa-plus"></i> Add Family Member
+        </button>
     </div>
+
+    <div class="form-actions">
+        <a href="{{ route('barangay.households.index') }}" class="btn-cancel">Cancel</a>
+        <button type="submit" class="btn-submit">
+            <i class="fas fa-save"></i> Create Household
+        </button>
+    </div>
+    </form>
 </div>
 @endsection
 
 @push('styles')
 <style>
-.household-create-page {
-    max-width: 100%;
-    padding: 0;
-}
-
-.page-header {
-    margin-bottom: 2rem;
-}
-
-.page-header h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 0.5rem;
-}
-
-.page-header p {
-    color: #6b7280;
-    font-size: 1rem;
-}
-
-.form-container {
-    background: white;
+/* Form Container */
+.form-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
     border-radius: 12px;
-    padding: 2rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
 }
 
-.form-section {
+/* Form Sections */
+.interview-section {
     margin-bottom: 2rem;
 }
 
-.form-section h3 {
-    font-size: 1.25rem;
+.interview-section-title {
+    font-size: 1.125rem;
     font-weight: 600;
     color: #1f2937;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     padding-bottom: 0.5rem;
     border-bottom: 2px solid #e5e7eb;
 }
 
+/* Form Grid */
 .form-grid {
     display: grid;
     gap: 2rem;
@@ -204,10 +180,11 @@
 
 .form-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1rem;
 }
 
+/* Form Groups */
 .form-group {
     display: flex;
     flex-direction: column;
@@ -220,34 +197,145 @@
     font-size: 0.875rem;
 }
 
-.form-control {
-    padding: 0.75rem;
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 0.625rem 0.875rem;
     border: 1px solid #d1d5db;
-    border-radius: 8px;
+    border-radius: 6px;
     font-size: 0.875rem;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.form-control:focus {
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: #1a6b2a;
+    box-shadow: 0 0 0 3px rgba(26, 107, 42, 0.1);
 }
 
-.error-message {
-    color: #ef4444;
+/* Family Background Styles */
+.family-member-card {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.member-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.member-header h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #495057;
+    margin: 0;
+}
+
+.btn-add-child {
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.2s ease;
+}
+
+.btn-add-child:hover {
+    background: #218838;
+}
+
+.btn-remove-child {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
-    margin-top: 0.25rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
 }
 
-.form-hint {
-    color: #6b7280;
-    font-size: 0.75rem;
-    margin-top: 0.25rem;
-    font-style: italic;
+.btn-remove-child:hover {
+    background: #c82333;
 }
 
-.checkbox-group {
+/* Alert Styles */
+.alert-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+}
+
+.alert-error ul {
+    margin: 0;
+    padding-left: 1.25rem;
+}
+
+.alert-error li {
+    margin-bottom: 0.25rem;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.btn-submit, .btn-cancel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.btn-cancel {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+.btn-cancel:hover {
+    background: #e5e7eb;
+}
+
+.btn-submit {
+    background: #1a6b2a;
+    color: white;
+}
+
+.btn-submit:hover {
+    background: #27500a;
+}
+
+/* Checkbox Styles */
+.checkbox-wrapper {
     display: flex;
     align-items: center;
     margin-top: 0.5rem;
@@ -259,103 +347,25 @@
     cursor: pointer;
     font-size: 0.875rem;
     color: #374151;
+    font-weight: 500;
 }
 
 .checkbox-label input[type="checkbox"] {
-    margin-right: 0.5rem;
-}
-
-.member-item {
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    background: #f9fafb;
-}
-
-.member-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    font-weight: 500;
-    color: #374151;
-}
-
-.btn-remove-member {
-    background: #ef4444;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    margin-right: 0.75rem;
+    width: 16px;
+    height: 16px;
+    accent-color: #1a6b2a;
     cursor: pointer;
-    font-size: 14px;
 }
 
-.btn-remove-member:hover {
-    background: #dc2626;
+.checkbox-text {
+    line-height: 1.4;
 }
 
-.btn-add-member {
-    background: #10b981;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    cursor: pointer;
-    font-size: 0.875rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
-
-.btn-add-member:hover {
-    background: #059669;
-}
-
-.form-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 1px solid #e5e7eb;
-}
-
-.btn {
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    border: none;
-}
-
-.btn-cancel {
-    background: #f3f4f6;
-    color: #374151;
-}
-
-.btn-cancel:hover {
-    background: #e5e7eb;
-}
-
-.btn-primary {
-    background: #3b82f6;
-    color: white;
-}
-
-.btn-primary:hover {
-    background: #2563eb;
+.error-message {
+    color: #dc2626;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
 }
 
 @media (max-width: 768px) {
@@ -363,7 +373,7 @@
         grid-template-columns: 1fr;
     }
     
-    .form-container {
+    .form-card {
         padding: 1rem;
     }
 }
@@ -377,28 +387,28 @@ let memberIndex = 1;
 function addMember() {
     const container = document.getElementById('membersContainer');
     const memberDiv = document.createElement('div');
-    memberDiv.className = 'member-item';
+    memberDiv.className = 'family-member-card';
     memberDiv.setAttribute('data-member-index', memberIndex);
     
     memberDiv.innerHTML = `
         <div class="member-header">
-            <span>Member ${memberIndex + 1}</span>
-            <button type="button" class="btn-remove-member" onclick="removeMember(this)">×</button>
+            <h4>Member ${memberIndex + 1}</h4>
+            <button type="button" class="btn-remove-child" onclick="removeMember(this)">×</button>
         </div>
         <div class="form-row">
             <div class="form-group">
                 <label>Name *</label>
-                <input type="text" name="members[${memberIndex}][name]" class="form-control" required>
+                <input type="text" name="members[${memberIndex}][name]" required>
             </div>
             <div class="form-group">
                 <label>Age *</label>
-                <input type="number" name="members[${memberIndex}][age]" class="form-control" required min="1" max="120">
+                <input type="number" name="members[${memberIndex}][age]" required min="1" max="120">
             </div>
         </div>
         <div class="form-row">
             <div class="form-group">
                 <label>Sex *</label>
-                <select name="members[${memberIndex}][sex]" class="form-control" required>
+                <select name="members[${memberIndex}][sex]" required>
                     <option value="">Select Sex</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
@@ -406,7 +416,7 @@ function addMember() {
             </div>
             <div class="form-group">
                 <label>Relationship to Head *</label>
-                <input type="text" name="members[${memberIndex}][relationship_to_head]" class="form-control" required
+                <input type="text" name="members[${memberIndex}][relationship_to_head]" required
                        placeholder="e.g., Wife, Son, Daughter, Mother">
             </div>
         </div>
@@ -417,14 +427,14 @@ function addMember() {
 }
 
 function removeMember(button) {
-    const memberItem = button.closest('.member-item');
+    const memberItem = button.closest('.family-member-card');
     memberItem.remove();
     
     // Re-index remaining members
-    const members = document.querySelectorAll('.member-item');
+    const members = document.querySelectorAll('.family-member-card');
     members.forEach((member, index) => {
         member.setAttribute('data-member-index', index);
-        member.querySelector('.member-header span').textContent = `Member ${index + 1}`;
+        member.querySelector('.member-header h4').textContent = `Member ${index + 1}`;
         
         // Update input names
         const inputs = member.querySelectorAll('input, select');
