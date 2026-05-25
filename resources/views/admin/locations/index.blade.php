@@ -107,9 +107,6 @@
                                 <i class="fas fa-times"></i>
                             </button>
                         </form>
-                        <a href="{{ route('admin.location-requests.show', $request->id) }}" class="btn-action btn-view" title="View">
-                            <i class="fas fa-eye"></i>
-                        </a>
                     </div>
                 </div>
             </div>
@@ -417,8 +414,6 @@
 .btn-approve:hover { opacity: .85; }
 .btn-reject  { background: #ef4444; color: var(--clr-white); }
 .btn-reject:hover  { opacity: .85; }
-.btn-view    { background: var(--clr-gray-100); color: var(--clr-gray-500); }
-.btn-view:hover    { background: var(--clr-gray-200); }
 
 .btn-delete {
     display: inline-flex;
