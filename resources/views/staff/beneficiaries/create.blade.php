@@ -296,9 +296,13 @@
                         <input type="date" name="mother_birthdate" value="{{ old('mother_birthdate') }}"
                                placeholder="Select birthdate">
                     </div>
-                    <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
-                        <input type="checkbox" name="mother_deceased" id="mother_deceased" {{ old('mother_deceased') ? 'checked' : '' }}>
-                        <label for="mother_deceased" style="margin: 0; cursor: pointer;">Deceased</label>
+                    <div class="form-group">
+                        <div class="checkbox-wrapper">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="mother_deceased" id="mother_deceased" value="1" {{ old('mother_deceased') ? 'checked' : '' }}>
+                                <span class="checkbox-text">Deceased</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -324,9 +328,13 @@
                         <input type="date" name="father_birthdate" value="{{ old('father_birthdate') }}"
                                placeholder="Select birthdate">
                     </div>
-                    <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
-                        <input type="checkbox" name="father_deceased" id="father_deceased" {{ old('father_deceased') ? 'checked' : '' }}>
-                        <label for="father_deceased" style="margin: 0; cursor: pointer;">Deceased</label>
+                    <div class="form-group">
+                        <div class="checkbox-wrapper">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="father_deceased" id="father_deceased" value="1" {{ old('father_deceased') ? 'checked' : '' }}>
+                                <span class="checkbox-text">Deceased</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
