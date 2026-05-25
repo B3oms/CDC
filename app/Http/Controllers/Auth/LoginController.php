@@ -69,6 +69,13 @@ class LoginController extends Controller
                 ])->onlyInput('unique_id', 'user_role');
             }
             
+            // Check if user account is active
+            if ($user->status !== 'active') {
+                return back()->withErrors([
+                    'unique_id' => 'Your account has been deactivated. Please contact your administrator.',
+                ])->onlyInput('unique_id', 'user_role');
+            }
+            
             // Log in the beneficiary without password
             Auth::login($user);
             
@@ -90,6 +97,14 @@ class LoginController extends Controller
             // Verify the user role matches the selected role
             $user = Auth::user();
             $actualRole = $user->role->name;
+            
+            // Check if user account is active
+            if ($user->status !== 'active') {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Your account has been deactivated. Please contact your administrator.',
+                ])->onlyInput('email', 'user_role');
+            }
             
             // Map role names
             $roleMap = [

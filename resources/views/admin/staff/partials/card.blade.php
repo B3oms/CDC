@@ -34,30 +34,6 @@
             @csrf
             <button type="submit" class="btn-sm-warning">Reset Password</button>
         </form>
-
-        @if($user->status === 'active')
-            <form method="POST" action="{{ route('admin.staff.deactivate', $user->id) }}"
-                style="display:inline;"
-                onsubmit="return confirm('Deactivate {{ $user->first_name }} {{ $user->last_name }}? They will not be able to login.')">
-                @csrf
-                <button type="submit" class="btn-sm-info">Deactivate</button>
-            </form>
-        @else
-            <form method="POST" action="{{ route('admin.staff.activate', $user->id) }}"
-                style="display:inline;"
-                onsubmit="return confirm('Activate {{ $user->first_name }} {{ $user->last_name }}?')">
-                @csrf
-                <button type="submit" class="btn-sm-success">Activate</button>
-            </form>
-        @endif
-
-        <form method="POST" action="{{ route('admin.staff.destroy', $user->id) }}"
-            style="display:inline;"
-            onsubmit="return confirm('WARNING: This will permanently delete {{ $user->first_name }} {{ $user->last_name }}. This action cannot be undone and may fail if the user has related records. Consider deactivating instead. Are you sure you want to continue?')">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn-sm-danger">Delete</button>
-        </form>
     </div>
 
     {{-- Hidden data for modal --}}

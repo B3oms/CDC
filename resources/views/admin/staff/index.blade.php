@@ -157,6 +157,7 @@ function closeStaffModal() {
 document.getElementById('staff-modal').addEventListener('click', function(e) {
     if (e.target === this) closeStaffModal();
 });
+
 </script>
 @endpush
 @endsection
