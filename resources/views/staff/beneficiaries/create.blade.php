@@ -35,6 +35,35 @@
     font-weight: 600;
 }
 
+/* Checkbox Styles */
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    min-height: 42px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: #374151;
+    font-weight: 500;
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin-right: 0.5rem;
+    width: 16px;
+    height: 16px;
+    accent-color: #1a6b2a;
+    cursor: pointer;
+}
+
+.checkbox-text {
+    line-height: 1.4;
+}
+
 /* Family Background Styles */
 .family-member-card {
     background: #f8f9fa;
