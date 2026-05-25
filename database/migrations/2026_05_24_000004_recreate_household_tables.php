@@ -8,6 +8,17 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Drop foreign key constraints first
+        if (Schema::hasTable('submission_evacuees')) {
+            try {
+                Schema::table('submission_evacuees', function (Blueprint $table) {
+                    $table->dropForeign('fk_se_household');
+                });
+            } catch (\Exception $e) {
+                // Foreign key doesn't exist, continue
+            }
+        }
+        
         // Drop existing tables
         Schema::dropIfExists('household_members');
         Schema::dropIfExists('households');
@@ -46,6 +57,18 @@ return new class extends Migration
 
     public function down(): void
     {
+        // Drop foreign key constraints first
+        if (Schema::hasTable('submission_evacuees')) {
+            try {
+                Schema::table('submission_evacuees', function (Blueprint $table) {
+                    $table->dropForeign('fk_se_household');
+                });
+            } catch (\Exception $e) {
+                // Foreign key doesn't exist, continue
+            }
+        }
+        
+        // Drop existing tables
         Schema::dropIfExists('household_members');
         Schema::dropIfExists('households');
     }
