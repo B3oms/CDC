@@ -105,6 +105,8 @@ Route::prefix('admin')->name('admin.')->middleware(['isAdmin'])->group(function 
     Route::put('staff/{id}',                 [StaffController::class, 'update'])->name('staff.update');
     Route::delete('staff/{id}',              [StaffController::class, 'destroy'])->name('staff.destroy');
     Route::post('staff/{id}/reset-password', [StaffController::class, 'resetPassword'])->name('staff.resetPassword');
+    Route::post('staff/{id}/deactivate',     [StaffController::class, 'deactivate'])->name('staff.deactivate');
+    Route::post('staff/{id}/activate',       [StaffController::class, 'activate'])->name('staff.activate');
 });
 
 // ──────────────────────────────────────────────────────────

@@ -129,10 +129,77 @@ class StaffController extends Controller
             return back()->with('error', 'You cannot delete your own account.');
         }
 
-        $user->delete();
+        try {
+            // Check for related records that would prevent deletion
+            $relatedTables = [
+                'beneficiaries' => 'beneficiary records',
+                'reliefEvents' => 'relief events',
+                'evacuationReports' => 'evacuation reports',
+                'recommendations' => 'recommendations',
+                'locationRequests' => 'location requests',
+                'barangayRequests' => 'barangay requests',
+                'municipalityRequests' => 'municipality requests',
+                'notifications' => 'notifications',
+                'households' => 'household records',
+            ];
 
-        return redirect()->route('admin.staff.index')
-            ->with('success', 'Staff account deleted.');
+            $hasRelatedRecords = false;
+            $relatedRecordInfo = [];
+
+            // Check beneficiaries relationship
+            if ($user->beneficiary) {
+                $hasRelatedRecords = true;
+                $relatedRecordInfo[] = 'beneficiary record';
+            }
+
+            // Check other potential relationships
+            $tablesToCheck = [
+                'relief_events' => 'created_by',
+                'evacuation_reports' => 'reported_by',
+                'recommended_beneficiaries' => 'submitted_by',
+                'location_requests' => 'requested_by',
+                'barangay_requests' => 'requested_by',
+                'municipality_requests' => 'requested_by',
+                'notifications' => 'user_id',
+                'households' => 'created_by',
+            ];
+
+            foreach ($tablesToCheck as $table => $column) {
+                try {
+                    $count = \DB::table($table)->where($column, $id)->count();
+                    if ($count > 0) {
+                        $hasRelatedRecords = true;
+                        $relatedRecordInfo[] = "{$count} record(s) in {$table}";
+                    }
+                } catch (\Exception $e) {
+                    // Table might not exist or other issue, continue checking
+                    continue;
+                }
+            }
+
+            if ($hasRelatedRecords) {
+                return back()->with('error', 'Cannot delete user. User has related records: ' . implode(', ', $relatedRecordInfo) . '. Please deactivate the account instead.');
+            }
+
+            // If no related records, proceed with deletion
+            $user->delete();
+
+            return redirect()->route('admin.staff.index')
+                ->with('success', 'Staff account deleted successfully.');
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Handle foreign key constraint violation
+            if (str_contains($e->getMessage(), 'foreign key constraint')) {
+                return back()->with('error', 'Cannot delete user due to foreign key constraints. Please deactivate the account instead.');
+            }
+            
+            // Handle other database errors
+            \Log::error('Error deleting user: ' . $e->getMessage());
+            return back()->with('error', 'An error occurred while trying to delete the user.');
+        } catch (\Exception $e) {
+            \Log::error('Unexpected error deleting user: ' . $e->getMessage());
+            return back()->with('error', 'An unexpected error occurred.');
+        }
     }
 
     public function resetPassword($id)
@@ -142,5 +209,28 @@ class StaffController extends Controller
         $user->update(['password' => Hash::make($temp)]);
 
         return back()->with('success', "Password reset. Temporary password: {$temp}");
+    }
+
+    public function deactivate($id)
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'You cannot deactivate your own account.');
+        }
+
+        $user->update(['status' => 'inactive']);
+
+        return redirect()->route('admin.staff.index')
+            ->with('success', 'Staff account deactivated successfully.');
+    }
+
+    public function activate($id)
+    {
+        $user = User::findOrFail($id);
+        $user->update(['status' => 'active']);
+
+        return redirect()->route('admin.staff.index')
+            ->with('success', 'Staff account activated successfully.');
     }
 }
