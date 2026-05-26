@@ -10,7 +10,7 @@ return new class extends SafeMigration
         return 'users';
     }
 
-    protected function columns(Blueprint $table): void
+    protected function columns($table): void
     {
         $table->string('middle_name')->nullable()->after('first_name');
     }

@@ -17,6 +17,7 @@ class Beneficiary extends Model
         'last_name',
         'suffix',
         'gender',
+        'civil_status',
         'age',
         'is_4ps_member',
         'birthdate',

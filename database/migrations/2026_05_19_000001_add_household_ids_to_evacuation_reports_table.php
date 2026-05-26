@@ -10,7 +10,7 @@ return new class extends SafeMigration
         return 'evacuation_reports';
     }
 
-    protected function columns(Blueprint $table): void
+    protected function columns($table): void
     {
         $table->json('household_ids')->nullable()->after('evacuee_count');
     }

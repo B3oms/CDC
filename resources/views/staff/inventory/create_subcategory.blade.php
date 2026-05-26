@@ -26,21 +26,13 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ route('staff.inventory.subcategory.store', $category->id) }}"
-        enctype="multipart/form-data">
+    <form method="POST" action="{{ route('staff.inventory.subcategory.store', $category->id) }}">
         @csrf
         <div class="form-grid">
             <div class="form-group">
                 <label>Subcategory Name</label>
                 <input type="text" name="name" value="{{ old('name') }}"
                     placeholder="e.g. Canned Goods" required>
-            </div>
-            <div class="form-group">
-                <label>Image</label>
-                <input type="file" name="image" accept="image/*"
-                    onchange="previewImage(this, 'preview-sub')">
-                <img id="preview-sub" src="#" alt="Preview"
-                    style="display:none;width:80px;height:80px;object-fit:cover;border-radius:8px;margin-top:8px;">
             </div>
             <div class="form-group full-width">
                 <label>Description</label>
@@ -144,18 +136,3 @@
 </style>
 @endpush
 
-@push('scripts')
-<script>
-function previewImage(input, previewId) {
-    const preview = document.getElementById(previewId);
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            preview.src = e.target.result;
-            preview.style.display = 'block';
-        }
-        reader.readAsDataURL(input.files[0]);
-    }
-}
-</script>
-@endpush

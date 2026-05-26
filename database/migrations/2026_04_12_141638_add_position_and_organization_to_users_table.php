@@ -10,7 +10,7 @@ return new class extends SafeMigration
         return 'users';
     }
 
-    protected function columns(Blueprint $table): void
+    protected function columns($table): void
     {
         $table->string('position', 100)->nullable()->after('contact_number');
         $table->string('organization', 150)->nullable()->after('position');

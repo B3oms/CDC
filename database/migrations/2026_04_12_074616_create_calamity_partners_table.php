@@ -10,7 +10,7 @@ return new class extends SafeMigration
         return 'calamity_partners';
     }
 
-    protected function columns(Blueprint $table): void
+    protected function columns($table): void
     {
         $table->id();
         $table->foreignId('calamity_id')->constrained()->cascadeOnDelete();

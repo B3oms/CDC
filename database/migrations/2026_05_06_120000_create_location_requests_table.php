@@ -10,7 +10,7 @@ return new class extends SafeMigration
         return 'location_requests';
     }
 
-    protected function columns(Blueprint $table): void
+    protected function columns($table): void
     {
         $table->id();
         $table->foreignId('requested_by')->constrained('users')->onDelete('cascade');

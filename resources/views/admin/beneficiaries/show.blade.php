@@ -68,9 +68,6 @@
         <p class="sub">{{ $beneficiary->barangay->name ?? 'N/A' }}</p>
     </div>
     <div class="header-actions">
-        <a href="{{ route('admin.beneficiaries.edit', $beneficiary->id) }}" class="btn-edit">
-            <i class="fas fa-edit"></i> Edit
-        </a>
         <form action="{{ route('admin.beneficiaries.destroy', $beneficiary->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this beneficiary?')" style="display: inline;">
             @csrf
             @method('DELETE')

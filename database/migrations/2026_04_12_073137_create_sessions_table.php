@@ -10,7 +10,7 @@ return new class extends SafeMigration
         return 'sessions';
     }
 
-    protected function columns(Blueprint $table): void
+    protected function columns($table): void
     {
         $table->string('id')->primary();
         $table->foreignId('user_id')->nullable()->index();

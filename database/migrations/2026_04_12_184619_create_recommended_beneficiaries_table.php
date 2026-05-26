@@ -10,7 +10,7 @@ return new class extends SafeMigration
         return 'recommended_beneficiaries';
     }
 
-    protected function columns(Blueprint $table): void
+    protected function columns($table): void
     {
         $table->id();
         $table->foreignId('barangay_id')->constrained('barangays')->onDelete('cascade');

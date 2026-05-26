@@ -43,7 +43,7 @@ Route::get('/admin/beneficiaries/pdf', [BeneficiaryController::class, 'downloadP
 // ──────────────────────────────────────────────────────────
 // Admin Only
 // ──────────────────────────────────────────────────────────
-Route::prefix('admin')->name('admin.')->middleware(['isAdmin'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['isAdmin', 'preventBackHistory'])->group(function () {
 
     // Location Requests Management
     Route::get('location-requests', [AdminLocationRequestController::class, 'index'])->name('location-requests.index');
@@ -114,7 +114,7 @@ Route::prefix('admin')->name('admin.')->middleware(['isAdmin'])->group(function 
 // ──────────────────────────────────────────────────────────
 // Shared: Admin + Staff
 // ──────────────────────────────────────────────────────────
-Route::middleware(['isAdminOrStaff'])->group(function () {
+Route::middleware(['isAdminOrStaff', 'preventBackHistory'])->group(function () {
 
     
     // Calamity

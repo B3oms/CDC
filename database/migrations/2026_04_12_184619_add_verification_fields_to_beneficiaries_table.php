@@ -10,7 +10,7 @@ return new class extends SafeMigration
         return 'beneficiaries';
     }
 
-    protected function columns(Blueprint $table): void
+    protected function columns($table): void
     {
         $table->boolean('has_senior')->default(false)->after('family_size');
         $table->integer('children_count')->default(0)->after('has_senior');

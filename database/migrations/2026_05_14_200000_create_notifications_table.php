@@ -10,7 +10,7 @@ return new class extends SafeMigration
         return 'notifications';
     }
 
-    protected function columns(Blueprint $table): void
+    protected function columns($table): void
     {
         $table->id();
         $table->foreignId('user_id')->constrained('users')->onDelete('cascade');

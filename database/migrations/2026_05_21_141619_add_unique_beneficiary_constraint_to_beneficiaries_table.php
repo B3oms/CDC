@@ -10,7 +10,7 @@ return new class extends SafeMigration
         return 'beneficiaries';
     }
 
-    protected function columns(Blueprint $table): void
+    protected function columns($table): void
     {
         // Add unique composite constraint on first_name, last_name, and birthdate
         $table->unique(['first_name', 'last_name', 'birthdate'], 'unique_beneficiary');

@@ -10,7 +10,7 @@ return new class extends SafeMigration
         return 'evacuation_reports';
     }
 
-    protected function columns(Blueprint $table): void
+    protected function columns($table): void
     {
         // Add barangay_id if it doesn't exist
         if (!Schema::hasColumn('evacuation_reports', 'barangay_id')) {

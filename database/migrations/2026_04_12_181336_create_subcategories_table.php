@@ -10,7 +10,7 @@ return new class extends SafeMigration
         return 'subcategories';
     }
 
-    protected function columns(Blueprint $table): void
+    protected function columns($table): void
     {
         $table->id();
         $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');

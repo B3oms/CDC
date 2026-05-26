@@ -8,6 +8,7 @@ use App\Http\Middleware\IsBarangay;
 use App\Http\Middleware\IsStaff;
 use App\Http\Middleware\IsAdminOrStaff;
 use App\Http\Middleware\IsBeneficiary;
+use App\Http\Middleware\PreventBackHistory;
 
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -36,6 +37,7 @@ return Application::configure(basePath: dirname(__DIR__))
     'isStaff'        => IsStaff::class,
     'isAdminOrStaff' => IsAdminOrStaff::class,
     'isBeneficiary'  => IsBeneficiary::class,
+    'preventBackHistory' => PreventBackHistory::class,
 ]);
 
     $middleware->redirectGuestsTo('/');

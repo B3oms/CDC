@@ -10,7 +10,7 @@ return new class extends SafeMigration
         return 'relief_event_beneficiaries';
     }
 
-    protected function columns(Blueprint $table): void
+    protected function columns($table): void
     {
         $table->id();
         $table->foreignId('relief_event_id')->constrained('relief_events')->onDelete('cascade');

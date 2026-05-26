@@ -313,6 +313,17 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label>Civil Status</label>
+                    <select name="civil_status" required>
+                        <option value="">Select Civil Status</option>
+                        <option value="Single" {{ old('civil_status', $beneficiary->civil_status) == 'Single' ? 'selected' : '' }}>Single</option>
+                        <option value="Married" {{ old('civil_status', $beneficiary->civil_status) == 'Married' ? 'selected' : '' }}>Married</option>
+                        <option value="Widowed" {{ old('civil_status', $beneficiary->civil_status) == 'Widowed' ? 'selected' : '' }}>Widowed</option>
+                        <option value="Separated" {{ old('civil_status', $beneficiary->civil_status) == 'Separated' ? 'selected' : '' }}>Separated</option>
+                        <option value="Divorced" {{ old('civil_status', $beneficiary->civil_status) == 'Divorced' ? 'selected' : '' }}>Divorced</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label>Age</label>
                     <input type="number" name="age" value="{{ old('age', $beneficiary->age) }}" required
                            min="1" max="120" placeholder="Enter age">

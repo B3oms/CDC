@@ -16,7 +16,7 @@
     <div class="left-panel">
         <div>
             <div class="left-top-label">SPUP-CDC</div>
-            <h2 class="left-heading">Disaster Response System</h2>
+            <h2 class="left-heading">Relief Management, Distribution and Monitoring System</h2>
             <p class="left-body">Coordinating relief operations and beneficiary management across Cagayan Valley.</p>
         </div>
         <div class="left-footer">
@@ -36,8 +36,8 @@
         <div class="login-card">
 
             <div class="login-header">
-                @if(file_exists(public_path('images/spup-logo.png')))
-                    <img src="{{ asset('images/spup-logo.png') }}" alt="SPUP Logo" style="height:48px; margin-bottom:0.25rem;">
+                @if(file_exists(public_path('images/images-5.jpeg')))
+                    <img src="{{ asset('images/images-5.jpeg') }}" alt="SPUP-CDC Logo" style="height:48px; width:auto; border-radius:50%; object-fit:cover; margin-bottom:0.25rem;">
                 @else
                     <div class="logo-circle"><i class="fas fa-shield-halved"></i></div>
                 @endif

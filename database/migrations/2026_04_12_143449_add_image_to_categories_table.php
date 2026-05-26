@@ -10,7 +10,7 @@ return new class extends SafeMigration
         return 'categories';
     }
 
-    protected function columns(Blueprint $table): void
+    protected function columns($table): void
     {
         $table->string('image', 255)->nullable()->after('description');
     }

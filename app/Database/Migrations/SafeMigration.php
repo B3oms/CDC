@@ -16,7 +16,7 @@ abstract class SafeMigration extends Migration
     /**
      * Define the table columns.
      */
-    abstract protected function columns(Blueprint $table): void;
+    abstract protected function columns($table): void;
 
     public function up(): void
     {

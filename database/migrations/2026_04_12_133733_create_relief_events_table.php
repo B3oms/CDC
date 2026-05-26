@@ -10,7 +10,7 @@ return new class extends SafeMigration
         return 'relief_events';
     }
 
-    protected function columns(Blueprint $table): void
+    protected function columns($table): void
     {
         $table->id();
         $table->string('name', 150);

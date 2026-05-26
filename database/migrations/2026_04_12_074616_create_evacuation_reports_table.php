@@ -10,7 +10,7 @@ return new class extends SafeMigration
         return 'evacuation_reports';
     }
 
-    protected function columns(Blueprint $table): void
+    protected function columns($table): void
     {
         $table->id();
         $table->foreignId('evacuation_center_id')->constrained('evacuation_centers')->onDelete('cascade');

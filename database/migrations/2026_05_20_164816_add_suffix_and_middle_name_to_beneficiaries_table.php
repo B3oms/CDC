@@ -12,7 +12,7 @@ return new class extends SafeMigration
         return 'beneficiaries';
     }
 
-    protected function columns(Blueprint $table): void
+    protected function columns($table): void
     {
         $table->string('suffix')->nullable()->after('last_name');
         $table->string('middle_name')->nullable()->after('first_name');

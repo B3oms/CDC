@@ -10,7 +10,7 @@ return new class extends SafeMigration
         return 'items';
     }
 
-    protected function columns(Blueprint $table): void
+    protected function columns($table): void
     {
         $table->foreignId('subcategory_id')
         ->nullable()
